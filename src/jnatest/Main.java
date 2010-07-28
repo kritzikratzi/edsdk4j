@@ -66,12 +66,7 @@ public class Main {
 		
 		// Wait a little bit! 
 		dispatchMessages();
-		new Thread(){
-			public void run(){
-			}
-		} .start(); 
 		
-		Thread.sleep( 10000 ); 
 		result = EDSDK.EdsCloseSession( camera[0] ); 
 		check( result ); 
 	}
@@ -103,12 +98,9 @@ public class Main {
 			}
 
 			else {
-				System.out.println( "M:::" + msg.message ); 
 				count ++; 
-				if( msg.message != 275 ){
-					lib.TranslateMessage(msg);
-					lib.DispatchMessage(msg);
-				}
+				lib.TranslateMessage(msg);
+				lib.DispatchMessage(msg);
 			}
 		}
 

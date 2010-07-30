@@ -8,11 +8,11 @@ import com.sun.jna.platform.win32.User32.MSG;
 import com.sun.jna.platform.win32.W32API.HMODULE;
 import com.sun.jna.ptr.NativeLongByReference;
 
-import edsdk.SLRHelpers;
 import edsdk.CanonSDK;
 import edsdk.CanonSDK.EdsObjectEventHandler;
 import edsdk.CanonSDK.EdsVoid;
 import edsdk.CanonSDK.__EdsObject;
+import edsdk.utils.CanonUtils;
 
 /** Simple example of JNA interface mapping and usage. */
 public class Simple {
@@ -73,7 +73,7 @@ public class Simple {
 	
 	public static void check( int result ){
 		if( result != EDSDK.EDS_ERR_OK ){
-			System.out.println( "Error: " + SLRHelpers.toString( result ) ); 
+			System.out.println( "Error: " + CanonUtils.toString( result ) ); 
 		}
 	}
 	

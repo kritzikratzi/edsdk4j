@@ -1,7 +1,8 @@
-package edsdk;
+package edsdk.utils;
 
 import com.sun.jna.NativeLong;
 
+import edsdk.CanonSDK;
 import edsdk.CanonSDK.EdsObjectEventHandler;
 import edsdk.CanonSDK.EdsVoid;
 import edsdk.CanonSDK.__EdsObject;
@@ -21,24 +22,24 @@ import edsdk.CanonSDK.__EdsObject;
  * @author hansi
  *
  */
-public abstract class SLRCommand<T> implements EdsObjectEventHandler{
+public abstract class CanonTask<T> implements EdsObjectEventHandler{
 
-	public SLR slr;
+	public CanonCamera camera;
 	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
 	private boolean finished = false; 
 	private boolean waitForFinish = false;
 	private boolean ran = false; 
 	private T result; 
 	
-	public SLRCommand(){
+	public CanonTask(){
 	}
 	
 	/**
 	 * The SLR is just by the dispatch thread automatically just before run is called. 
 	 * @param slr
 	 */
-	public void setSLR( SLR slr ){
-		this.slr = slr;
+	public void setSLR( CanonCamera slr ){
+		this.camera = slr;
 	}
 	
 	/**
@@ -73,7 +74,7 @@ public abstract class SLRCommand<T> implements EdsObjectEventHandler{
 	 * Only used in combination with notYetFinished. 
 	 * Call this when your commands work is done (e.g. you successfully 
 	 * shot and downloaded an image). 
-	 * @see SLRCommand#notYetFinished()
+	 * @see CanonTask#notYetFinished()
 	 */
 	public void finish(){
 		finished = true; 
@@ -89,7 +90,7 @@ public abstract class SLRCommand<T> implements EdsObjectEventHandler{
 	/**
 	 * Checks if this command finished it's work. Only useful in combination with 
 	 * finish() and notYetFinished(). 
-	 * @see SLRCommand#notYetFinished()
+	 * @see CanonTask#notYetFinished()
 	 * @return
 	 */
 	protected boolean finished(){
@@ -98,9 +99,10 @@ public abstract class SLRCommand<T> implements EdsObjectEventHandler{
 	
 	/**
 	 * Sends a command to the camera
+	 * @return 
 	 */
-	public void sendCommand( long command, long params ){
-		slr.EDSDK.EdsSendCommand( slr.camera, new NativeLong( command ), new NativeLong( params ) );
+	public int sendCommand( long command, long params ){
+		return EDSDK.EdsSendCommand( camera.getEdsCamera(), new NativeLong( command ), new NativeLong( params ) );
 	}
 	
 	/**

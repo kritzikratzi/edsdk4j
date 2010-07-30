@@ -1,4 +1,4 @@
-package edsdk;
+package edsdk.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,10 +10,11 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.User32.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
 
+import edsdk.CanonSDK;
 import edsdk.CanonSDK.EdsObjectEventHandler;
 import edsdk.CanonSDK.EdsVoid;
 import edsdk.CanonSDK.__EdsObject;
-import edsdk.commands.ShootCommand;
+import edsdk.utils.commands.ShootTask;
 /**
  * This class should be the easiest way to use the canon sdk. 
  * Please note that you _can_ use the sdk directly or also 
@@ -24,10 +25,10 @@ import edsdk.commands.ShootCommand;
  * edsdk is not multithreaded so your vm might crash if you just call functions
  * from the library. 
  * Instead I suggest you use the static method SLR.invoke( Runnable r ); 
- * or the method SLR.invoke( SLRCommand cmd ); 
+ * or the method canonCamera.invoke( CanonTask task ); 
  * 
  * The later is basically the same, but allows you to easily get a return integer value, 
- * like int result = SLR.invoke( new SLRCommand(){ public int run(){ return ...; } } );
+ * like int result = SLR.invoke( new CanonTask(){ public int run(){ return ...; } } );
  * 
  * 
  * This class also automatically processes and forwards all windows-style messages. 
@@ -36,7 +37,7 @@ import edsdk.commands.ShootCommand;
  * 
  * @author hansi
  */
-public class SLR implements EdsObjectEventHandler {
+public class CanonCamera implements EdsObjectEventHandler {
 	// This gives you direct access to the EDSDK
 	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
 	
@@ -45,7 +46,7 @@ public class SLR implements EdsObjectEventHandler {
 	//private static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("");
 	
 	// The queue of commands that need to be run. 
-	private static ConcurrentLinkedQueue<SLRCommand<?>> queue = new ConcurrentLinkedQueue<SLRCommand<?>>( ); 
+	private static ConcurrentLinkedQueue<CanonTask<?>> queue = new ConcurrentLinkedQueue<CanonTask<?>>( ); 
 	
 	// Object Event Handlers
 	private static ArrayList<EdsObjectEventHandler> objectEventHandlers = new ArrayList<EdsObjectEventHandler>( 10 ); 
@@ -76,7 +77,7 @@ public class SLR implements EdsObjectEventHandler {
 		Runtime.getRuntime().addShutdownHook( new Thread(){
 			@Override
 			public void run() {
-				SLR.close(); 
+				CanonCamera.close(); 
 			}
 		}); 
 	}
@@ -86,13 +87,13 @@ public class SLR implements EdsObjectEventHandler {
 	/////////////////////////////////////////////
 	// From here on it's instance variables
 	
-	__EdsObject camera;
+	private __EdsObject edsCamera;
 
 	private String errorMessage;
 	private int errorCode; 
 	
 	
-	public SLR(){
+	public CanonCamera(){
 	}
 	
 	public boolean openSession(){
@@ -103,22 +104,26 @@ public class SLR implements EdsObjectEventHandler {
 		return executeNow( new CloseSessionCommand() ); 
 	}
 
-	public File shoot(){
-		return executeNow( new ShootCommand() ); 
+	public __EdsObject getEdsCamera(){
+		return edsCamera; 
 	}
 	
-	public void execute( SLRCommand<?> cmd ){
+	public File shoot(){
+		return executeNow( new ShootTask() ); 
+	}
+	
+	public void execute( CanonTask<?> cmd ){
 		cmd.setSLR( this ); 
 		queue.add( cmd );
 	}
 	
-	public <T> T executeNow( SLRCommand<T> cmd ){
+	public <T> T executeNow( CanonTask<T> cmd ){
 		execute( cmd ); 
 		return cmd.result(); 
 	}
 	
 	public boolean setError( int result, String message ){
-		errorMessage = message + " (code=" + result + ", _might_ mean " + SLRHelpers.toString( result ) + ")"; 
+		errorMessage = message + " (code=" + result + ", _might_ mean " + CanonUtils.toString( result ) + ")"; 
 		errorCode = result; 
 		
 		System.err.println( errorMessage ); 
@@ -165,7 +170,7 @@ public class SLR implements EdsObjectEventHandler {
 		
 		MSG msg = new MSG();
 	
-		SLRCommand<?> cmd = null; 
+		CanonTask<?> task = null; 
 		
 		while( !Thread.currentThread().isInterrupted() ){
 			// do we have a new message? 
@@ -176,23 +181,23 @@ public class SLR implements EdsObjectEventHandler {
 			}
 			
 			// is there a command we're currently working on? 
-			if( cmd != null ){
-				if( cmd.finished() ){
+			if( task != null ){
+				if( task.finished() ){
 					System.out.println( "Command finished" ); 
 					// great! 
-					cmd.slr.removeObjectEventHandler( cmd ); 
-					cmd = null; 
+					task.camera.removeObjectEventHandler( task ); 
+					task = null; 
 				}
 			}
 			
 			// are we free to do new work, and is there even new work to be done? 
-			if( !queue.isEmpty() && cmd == null ){
+			if( !queue.isEmpty() && task == null ){
 				System.out.println( "Received new command, processing " + queue.peek().getClass().toString() ); 
-				cmd = queue.poll(); 
-				if( !(cmd instanceof OpenSessionCommand) )
-					cmd.slr.addObjectEventHandler( cmd );
-				cmd.run(); 
-				cmd.ran(); 
+				task = queue.poll(); 
+				if( !(task instanceof OpenSessionCommand) )
+					task.camera.addObjectEventHandler( task );
+				task.run(); 
+				task.ran(); 
 			}
 			
 			try {
@@ -223,7 +228,7 @@ public class SLR implements EdsObjectEventHandler {
 	}
 
 
-	private class OpenSessionCommand extends SLRCommand<Boolean>{
+	private class OpenSessionCommand extends CanonTask<Boolean>{
 		public void run(){
 			setResult( connect() ); 
 		}
@@ -257,13 +262,13 @@ public class SLR implements EdsObjectEventHandler {
 			
 
 			EdsVoid context = new EdsVoid( new Pointer( 0 ) );
-			camera = cameras[0]; 
-			result = EDSDK.EdsSetObjectEventHandler( camera, new NativeLong( CanonSDK.kEdsObjectEvent_All ), SLR.this, context );
+			edsCamera = cameras[0]; 
+			result = EDSDK.EdsSetObjectEventHandler( edsCamera, new NativeLong( CanonSDK.kEdsObjectEvent_All ), CanonCamera.this, context );
 			if( result != CanonSDK.EDS_ERR_OK ){
 				return setError( result, "Callback handler couldn't be added. " ); 
 			}
 			
-			result = EDSDK.EdsOpenSession( camera ); 
+			result = EDSDK.EdsOpenSession( edsCamera ); 
 			if( result != CanonSDK.EDS_ERR_OK ){
 				return setError( result, "Couldn't open camera session" ); 
 			}
@@ -273,7 +278,7 @@ public class SLR implements EdsObjectEventHandler {
 	}
 	
 	
-	private class CloseSessionCommand extends SLRCommand<Boolean>{
+	private class CloseSessionCommand extends CanonTask<Boolean>{
 		
 		public void run(){
 			setResult( close() ); 
@@ -281,7 +286,7 @@ public class SLR implements EdsObjectEventHandler {
 		
 		private boolean close(){
 			System.out.println( "closing session" ); 
-			int result = EDSDK.EdsCloseSession( camera ); 
+			int result = EDSDK.EdsCloseSession( edsCamera ); 
 			
 			if( result != CanonSDK.EDS_ERR_OK ){
 				return setError( result, "Couldn't close camera session" ); 

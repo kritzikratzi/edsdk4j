@@ -15,7 +15,7 @@ import edsdk.CanonSDK.__EdsObject;
 import edsdk.utils.CanonUtils;
 
 /** Simple example of JNA interface mapping and usage. */
-public class Simple {
+public class E01_Simple {
 
 	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
 	static final User32 lib = User32.INSTANCE;

@@ -1,5 +1,6 @@
 package edsdk.utils;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -14,6 +15,7 @@ import edsdk.CanonSDK;
 import edsdk.CanonSDK.EdsObjectEventHandler;
 import edsdk.CanonSDK.EdsVoid;
 import edsdk.CanonSDK.__EdsObject;
+import edsdk.utils.commands.LiveViewTask;
 import edsdk.utils.commands.ShootTask;
 /**
  * This class should be the easiest way to use the canon sdk. 
@@ -294,5 +296,18 @@ public class CanonCamera implements EdsObjectEventHandler {
 			
 			return true; 
 		}
+	}
+
+
+	public boolean beginLiveView() {
+		return executeNow( new LiveViewTask.Begin() ); 
+	}
+	
+	public boolean endLiveView(){
+		return executeNow( new LiveViewTask.End() ); 
+	}
+	
+	public BufferedImage downloadLiveView(){
+		return executeNow( new LiveViewTask.Download() ); 
 	}
 }

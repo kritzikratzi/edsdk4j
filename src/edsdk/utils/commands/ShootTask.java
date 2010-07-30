@@ -23,6 +23,14 @@ public class ShootTask extends CanonTask<File>{
 		while( result != CanonSDK.EDS_ERR_OK ){
 			System.out.println( "Trying to take image..." ); 
 			result = sendCommand( CanonSDK.kEdsCameraCommand_TakePicture, 0 ); 
+			System.out.println( "result= " + result + ", might mean " + CanonUtils.toString( result ) ); 
+			try {
+				Thread.sleep( 1000 );
+			}
+			catch( InterruptedException e ){
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		}
 		System.out.println( "Took image, waiting for file" ); 
 		notYetFinished(); 

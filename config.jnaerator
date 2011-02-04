@@ -1,0 +1,10 @@
+-o src
+-arch WIN32
+-noJar
+-noComp
+-runtime JNA
+-package edsdk
+-library EdSdk
+$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDK.h
+$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDKTypes.h
+$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDKErrors.h

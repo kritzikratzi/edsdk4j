@@ -1,6 +1,5 @@
 package gettingstarted;
 
-import edsdk.CanonSDK;
 import edsdk.utils.CanonCamera;
 import edsdk.utils.CanonTask;
 

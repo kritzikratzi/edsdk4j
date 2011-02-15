@@ -2,10 +2,10 @@ package edsdk.utils;
 
 import com.sun.jna.NativeLong;
 
-import edsdk.CanonSDK;
-import edsdk.CanonSDK.EdsObjectEventHandler;
-import edsdk.CanonSDK.EdsVoid;
-import edsdk.CanonSDK.__EdsObject;
+import edsdk.EdSdkLibrary;
+import edsdk.EdSdkLibrary.EdsObjectEventHandler;
+import edsdk.EdSdkLibrary.EdsVoid;
+import edsdk.EdSdkLibrary.__EdsObject;
 
 /**
  * The SLRCommand class tries to make your life a whole lot easier when you would like 
@@ -25,7 +25,7 @@ import edsdk.CanonSDK.__EdsObject;
 public abstract class CanonTask<T> implements EdsObjectEventHandler{
 
 	public CanonCamera camera;
-	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
+	public static EdSdkLibrary EDSDK = CanonCamera.EDSDK; 
 	private boolean finished = false; 
 	private boolean waitForFinish = false;
 	private boolean ran = false; 
@@ -102,7 +102,7 @@ public abstract class CanonTask<T> implements EdsObjectEventHandler{
 	 * @return 
 	 */
 	public int sendCommand( long command, long params ){
-		return EDSDK.EdsSendCommand( camera.getEdsCamera(), new NativeLong( command ), new NativeLong( params ) );
+		return EDSDK.EdsSendCommand( camera.getEdsCamera(), new NativeLong( command ), new NativeLong( params ) ).intValue();
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public abstract class CanonTask<T> implements EdsObjectEventHandler{
 	 * Also don't worry about the return value, just use null! 
 	 */
 	@Override
-	public NativeLong invoke(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext) {
+	public NativeLong apply(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext) {
 		return new NativeLong( 0 ); 
 	}
 	

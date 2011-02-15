@@ -4,9 +4,9 @@ import java.io.File;
 
 import com.sun.jna.NativeLong;
 
-import edsdk.CanonSDK;
-import edsdk.CanonSDK.EdsVoid;
-import edsdk.CanonSDK.__EdsObject;
+import edsdk.EdSdkLibrary;
+import edsdk.EdSdkLibrary.EdsVoid;
+import edsdk.EdSdkLibrary.__EdsObject;
 import edsdk.utils.CanonTask;
 import edsdk.utils.CanonUtils;
 
@@ -20,9 +20,9 @@ public class ShootTask extends CanonTask<File>{
 	@Override
 	public void run() {
 		int result = -1; 
-		while( result != CanonSDK.EDS_ERR_OK ){
+		while( result != EdSdkLibrary.EDS_ERR_OK ){
 			System.out.println( "Trying to take image..." ); 
-			result = sendCommand( CanonSDK.kEdsCameraCommand_TakePicture, 0 ); 
+			result = sendCommand( EdSdkLibrary.kEdsCameraCommand_TakePicture, 0 ); 
 			System.out.println( "result= " + result + ", might mean " + CanonUtils.toString( result ) ); 
 			try {
 				Thread.sleep( 1000 );
@@ -37,11 +37,11 @@ public class ShootTask extends CanonTask<File>{
 	}
 	
 	@Override
-	public NativeLong invoke( NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ) {
-		if( inEvent.intValue() == CanonSDK.kEdsObjectEvent_DirItemCreated ){
+	public NativeLong apply( NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ) {
+		if( inEvent.intValue() == EdSdkLibrary.kEdsObjectEvent_DirItemCreated ){
 			System.out.println( "Looks like we got a file!" ); 
 			setResult( CanonUtils.download( inRef, null, false ) ); 
-			finish(); 
+	    finish(); 
 		}
 		
 		return null;

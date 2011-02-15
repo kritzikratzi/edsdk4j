@@ -3,18 +3,23 @@ package edsdk.utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.User32.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
+import com.sun.jna.win32.StdCallLibrary;
 
-import edsdk.CanonSDK;
-import edsdk.CanonSDK.EdsObjectEventHandler;
-import edsdk.CanonSDK.EdsVoid;
-import edsdk.CanonSDK.__EdsObject;
+import edsdk.EdSdkLibrary;
+import edsdk.EdSdkLibrary.EdsObjectEventHandler;
+import edsdk.EdSdkLibrary.EdsVoid;
+import edsdk.EdSdkLibrary.__EdsObject;
 import edsdk.utils.commands.LiveViewTask;
 import edsdk.utils.commands.ShootTask;
 /**
@@ -40,8 +45,14 @@ import edsdk.utils.commands.ShootTask;
  * @author hansi
  */
 public class CanonCamera implements EdsObjectEventHandler {
+  private static final Map<String, Integer> options = new HashMap<String, Integer>();
+  static {
+    options.put(Library.OPTION_CALLING_CONVENTION, StdCallLibrary.STDCALL_CONVENTION);
+  }
+  
 	// This gives you direct access to the EDSDK
-	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
+	public static EdSdkLibrary EDSDK = 
+	  (EdSdkLibrary)Native.loadLibrary("Dll/EDSDK.dll", EdSdkLibrary.class, options); 
 	
 	// Libraries needed to forward windows messages
 	private static final User32 lib = User32.INSTANCE;
@@ -149,11 +160,11 @@ public class CanonCamera implements EdsObjectEventHandler {
 	
 	
 	@Override
-	public NativeLong invoke(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ){
+	public NativeLong apply(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ){
 		System.out.println( "Event!!!" + inEvent.doubleValue() + ", " + inContext ); 
 
 		for( EdsObjectEventHandler handler : objectEventHandlers ){
-			handler.invoke( inEvent, inRef, inContext ); 
+			handler.apply( inEvent, inRef, inContext ); 
 		}
 		
 		return new NativeLong( 0 ); 
@@ -164,8 +175,8 @@ public class CanonCamera implements EdsObjectEventHandler {
 	 */
 	private static void dispatchMessages() {
 		// Do some initializing
-		int err = EDSDK.EdsInitializeSDK(); 
-		if( err != CanonSDK.EDS_ERR_OK ){
+		int err = EDSDK.EdsInitializeSDK().intValue(); 
+		if( err != EdSdkLibrary.EDS_ERR_OK ){
 			System.err.println( "EDSDK failed to initialize, most likely you won't be able to speak to your slr :(" ); 
 		}
 		
@@ -239,15 +250,15 @@ public class CanonCamera implements EdsObjectEventHandler {
 			int result; 
 			
 			__EdsObject list[] = new __EdsObject[10]; 
-			result = EDSDK.EdsGetCameraList( list );		
-			if( result != CanonSDK.EDS_ERR_OK ){
+			result = EDSDK.EdsGetCameraList( list ).intValue();		
+			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Camera failed to initialize" ); 
 			}
 			
 			
 			NativeLongByReference outRef = new NativeLongByReference(); 
-			result = EDSDK.EdsGetChildCount( list[0], outRef ); 
-			if( result != CanonSDK.EDS_ERR_OK ){
+			result = EDSDK.EdsGetChildCount( list[0], outRef ).intValue(); 
+			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Number of attached cameras couldn't be read" ); 
 			}
 			
@@ -257,21 +268,21 @@ public class CanonCamera implements EdsObjectEventHandler {
 			}
 			
 			__EdsObject cameras[] = new __EdsObject[1]; 
-			result = EDSDK.EdsGetChildAtIndex( list[0], new NativeLong( 0 ), cameras ); 
-			if ( result != CanonSDK.EDS_ERR_OK ){
+			result = EDSDK.EdsGetChildAtIndex( list[0], new NativeLong( 0 ), cameras ).intValue(); 
+			if ( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Access to camera failed" ); 
 			}
 			
 
 			EdsVoid context = new EdsVoid( new Pointer( 0 ) );
 			edsCamera = cameras[0]; 
-			result = EDSDK.EdsSetObjectEventHandler( edsCamera, new NativeLong( CanonSDK.kEdsObjectEvent_All ), CanonCamera.this, context );
-			if( result != CanonSDK.EDS_ERR_OK ){
+			result = EDSDK.EdsSetObjectEventHandler( edsCamera, new NativeLong( EdSdkLibrary.kEdsObjectEvent_All ), CanonCamera.this, context ).intValue();
+			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Callback handler couldn't be added. " ); 
 			}
 			
-			result = EDSDK.EdsOpenSession( edsCamera ); 
-			if( result != CanonSDK.EDS_ERR_OK ){
+			result = EDSDK.EdsOpenSession( edsCamera ).intValue(); 
+			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Couldn't open camera session" ); 
 			}
 			
@@ -288,9 +299,9 @@ public class CanonCamera implements EdsObjectEventHandler {
 		
 		private boolean close(){
 			System.out.println( "closing session" ); 
-			int result = EDSDK.EdsCloseSession( edsCamera ); 
+			int result = EDSDK.EdsCloseSession( edsCamera ).intValue(); 
 			
-			if( result != CanonSDK.EDS_ERR_OK ){
+			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Couldn't close camera session" ); 
 			}
 			

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<project name="edsdk4j" default="jar" basedir=".">
+
+  <property name="version"          value="snapshot" />
+    
+  <property name="src"              value="src"/>
+  <property name="lib"              value="lib"/>
+  <property name="build"            value="build"/>
+  <property name="dist"             value="dist"/>
+  <property name="distver"          value="${dist}/edsdk4j-${version}"/>
+  
+  <property name="jar.file"         value="${distver}/edsdk4j.jar" />
+  
+  <property environment="env"/>
+	
+	<property name="jnaerator.lib"    value="${lib}/jnaerator-0.9.5.jar"/>
+  
+  <fileset id="jna.libs" dir="${lib}">
+    <include name="jna.jar"/>
+    <include name="platform.jar"/>
+  </fileset>
+  
+  <path id="compile.path">
+    <fileset refid="jna.libs"/>
+  </path>
+  
+  <target name="setup">
+    <tstamp>
+      <format property="build.current.date" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC"/>
+    </tstamp>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+
+	<target name="generate-wrapper">
+    <exec logerror="true" executable="java">
+      <arg line="-jar ${jnaerator.lib} config.jnaerator"/>
+    </exec>
+	</target>
+	
+  <target name="compile" depends="setup">
+    <mkdir dir="${build}/classes" />
+    <javac
+      srcdir="${src}"
+      destdir="${build}/classes"
+      source="1.6"
+      target="1.6"
+      debug="on">
+      <classpath refid="compile.path"/>
+    </javac>
+  </target>
+  
+  <target name="jar" depends="compile">
+    <mkdir dir="${distver}"/>
+    <jar destfile="${jar.file}">
+      <manifest>
+        <attribute name="Build-Creator"           value="${user.name}"/>
+        <attribute name="Build-Date"              value="${build.current.date}"/>
+        <attribute name="Specification-Title"     value="EdSdk4J API Spec"/>
+        <attribute name="Specification-Version"   value="${version}"/>
+        <attribute name="Implementation-Title"    value="EdSdk4J"/>
+        <attribute name="Implementation-Version"  value="${version} build ${build.current.revision}"/>
+      </manifest>
+      <fileset dir="${build}/classes"/>
+    	<zipgroupfileset refid="jna.libs"/>
+    </jar>
+  </target>
+  
+</project>

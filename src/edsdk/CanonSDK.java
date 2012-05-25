@@ -1,9 +1,12 @@
 package edsdk;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import com.sun.jna.Callback;
+import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
@@ -18,11 +21,12 @@ import com.sun.jna.win32.StdCallLibrary;
  * a tool written by <a href="http://ochafik.free.fr/">Olivier Chafik</a> that <a href="http://code.google.com/p/jnaerator/wiki/CreditsAndLicense">uses a few opensource projects.</a>.<br>
  * For help, please visit <a href="http://nativelibs4java.googlecode.com/">NativeLibs4Java</a> , <a href="http://rococoa.dev.java.net/">Rococoa</a>, or <a href="http://jna.dev.java.net/">JNA</a>.
  */
-public interface CanonSDK extends StdCallLibrary {
-	//public static final java.lang.String JNA_LIBRARY_NAME = LibraryExtractor.getLibraryPath("dll/EDSDK.dll", true, edsdk.CanonSDK.class);
+public interface CanonSDK extends Library{
+	//public static final java.lang.String JNA_LIBRARY_NAME = LibraryExtractor.getLibraryPath("EDSDK", true, edsdk.CanonSDK.class);
 	//public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(edsdk.CanonSDK.JNA_LIBRARY_NAME, com.ochafik.lang.jnaerator.runtime.MangledFunctionMapper.DEFAULT_OPTIONS);
 	//public static final CanonSDK INSTANCE = (CanonSDK)Native.loadLibrary(edsdk.CanonSDK.JNA_LIBRARY_NAME, edsdk.CanonSDK.class, com.ochafik.lang.jnaerator.runtime.MangledFunctionMapper.DEFAULT_OPTIONS);
-	public static final CanonSDK INSTANCE = (CanonSDK) Native.loadLibrary("dll/EDSDK.dll", CanonSDK.class );
+//	public static final CanonSDK INSTANCE = (CanonSDK) Native.loadLibrary("dll/EDSDK.dll", CanonSDK.class );
+	public static final CanonSDK INSTANCE = (CanonSDK) Native.loadLibrary( new File( "/Library/Frameworks/EDSDK.framework/EDSDK" ).getAbsolutePath(), CanonSDK.class );
 	
 	/// enum values
 	public static interface EdsDataType {
@@ -832,7 +836,7 @@ public interface CanonSDK extends StdCallLibrary {
 	 * EdsObjectEventHandler<br>
 	 * -----------------------------------------------------------------------------
 	 */
-	public interface EdsObjectEventHandler extends StdCallCallback {
+	public interface EdsObjectEventHandler extends Callback {
 		// CHANGED FROM NATIVELONG to ... NATIVELONG!
 		NativeLong invoke(NativeLong inEvent, CanonSDK.__EdsObject inRef, CanonSDK.EdsVoid inContext);
 	};

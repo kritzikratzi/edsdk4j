@@ -1,10 +1,14 @@
 package edsdk.utils;
 
+import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.example.app.addressbook.NativeAddressBook;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
@@ -42,9 +46,15 @@ import edsdk.utils.commands.ShootTask;
 public class CanonCamera implements EdsObjectEventHandler {
 	// This gives you direct access to the EDSDK
 	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
+	private static CanonTask<?> currentTask = null; 
+	
 	
 	// Libraries needed to forward windows messages
-	private static final User32 lib = User32.INSTANCE;
+	private static boolean IS_WINDOWS = System.getProperty( "os.name" ).toLowerCase().contains( "windows" );
+	private static boolean IS_MAC = System.getProperty( "os.name" ).toLowerCase().contains( "mac os" );
+	
+	private static User32 lib = IS_WINDOWS? User32.INSTANCE : null;  
+	
 	//private static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("");
 	
 	// The queue of commands that need to be run. 
@@ -64,11 +74,25 @@ public class CanonCamera implements EdsObjectEventHandler {
 		// which is imho more annoying than a proper crash. 
 		// Anyways, if you want the exception-throwing-instead-crashing behaviour
 		// just call the above code as early as possible in your main method. 
-		
+
 		// Start the dispatch thread
+		queue.add( new CanonTask<Boolean>(){
+			@Override
+			public void run() {
+				// Do some initializing
+				int err = CanonSDK.INSTANCE.EdsInitializeSDK(); 
+				if( err != CanonSDK.EDS_ERR_OK ){
+					System.err.println( "EDSDK failed to initialize, most likely you won't be able to speak to your slr :(" ); 
+				}
+				setResult( err == CanonSDK.EDS_ERR_OK ); 
+			}
+		});
+		
 		dispatcherThread = new Thread(){
 			public void run(){
-				dispatchMessages(); 
+				
+				if( IS_MAC ) startMacDispatcher(); 
+				else if( IS_WINDOWS ) startWindowsDispatcher(); 
 			}
 		}; 
 		dispatcherThread.start(); 
@@ -111,7 +135,11 @@ public class CanonCamera implements EdsObjectEventHandler {
 	}
 	
 	public File shoot(){
-		return executeNow( new ShootTask() ); 
+		return executeNow( new ShootTask( null ) ); 
+	}
+	
+	public File shoot( File destination ){
+		return executeNow( new ShootTask( destination ) ); 
 	}
 	
 	public void execute( CanonTask<?> cmd ){
@@ -162,18 +190,9 @@ public class CanonCamera implements EdsObjectEventHandler {
 	/**
 	 * Dispatches windows messages and executes tasks
 	 */
-	private static void dispatchMessages() {
-		// Do some initializing
-		int err = EDSDK.EdsInitializeSDK(); 
-		if( err != CanonSDK.EDS_ERR_OK ){
-			System.err.println( "EDSDK failed to initialize, most likely you won't be able to speak to your slr :(" ); 
-		}
-		
-		
+	private static void startWindowsDispatcher(){
 		MSG msg = new MSG();
 	
-		CanonTask<?> task = null; 
-		
 		while( !Thread.currentThread().isInterrupted() ){
 			// do we have a new message? 
 			boolean hasMessage = lib.PeekMessage( msg, null, 0, 0, 1 ); // peek and remove
@@ -182,40 +201,68 @@ public class CanonCamera implements EdsObjectEventHandler {
 				lib.DispatchMessage( msg ); 
 			}
 			
-			// is there a command we're currently working on? 
-			if( task != null ){
-				if( task.finished() ){
-					System.out.println( "Command finished" ); 
-					// great! 
-					task.camera.removeObjectEventHandler( task ); 
-					task = null; 
-				}
-			}
-			
-			// are we free to do new work, and is there even new work to be done? 
-			if( !queue.isEmpty() && task == null ){
-				System.out.println( "Received new command, processing " + queue.peek().getClass().toString() ); 
-				task = queue.poll(); 
-				if( !(task instanceof OpenSessionCommand) )
-					task.camera.addObjectEventHandler( task );
-				task.run(); 
-				task.ran(); 
-			}
-			
-			try {
-				Thread.sleep( 10 );
-			}
-			catch( InterruptedException e ){
-				// we don't mind being interrupted
-				//e.printStackTrace();
-				break; 
-			}
+			processQueue(); 
 		}
-		
-		EDSDK.EdsTerminateSDK();
-		System.out.println( "Dispatcher thread says bye!" ); 
 	}
 	
+	private static void startMacDispatcher(){
+		// this is enough to start the mac message dispatcher
+		// that handles the canon camera's events
+		new Frame().dispose(); 
+		while( !Thread.currentThread().isInterrupted() ){
+			if( currentTask != null || !queue.isEmpty() ){
+				try {
+					// execute in the event thread
+					EventQueue.invokeAndWait( new Runnable(){
+						public void run(){
+							processQueue(); 
+						}
+					} );
+				}
+				catch (InterruptedException e) {
+					return; 
+				}
+				catch (InvocationTargetException e) {
+					e.printStackTrace();
+				} 
+			}
+			else{
+				try { Thread.sleep( 10 ); }
+				catch (InterruptedException e) { return; } 
+			}
+		}
+	}
+	
+	
+	private static void processQueue(){
+		// is there a command we're currently working on? 
+		if( currentTask != null ){
+			if( currentTask.finished() ){
+				System.out.println( "Command finished" ); 
+				// great! 
+				if( currentTask.camera != null ) currentTask.camera.removeObjectEventHandler( currentTask ); 
+				currentTask = null; 
+			}
+			CanonTask<?> x = currentTask;
+			String y = "3"; 
+		}
+		
+		// are we free to do new work, and is there even new work to be done? 
+		if( !queue.isEmpty() && currentTask == null ){
+			System.out.println( "----------------" ); 
+			System.out.println( "Current-Thread = " + Thread.currentThread().getName() ); 
+			System.out.println( "Received new command, processing " + queue.peek().getClass().toString() ); 
+			currentTask = queue.poll(); 
+			if( !(currentTask instanceof OpenSessionCommand) && currentTask.camera != null )
+				currentTask.camera.addObjectEventHandler( currentTask );
+			currentTask.run(); 
+			currentTask.ran(); 
+			System.out.println( "Done, task finished" ); 
+		}
+		
+		try { Thread.sleep( 10 ); }
+		catch( InterruptedException e ){ }
+	}
 	
 	public static void close() {
 		if( dispatcherThread != null && dispatcherThread.isAlive() ){
@@ -232,6 +279,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 
 	private class OpenSessionCommand extends CanonTask<Boolean>{
 		public void run(){
+			System.out.println( "running" ); 
 			setResult( connect() ); 
 		}
 		

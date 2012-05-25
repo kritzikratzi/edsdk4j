@@ -129,4 +129,8 @@ public abstract class CanonTask<T> implements EdsObjectEventHandler{
 		
 		return result; 
 	}
+	
+	public T getResultIfSet(){
+		return result; 
+	}
 }

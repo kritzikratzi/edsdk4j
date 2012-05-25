@@ -141,7 +141,7 @@ public class CanonUtils {
 		}
 
 		if( err == CanonSDK.EDS_ERR_OK ){
-			System.out.println( "Image downloaded in " +  ( System.currentTimeMillis() - timeStart ) );
+			System.out.println( "Image downloaded in " +  ( System.currentTimeMillis() - timeStart ) + " ms" );
 
 			err = CanonSDK.INSTANCE.EdsDownloadComplete( directoryItem );
 			if( deleteAfterDownload ){
@@ -164,8 +164,25 @@ public class CanonUtils {
 		return CanonSDK.INSTANCE.EdsSetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ); 
 	}
 	
+	public static int setPropertyData( __EdsObject ref, long property, long value ){
+		NativeLongByReference number = new NativeLongByReference( new NativeLong( value ) ); 
+		EdsVoid data = new EdsVoid( number.getPointer() ); 
+
+		return setPropertyData( ref, property, 0, NativeLong.SIZE, data ); 
+	}
+	
 	public static int getPropertyData( __EdsObject ref, long property, long param, int size, EdsVoid data ){
 		return CanonSDK.INSTANCE.EdsGetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ); 
+	}
+	
+	public static int getPropertyData( __EdsObject ref, long property ){
+		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
+		EdsVoid data = new EdsVoid( number.getPointer() ); 
+
+		int res = getPropertyData( ref, property, 0, NativeLong.SIZE, data );
+		System.out.println( "res=" + res );
+		
+		return number.getValue().intValue(); 
 	}
 	
 	public static boolean beginLiveView( __EdsObject camera ){

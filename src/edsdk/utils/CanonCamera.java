@@ -12,7 +12,7 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.User32.MSG;
+import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
 
 import edsdk.CanonSDK;
@@ -95,14 +95,14 @@ public class CanonCamera implements EdsObjectEventHandler {
 			}
 		});
 		
-		dispatcherThread = new Thread(){
-			public void run(){
-				
-				if( IS_MAC ) startMacDispatcher(); 
-				else if( IS_WINDOWS ) startWindowsDispatcher(); 
-			}
-		}; 
-		dispatcherThread.start(); 
+//		dispatcherThread = new Thread(){
+//			public void run(){
+//				
+//				if( IS_MAC ) startMacDispatcher(); 
+//				else if( IS_WINDOWS ) startWindowsDispatcher(); 
+//			}
+//		}; 
+//		dispatcherThread.start(); 
 		
 		// people are sloppy! 
 		// so we add a shutdown hook to close camera connections
@@ -209,18 +209,19 @@ public class CanonCamera implements EdsObjectEventHandler {
 	@Override
 	public NativeLong invoke(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ){
 		System.out.println( "Event!!!" + inEvent.doubleValue() + ", " + inContext ); 
+		CanonUtils.abc( "event arrived, type = " + inEvent.doubleValue() + " /" + CanonUtils.toString( inEvent.intValue() )); 
 
 		for( EdsObjectEventHandler handler : objectEventHandlers ){
 			handler.invoke( inEvent, inRef, inContext ); 
 		}
 		
-		return new NativeLong( 0 ); 
+		return new NativeLong( 0 );
 	}
 
 	/**
 	 * Dispatches windows messages and executes tasks
 	 */
-	private static void startWindowsDispatcher(){
+	public static void startWindowsDispatcher(){
 		MSG msg = new MSG();
 	
 		while( !Thread.currentThread().isInterrupted() ){
@@ -312,6 +313,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 		}
 		
 		private boolean connect(){
+			CanonUtils.abc( "connecting to camera" ); 
 			int result; 
 			
 			__EdsObject list[] = new __EdsObject[10]; 

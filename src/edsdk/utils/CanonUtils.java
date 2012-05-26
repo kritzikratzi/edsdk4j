@@ -129,7 +129,7 @@ public class CanonUtils {
 					+ destination.getAbsolutePath());
 
 			err = CanonSDK.INSTANCE.EdsCreateFileStream(
-					ByteBuffer.wrap( destination.getAbsolutePath().getBytes() ), 
+					ByteBuffer.wrap( ( destination.getAbsolutePath() ).getBytes() ), 
 					CanonSDK.EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways,
 					CanonSDK.EdsAccess.kEdsAccess_ReadWrite, 
 					stream
@@ -137,7 +137,24 @@ public class CanonUtils {
 		}
 
 		if(err == CanonSDK.EDS_ERR_OK ){
-			err = CanonSDK.INSTANCE.EdsDownload( directoryItem, dirItemInfo.size, stream[0] );
+			//err = CanonSDK.INSTANCE.EdsDownload( directoryItem, dirItemInfo.size, stream[0] );
+	        // according to the 2.7 API documentation we must use a multiple of 512 bytes except for          
+			// the final block          
+			int blockSize = 1024 * 1024; 
+			// 1MB at a time          
+			int remainingBytes = dirItemInfo.size();
+			do {
+				if (remainingBytes < blockSize) {
+					blockSize = (int)(remainingBytes / 512) * 512;
+					}
+				remainingBytes -= blockSize;
+				err = CanonSDK.INSTANCE.EdsDownload( directoryItem, new NativeLong(blockSize), stream[0]);
+				//Debug.WriteLine(String.Format("CreateFileStream = {0:X}", err));
+				//Debug.WriteLineIf(err == 0, String.Format("Download in progress [{0} bytes remaining]",remainingBytes.ToString()));          
+			} while (remainingBytes > 512);
+			
+			// now we need to download the final block          
+			//err = CanonSDK.INSTANCE.EdsDownload( directoryItem, new NativeLong(remainingBytes), stream[0]);
 		}
 
 		if( err == CanonSDK.EDS_ERR_OK ){
@@ -328,4 +345,9 @@ public class CanonUtils {
 			}
 		}
 	}
+
+	 public static float abc(String action) {
+		 System.out.println(  action + "  on thread " + Thread.currentThread().getName() );
+		 return 0; 
+		}
 }

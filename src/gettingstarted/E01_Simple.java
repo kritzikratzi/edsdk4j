@@ -2,10 +2,8 @@ package gettingstarted;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.User32.MSG;
-import com.sun.jna.platform.win32.W32API.HMODULE;
+import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
 
 import edsdk.CanonSDK;
@@ -19,7 +17,6 @@ public class E01_Simple {
 
 	public static CanonSDK EDSDK = CanonSDK.INSTANCE; 
 	static final User32 lib = User32.INSTANCE;
-	static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("Me");
 	
 	public static void main(String[] args) throws InterruptedException {
 		int result = 0; 

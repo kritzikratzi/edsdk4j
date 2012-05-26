@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.example.app.addressbook.NativeAddressBook;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
@@ -19,7 +19,9 @@ import edsdk.CanonSDK;
 import edsdk.CanonSDK.EdsObjectEventHandler;
 import edsdk.CanonSDK.EdsVoid;
 import edsdk.CanonSDK.__EdsObject;
+import edsdk.utils.commands.GetPropertyTask;
 import edsdk.utils.commands.LiveViewTask;
+import edsdk.utils.commands.SetPropertyTask;
 import edsdk.utils.commands.ShootTask;
 /**
  * This class should be the easiest way to use the canon sdk. 
@@ -63,10 +65,15 @@ public class CanonCamera implements EdsObjectEventHandler {
 	// Object Event Handlers
 	private static ArrayList<EdsObjectEventHandler> objectEventHandlers = new ArrayList<EdsObjectEventHandler>( 10 ); 
 	
+	// Store this task fore the begin/end blocks
+	// If you know this concept from processing (e.g. graphics.begin() / .end()): yep, 
+	// that's what it is. If you don't know what i mean: leave your hands off of this! 
+	private CanonTask<Boolean> beginTask; 
+	
 	private static Thread dispatcherThread; 
 	static{
 		// Tells the app to throw an error instead of crashing entirely. 
-		// Native.setProtected( true ); 
+		Native.setProtected( true ); 
 		// We actually want our apps to crash, because something very dramatic 
 		// is going on when the user receives this kind of crash message from 
 		// the os and it puts the developer under pressure to fix the issue. 
@@ -142,6 +149,14 @@ public class CanonCamera implements EdsObjectEventHandler {
 		return executeNow( new ShootTask( destination ) ); 
 	}
 	
+	public Boolean setProperty( long property, long value ){
+		return executeNow( new SetPropertyTask( property, value ) ); 
+	}
+	
+	public Long getProperty( long property ){
+		return executeNow( new GetPropertyTask( property ) ); 
+	}
+	
 	public void execute( CanonTask<?> cmd ){
 		cmd.setSLR( this ); 
 		queue.add( cmd );
@@ -150,6 +165,21 @@ public class CanonCamera implements EdsObjectEventHandler {
 	public <T> T executeNow( CanonTask<T> cmd ){
 		execute( cmd ); 
 		return cmd.result(); 
+	}
+	
+	@Deprecated
+	public void begin(){
+		executeNow( beginTask = new CanonTask<Boolean>() {
+			@Override
+			public void run() {
+				notYetFinished(); 
+			}
+		} );
+	}
+	
+	@Deprecated
+	public void end(){
+		beginTask.finish(); 
 	}
 	
 	public boolean setError( int result, String message ){
@@ -243,8 +273,6 @@ public class CanonCamera implements EdsObjectEventHandler {
 				if( currentTask.camera != null ) currentTask.camera.removeObjectEventHandler( currentTask ); 
 				currentTask = null; 
 			}
-			CanonTask<?> x = currentTask;
-			String y = "3"; 
 		}
 		
 		// are we free to do new work, and is there even new work to be done? 

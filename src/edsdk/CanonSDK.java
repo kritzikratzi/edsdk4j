@@ -26,7 +26,11 @@ public interface CanonSDK extends Library{
 	//public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(edsdk.CanonSDK.JNA_LIBRARY_NAME, com.ochafik.lang.jnaerator.runtime.MangledFunctionMapper.DEFAULT_OPTIONS);
 	//public static final CanonSDK INSTANCE = (CanonSDK)Native.loadLibrary(edsdk.CanonSDK.JNA_LIBRARY_NAME, edsdk.CanonSDK.class, com.ochafik.lang.jnaerator.runtime.MangledFunctionMapper.DEFAULT_OPTIONS);
 //	public static final CanonSDK INSTANCE = (CanonSDK) Native.loadLibrary("dll/EDSDK.dll", CanonSDK.class );
-	public static final CanonSDK INSTANCE = (CanonSDK) Native.loadLibrary( new File( "/Library/Frameworks/EDSDK.framework/EDSDK" ).getAbsolutePath(), CanonSDK.class );
+	
+	public static final CanonSDK INSTANCE = 
+			System.getProperty( "os.name" ).toLowerCase().contains( "windows" )? 
+			(CanonSDK) Native.loadLibrary("dll/EDSDK.dll", CanonSDK.class ) : 
+			(CanonSDK) Native.loadLibrary( new File( "/Library/Frameworks/EDSDK.framework/EDSDK" ).getAbsolutePath(), CanonSDK.class );
 	
 	/// enum values
 	public static interface EdsDataType {

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
@@ -110,6 +111,7 @@ public class CanonUtils {
 		int err = CanonSDK.EDS_ERR_OK;
 		__EdsObject[] stream = new __EdsObject[1]; 
 		EdsDirectoryItemInfo dirItemInfo = new EdsDirectoryItemInfo();
+		ByteBuffer filenameBytes; 
 
 		boolean success = false;
 
@@ -127,34 +129,20 @@ public class CanonUtils {
 			System.out.println("Downloading image "
 					+ toString(dirItemInfo.szFileName) + " to "
 					+ destination.getAbsolutePath());
-
+			filenameBytes = ByteBuffer.wrap( Native.toByteArray( destination.getAbsolutePath() ) ); 
 			err = CanonSDK.INSTANCE.EdsCreateFileStream(
-					ByteBuffer.wrap( ( destination.getAbsolutePath() ).getBytes() ), 
+					/*ByteBuffer.wrap( ( destination.getAbsolutePath() ).getBytes() ), */
+					filenameBytes, 
 					CanonSDK.EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways,
-					CanonSDK.EdsAccess.kEdsAccess_ReadWrite, 
+					CanonSDK.EdsAccess.kEdsAccess_Write, 
 					stream
 			);
 		}
 
 		if(err == CanonSDK.EDS_ERR_OK ){
-			//err = CanonSDK.INSTANCE.EdsDownload( directoryItem, dirItemInfo.size, stream[0] );
-	        // according to the 2.7 API documentation we must use a multiple of 512 bytes except for          
-			// the final block          
-			int blockSize = 1024 * 1024; 
-			// 1MB at a time          
-			int remainingBytes = dirItemInfo.size();
-			do {
-				if (remainingBytes < blockSize) {
-					blockSize = (int)(remainingBytes / 512) * 512;
-					}
-				remainingBytes -= blockSize;
-				err = CanonSDK.INSTANCE.EdsDownload( directoryItem, new NativeLong(blockSize), stream[0]);
-				//Debug.WriteLine(String.Format("CreateFileStream = {0:X}", err));
-				//Debug.WriteLineIf(err == 0, String.Format("Download in progress [{0} bytes remaining]",remainingBytes.ToString()));          
-			} while (remainingBytes > 512);
-			
-			// now we need to download the final block          
-			//err = CanonSDK.INSTANCE.EdsDownload( directoryItem, new NativeLong(remainingBytes), stream[0]);
+			System.out.print( "downloading image ..." ); 
+			err = CanonSDK.INSTANCE.EdsDownload( directoryItem, dirItemInfo.size, stream[0] );
+			System.out.println( "... done" ); 
 		}
 
 		if( err == CanonSDK.EDS_ERR_OK ){

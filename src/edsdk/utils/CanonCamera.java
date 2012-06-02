@@ -20,7 +20,9 @@ import edsdk.EdSdkLibrary;
 import edsdk.EdSdkLibrary.EdsObjectEventHandler;
 import edsdk.EdSdkLibrary.EdsVoid;
 import edsdk.EdSdkLibrary.__EdsObject;
+import edsdk.utils.commands.GetPropertyTask;
 import edsdk.utils.commands.LiveViewTask;
+import edsdk.utils.commands.SetPropertyTask;
 import edsdk.utils.commands.ShootTask;
 /**
  * This class should be the easiest way to use the canon sdk. 
@@ -52,7 +54,7 @@ public class CanonCamera implements EdsObjectEventHandler {
   
 	// This gives you direct access to the EDSDK
 	public static EdSdkLibrary EDSDK = 
-	  (EdSdkLibrary)Native.loadLibrary("Dll/EDSDK.dll", EdSdkLibrary.class, options); 
+	  (EdSdkLibrary)Native.loadLibrary("EDSDK/dll/EDSDK.dll", EdSdkLibrary.class, options); 
 	
 	// Libraries needed to forward windows messages
 	private static final User32 lib = User32.INSTANCE;
@@ -124,6 +126,16 @@ public class CanonCamera implements EdsObjectEventHandler {
 	public File shoot(){
 		return executeNow( new ShootTask() ); 
 	}
+	
+	public Boolean setProperty( long property, long value ){
+		return executeNow( new SetPropertyTask( property, value ) ); 
+	}
+	
+	public Long getProperty( long property ){
+		return executeNow( new GetPropertyTask( property ) ); 
+	}
+	
+
 	
 	public void execute( CanonTask<?> cmd ){
 		cmd.setSLR( this ); 

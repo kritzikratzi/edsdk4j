@@ -54,6 +54,9 @@ public class E01_Simple {
 			@Override
 			public NativeLong apply(NativeLong inEvent, __EdsObject inRef, EdsVoid inContext) {
 				System.out.println( "Event!!!" + inEvent.doubleValue() + ", " + inContext ); 
+				if( inEvent.intValue() == 516 ){
+					CanonUtils.download( inRef, null, true );
+				}
 				return new NativeLong( -1 );
 				//return -1;
 			}

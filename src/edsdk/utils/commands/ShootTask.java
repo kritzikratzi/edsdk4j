@@ -16,7 +16,16 @@ import edsdk.utils.CanonUtils;
  *
  */
 public class ShootTask extends CanonTask<File>{
-
+	private File dest = null; 
+	
+	public ShootTask(){
+		
+	}
+	public ShootTask( File dest ){
+		this.dest = dest; 
+	}
+	
+	
 	@Override
 	public void run() {
 		int result = -1; 
@@ -40,7 +49,7 @@ public class ShootTask extends CanonTask<File>{
 	public NativeLong apply( NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ) {
 		if( inEvent.intValue() == EdSdkLibrary.kEdsObjectEvent_DirItemCreated ){
 			System.out.println( "Looks like we got a file!" ); 
-			setResult( CanonUtils.download( inRef, null, false ) ); 
+			setResult( CanonUtils.download( inRef, dest, false ) ); 
 	    finish(); 
 		}
 		

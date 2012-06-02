@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
@@ -76,6 +77,26 @@ public class CanonUtils {
 		return "unknown error code"; 
 	}
 	
+
+	public static String propertyIdToString(long property) {
+		Field[] fields = EdSdkLibrary.class.getFields();
+		
+		for( Field field : fields ){
+			try {
+				if( field.getType().toString().equals( "int" ) && field.getInt( EdSdkLibrary.class ) == property ){
+					if( field.getName().startsWith( "kEdsPropID_" ) ){
+						return field.getName(); 
+					}
+				}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return "unknown error code"; 
+	}
+	
 	/**
 	 * Finds the size of a class
 	 * Use only with JNA stuff! 
@@ -124,12 +145,14 @@ public class CanonUtils {
 				destination = new File(destination, toString( dirItemInfo.szFileName ) );
 			}
 			
+			destination.getParentFile().mkdirs(); 
+			
 			System.out.println("Downloading image "
 					+ toString(dirItemInfo.szFileName) + " to "
 					+ destination.getAbsolutePath());
 
 			err = CanonCamera.EDSDK.EdsCreateFileStream(
-					ByteBuffer.wrap( destination.getAbsolutePath().getBytes() ), 
+					ByteBuffer.wrap( Native.toByteArray( destination.getAbsolutePath() ) ), 
 					EdSdkLibrary.EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways,
 					EdSdkLibrary.EdsAccess.kEdsAccess_ReadWrite, 
 					stream
@@ -164,8 +187,25 @@ public class CanonUtils {
 		return CanonCamera.EDSDK.EdsSetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ).intValue(); 
 	}
 	
+	public static int setPropertyData( __EdsObject ref, long property, long value ){
+		NativeLongByReference number = new NativeLongByReference( new NativeLong( value ) ); 
+		EdsVoid data = new EdsVoid( number.getPointer() ); 
+
+		return setPropertyData( ref, property, 0, NativeLong.SIZE, data ); 
+	}
+	
 	public static int getPropertyData( __EdsObject ref, long property, long param, int size, EdsVoid data ){
 		return CanonCamera.EDSDK.EdsGetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ).intValue(); 
+	}
+	
+	public static int getPropertyData( __EdsObject ref, long property ){
+		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
+		EdsVoid data = new EdsVoid( number.getPointer() ); 
+
+		int res = getPropertyData( ref, property, 0, NativeLong.SIZE, data );
+		System.out.println( "res=" + res );
+		
+		return number.getValue().intValue(); 
 	}
 	
 	public static boolean beginLiveView( __EdsObject camera ){

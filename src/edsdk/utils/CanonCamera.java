@@ -20,6 +20,7 @@ import edsdk.EdSdkLibrary;
 import edsdk.EdSdkLibrary.EdsObjectEventHandler;
 import edsdk.EdSdkLibrary.EdsVoid;
 import edsdk.EdSdkLibrary.__EdsObject;
+import edsdk.utils.commands.FocusModeTask;
 import edsdk.utils.commands.GetPropertyTask;
 import edsdk.utils.commands.LiveViewTask;
 import edsdk.utils.commands.SetPropertyTask;
@@ -54,7 +55,7 @@ public class CanonCamera implements EdsObjectEventHandler {
   
 	// This gives you direct access to the EDSDK
 	public static EdSdkLibrary EDSDK = 
-	  (EdSdkLibrary)Native.loadLibrary("EDSDK/dll/EDSDK.dll", EdSdkLibrary.class, options); 
+	  (EdSdkLibrary)Native.loadLibrary("EDSDK/Dll/EDSDK.dll", EdSdkLibrary.class, options); 
 	
 	// Libraries needed to forward windows messages
 	private static final User32 lib = User32.INSTANCE;
@@ -85,16 +86,6 @@ public class CanonCamera implements EdsObjectEventHandler {
 			}
 		}; 
 		dispatcherThread.start(); 
-		
-		// people are sloppy! 
-		// so we add a shutdown hook to close camera connections
-		// TODO: doesn't seem to work
-		Runtime.getRuntime().addShutdownHook( new Thread(){
-			@Override
-			public void run() {
-				CanonCamera.close(); 
-			}
-		}); 
 	}
 	
 	
@@ -137,9 +128,11 @@ public class CanonCamera implements EdsObjectEventHandler {
 	
 
 	
-	public void execute( CanonTask<?> cmd ){
+	public <T extends CanonTask> T execute( T cmd ){
 		cmd.setSLR( this ); 
 		queue.add( cmd );
+		
+		return cmd; 
 	}
 	
 	public <T> T executeNow( CanonTask<T> cmd ){
@@ -287,7 +280,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 			
 
 			EdsVoid context = new EdsVoid( new Pointer( 0 ) );
-			edsCamera = cameras[0]; 
+			CanonCamera.this.edsCamera = edsCamera = cameras[0]; 
 			result = EDSDK.EdsSetObjectEventHandler( edsCamera, new NativeLong( EdSdkLibrary.kEdsObjectEvent_All ), CanonCamera.this, context ).intValue();
 			if( result != EdSdkLibrary.EDS_ERR_OK ){
 				return setError( result, "Callback handler couldn't be added. " ); 
@@ -332,5 +325,9 @@ public class CanonCamera implements EdsObjectEventHandler {
 	
 	public BufferedImage downloadLiveView(){
 		return executeNow( new LiveViewTask.Download() ); 
+	}
+	
+	public boolean setFocusMode( FocusModeTask.Mode mode ){
+		return executeNow( new FocusModeTask( mode ) ); 
 	}
 }

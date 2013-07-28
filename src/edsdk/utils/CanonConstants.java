@@ -158,4 +158,9 @@ public interface CanonConstants {
 	public final static int kEdsSaveTo_Host = 2; 
 	public final static int kEdsSaveTo_Both = 3; 
 	
+	
+	public final static int AFMode_OneShot = 0; 
+	public final static int AFMode_AIServo = 1; 
+	public final static int AFMode_AIFocus = 2; 
+	public final static int AFMode_Manual = 3; 
 }

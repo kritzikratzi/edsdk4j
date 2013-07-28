@@ -6,12 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -183,6 +185,19 @@ public class CanonUtils {
 	}
 
 
+	
+	/*public static long getPropertySize( __EdsObject ref, long property ){
+		IntBuffer type = IntBuffer.allocate( 1 ); 
+		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
+		NativeLong res = CanonCamera.EDSDK.EdsGetPropertySize( ref, new NativeLong( property ), new NativeLong( 0 ), type, number );
+		
+		System.out.println( "A=" + res.intValue() ); 
+		System.out.println( "B=" + number.getValue().intValue() );
+		return 0; 
+	}*/
+	
+	
+	
 	public static int setPropertyData( __EdsObject ref, long property, long param, int size, EdsVoid data ){
 		return CanonCamera.EDSDK.EdsSetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ).intValue(); 
 	}
@@ -202,8 +217,7 @@ public class CanonUtils {
 		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
 		EdsVoid data = new EdsVoid( number.getPointer() ); 
 
-		int res = getPropertyData( ref, property, 0, NativeLong.SIZE, data );
-		System.out.println( "res=" + res );
+		getPropertyData( ref, property, 0, NativeLong.SIZE, data );
 		
 		return number.getValue().intValue(); 
 	}
@@ -220,8 +234,8 @@ public class CanonUtils {
 		}
 		
 		//TODO:delete! 
-		getPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
-		System.out.println( "===" + number.getValue() ); 
+		//getPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
+		//System.out.println( "===" + number.getValue() ); 
 		
 		number = new NativeLongByReference( new NativeLong( EdSdkLibrary.EdsEvfOutputDevice.kEdsEvfOutputDevice_PC ) ); 
 		data = new EdsVoid( number.getPointer() ); 
@@ -256,6 +270,10 @@ public class CanonUtils {
 		
 		
 		return true; 
+	}
+	
+	public static boolean isLiveViewEnabled( __EdsObject camera ){
+		return getPropertyData( camera , EdSdkLibrary.kEdsPropID_Evf_Mode ) == 1;
 	}
 	
 	public static BufferedImage downloadLiveViewImage( __EdsObject camera ){

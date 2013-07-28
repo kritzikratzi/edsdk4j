@@ -25,11 +25,12 @@ import edsdk.EdSdkLibrary.__EdsObject;
 public abstract class CanonTask<T> implements EdsObjectEventHandler{
 
 	public CanonCamera camera;
+	public __EdsObject edsCamera; 
 	public static EdSdkLibrary EDSDK = CanonCamera.EDSDK; 
 	private boolean finished = false; 
 	private boolean waitForFinish = false;
 	private boolean ran = false; 
-	private T result; 
+	private T result;
 	
 	public CanonTask(){
 	}
@@ -40,6 +41,7 @@ public abstract class CanonTask<T> implements EdsObjectEventHandler{
 	 */
 	public void setSLR( CanonCamera slr ){
 		this.camera = slr;
+		this.edsCamera = slr.getEdsCamera(); 
 	}
 	
 	/**

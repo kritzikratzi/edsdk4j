@@ -2,7 +2,7 @@ package edsdk.utils.commands;
 
 import edsdk.utils.CanonTask;
 
-public class SudoTask extends CanonTask{
+public class SudoTask extends CanonTask<Boolean>{
 	private boolean superpower = false; 
 	
 	public SudoTask(){

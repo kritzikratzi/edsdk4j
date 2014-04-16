@@ -18,7 +18,6 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -72,7 +71,7 @@ public class E05_Timelapse {
 		GridBagConstraints gbc = new GridBagConstraints(); 
 		
 		gbc.anchor = GridBagConstraints.EAST; 
-		gbc.fill = gbc.HORIZONTAL; 
+		gbc.fill = GridBagConstraints.HORIZONTAL; 
 		gbc.insets = new Insets( 3, 3, 3, 3 ); 
 		gbc.gridy = 1; 
 		
@@ -117,7 +116,7 @@ public class E05_Timelapse {
 			}
 		}
 		
-		final JComboBox combo = new JComboBox( items.toArray( new String[]{} ) );
+		final JComboBox<String> combo = new JComboBox<String>( items.toArray( new String[]{} ) );
 		combo.addActionListener( new ActionListener(){
 			@Override
 			public void actionPerformed( ActionEvent event ) {

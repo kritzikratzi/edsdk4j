@@ -92,7 +92,6 @@ public class E01_Simple {
 
 	public static void dispatchMessages() {
 		// This bit never returns from GetMessage
-		int count = 0; 
 		int result;
 		MSG msg = new MSG();
 
@@ -104,7 +103,6 @@ public class E01_Simple {
 			}
 
 			else {
-				count ++; 
 				lib.TranslateMessage(msg);
 				try{lib.DispatchMessage(msg);}
 				catch( Error e ){ e.printStackTrace(); }

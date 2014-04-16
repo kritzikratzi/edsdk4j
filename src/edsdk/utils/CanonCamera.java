@@ -128,7 +128,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 	
 
 	
-	public <T extends CanonTask> T execute( T cmd ){
+	public <T extends CanonTask<?>> T execute( T cmd ){
 		cmd.setSLR( this ); 
 		queue.add( cmd );
 		
@@ -329,5 +329,13 @@ public class CanonCamera implements EdsObjectEventHandler {
 	
 	public boolean setFocusMode( FocusModeTask.Mode mode ){
 		return executeNow( new FocusModeTask( mode ) ); 
+	}
+	
+	public int lastErrorCode(){
+		return errorCode; 
+	}
+	
+	public String lastErrorMessage(){
+		return errorMessage; 
 	}
 }

@@ -2,7 +2,6 @@ package edsdk.utils.commands;
 
 import edsdk.EdSdkLibrary;
 import edsdk.utils.CanonTask;
-import edsdk.utils.CanonUtils;
 
 /**
  * Drives the lense in a direction. 

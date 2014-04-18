@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
 
 /**
  * A live view example
@@ -40,7 +40,7 @@ public class E04_LiveView {
 		
 		while( true ){
 			Thread.sleep( 50 ); 
-			BufferedImage image = cam.downloadLiveView(); 
+			BufferedImage image = cam.downloadLiveView().get(); 
 			if( image != null ){
 				label.setIcon( new ImageIcon( image ) ); 
 				frame.pack(); 

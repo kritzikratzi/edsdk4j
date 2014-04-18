@@ -1,9 +1,9 @@
 package gettingstarted;
 
-import static edsdk.EdSdkLibrary.kEdsPropID_Av;
-import static edsdk.EdSdkLibrary.kEdsPropID_BatteryLevel;
-import static edsdk.EdSdkLibrary.kEdsPropID_ISOSpeed;
-import static edsdk.EdSdkLibrary.kEdsPropID_Tv;
+import static edsdk.bindings.EdSdkLibrary.kEdsPropID_Av;
+import static edsdk.bindings.EdSdkLibrary.kEdsPropID_BatteryLevel;
+import static edsdk.bindings.EdSdkLibrary.kEdsPropID_ISOSpeed;
+import static edsdk.bindings.EdSdkLibrary.kEdsPropID_Tv;
 import static edsdk.utils.CanonConstants.Av_7_1;
 import static edsdk.utils.CanonConstants.ISO_800;
 import static edsdk.utils.CanonConstants.Tv_1by100;
@@ -25,9 +25,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
+import edsdk.api.commands.ShootCommand;
 import edsdk.utils.CanonConstants;
-import edsdk.utils.commands.ShootTask;
 
 public class E05_Timelapse {
 
@@ -44,7 +44,7 @@ public class E05_Timelapse {
 		while( true ){
 			System.out.println( "=========================================" ); 
 			System.out.println( "Battery Level = " + camera.getProperty( kEdsPropID_BatteryLevel ) ); 
-			camera.execute( new ShootTask( filename() ) ); 
+			camera.execute( new ShootCommand( filename() ) ); 
 
 			try {
 				Thread.sleep( 15000 );

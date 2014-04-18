@@ -8,11 +8,11 @@ import com.sun.jna.platform.win32.User32.MSG;
 import com.sun.jna.platform.win32.W32API.HMODULE;
 import com.sun.jna.ptr.NativeLongByReference;
 
-import edsdk.EdSdkLibrary;
-import edsdk.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.EdSdkLibrary.EdsVoid;
-import edsdk.EdSdkLibrary.__EdsObject;
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
+import edsdk.bindings.EdSdkLibrary;
+import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
+import edsdk.bindings.EdSdkLibrary.EdsVoid;
+import edsdk.bindings.EdSdkLibrary.__EdsObject;
 import edsdk.utils.CanonUtils;
 
 /** Simple example of JNA interface mapping and usage. */

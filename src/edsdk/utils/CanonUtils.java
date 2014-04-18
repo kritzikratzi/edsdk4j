@@ -15,25 +15,31 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-import edsdk.EdSdkLibrary;
-import edsdk.EdSdkLibrary.EdsVoid;
-import edsdk.EdSdkLibrary.__EdsObject;
-import edsdk.EdsDirectoryItemInfo;
+import edsdk.api.CanonCamera;
+import edsdk.bindings.EdSdkLibrary;
+import edsdk.bindings.EdsDirectoryItemInfo;
+import edsdk.bindings.EdSdkLibrary.EdsVoid;
+import edsdk.bindings.EdSdkLibrary.__EdsObject;
 
 /**
  * Here are some great helpers. 
  * _All_ the functions in here are not thread save, so you'll want to encapsulate them in 
  * a CanonTask and then send them to the camera, like so for instance : 
  * 
- * 
+ * <pre>
  * canonCamera.executeNow( new CanonTask<Boolean>(){
  * 	 public void run(){
  * 		CanonUtils.doSomethingLikeDownloadOrWhatever(); 
  *   }
  * }
+ * </pre>
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
  * 
  * @author hansi
- *
  */
 public class CanonUtils {
 	/**
@@ -254,7 +260,7 @@ public class CanonUtils {
 		EdsVoid data = new EdsVoid( number.getPointer() ); 
 		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
 		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
+			// System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
 			return false; 
 		}
 		
@@ -262,7 +268,7 @@ public class CanonUtils {
 		data = new EdsVoid( number.getPointer() ); 
 		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data ); 
 		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
+			// System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
 			return false; 
 		}
 		
@@ -303,7 +309,7 @@ public class CanonUtils {
 		// Download live view image data.
 		err = CanonCamera.EDSDK.EdsDownloadEvfImage( camera, image[0] ).intValue(); 
 		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Failed to download life view image, code=" + err + ", " + toString( err ) ); 
+			// System.err.println( "Failed to download life view image, code=" + err + ", " + toString( err ) ); 
 			release( image[0], stream[0] ); 
 			return null; 
 		}
@@ -344,7 +350,6 @@ public class CanonUtils {
 		byte data[] = pp.getByteArray( 0, length.getValue().intValue() ); 
 		try {
 			BufferedImage img = ImageIO.read( new ByteArrayInputStream( data ) );
-			System.out.println( img.getWidth() + ",," + img.getHeight() ); 
 			return img; 
 		}
 		catch (IOException e) {

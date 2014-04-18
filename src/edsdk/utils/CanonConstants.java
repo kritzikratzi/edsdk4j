@@ -1,5 +1,14 @@
 package edsdk.utils;
 
+/**
+ * A Lot of constants. 
+ * @author hansi
+ *
+ * Copyright © 2014 Hansi Raber <super@superduper.org>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ */
 public interface CanonConstants {
 	public final static int Av_1 = 0x08;
 	public final static int Av_1_1 = 0x0B;
@@ -126,7 +135,7 @@ public interface CanonConstants {
 	public final static int Tv_1by6000 = 0x9C;
 	public final static int Tv_1by6400 = 0x9D;
 	public final static int Tv_1by8000 = 0xA0;
-	public final static int Tv_1by8000_invalid = 0xFFFFFFFF;
+	public final static int Tv_invalid = 0xFFFFFFFF;
 	
 	public final static int ISO_6 = 0x28;
 	public final static int ISO_12 = 0x30;

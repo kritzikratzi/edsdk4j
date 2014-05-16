@@ -127,6 +127,24 @@ public class CanonUtils {
 
 	
 	/**
+	 * Finds the filename for a directory item
+	 * @param directoryItem The item you want to download
+	 * @return Either null, or the filename of the item 
+	 */
+	public static EdsDirectoryItemInfo getDirectoryItemInfo( __EdsObject directoryItem ){
+		int err = EdSdkLibrary.EDS_ERR_OK;
+		EdsDirectoryItemInfo dirItemInfo = new EdsDirectoryItemInfo();
+
+		err = CanonCamera.EDSDK.EdsGetDirectoryItemInfo(directoryItem, dirItemInfo).intValue();
+		if (err == EdSdkLibrary.EDS_ERR_OK) {
+			return dirItemInfo;  
+		}
+		else{
+			return null; 
+		}
+	}
+	
+	/**
 	 * Downloads an image and saves it somewhere
 	 * @param directoryItem The item you want to download
 	 * @param destination A path in the filesystem where you want to save the file. Can also be null or a directory. In case of null the temp directory will be used, in case of a directory the file name of the item will be used. 

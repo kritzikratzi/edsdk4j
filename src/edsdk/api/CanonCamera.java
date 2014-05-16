@@ -104,6 +104,8 @@ public class CanonCamera implements EdsObjectEventHandler {
 			}
 		}
 		
+		
+		
 		if( result ){
 			dispatcherThread = new Thread(){
 				public void run(){

@@ -2,15 +2,20 @@ package edsdk.api.commands;
 
 import edsdk.api.CanonCommand;
 
-public class SudoCommand extends CanonCommand<Boolean>{
+/**
+ * Get access to the main thread. 
+ * This is used by CanonCamera.beginDirect() / CanonCamera.endDirect() 
+ * @author hansi
+ *
+ */
+public class MainThreadCommand extends CanonCommand<Void>{
 	private boolean superpower = false; 
 	
-	public SudoCommand(){
+	public MainThreadCommand(){
 	}
 	
 	@Override
 	public void run() {
-		
 		notYetFinished();
 		superpower = true; 
 	}
@@ -32,6 +37,6 @@ public class SudoCommand extends CanonCommand<Boolean>{
 	 * Call this when you're done
 	 */
 	public void end(){
-		setResult( true ); 
+		setResult( null ); 
 	}
 }

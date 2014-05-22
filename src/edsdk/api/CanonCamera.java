@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.sun.javafx.tk.FocusCause;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
@@ -21,6 +21,7 @@ import edsdk.api.commands.DriveLenseCommand;
 import edsdk.api.commands.FocusModeCommand;
 import edsdk.api.commands.GetPropertyCommand;
 import edsdk.api.commands.LiveViewCommand;
+import edsdk.api.commands.MainThreadCommand;
 import edsdk.api.commands.SetPropertyCommand;
 import edsdk.api.commands.ShootCommand;
 import edsdk.bindings.EdSdkLibrary;
@@ -71,6 +72,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 	// Object Event Handlers
 	private static ArrayList<EdsObjectEventHandler> objectEventHandlers = new ArrayList<EdsObjectEventHandler>( 10 ); 
 	
+	private static ThreadLocal<MainThreadCommand> mainThreadCommand = new ThreadLocal<MainThreadCommand>(); 
 	
 	private static Thread dispatcherThread = null; 
 	static{
@@ -98,7 +100,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 		
 		if( !result ){
 			try {
-				result = loadLibrary( new File( ProcessingCanonCamera.class.getProtectionDomain().getCodeSource().getLocation().toURI().getSchemeSpecificPart() ).getParentFile() );
+				result = loadLibrary( new File( CanonCamera.class.getProtectionDomain().getCodeSource().getLocation().toURI().getSchemeSpecificPart() ).getParentFile() );
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -125,8 +127,21 @@ public class CanonCamera implements EdsObjectEventHandler {
 		try{
 			Map<String, Integer> options = new HashMap<String, Integer>();
 			options.put(Library.OPTION_CALLING_CONVENTION, StdCallLibrary.STDCALL_CONVENTION);
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\EDSDK.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\DPPDLL.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\DPPLibCom.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\DPPRSC.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\Mlib.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\Ucs32P.dll", options ) ); 
+			Native.register( EdSdkLibrary.class, NativeLibrary.getInstance( baseDir.getAbsolutePath() + "\\EDSDK\\Dll\\EdsImage.dll", options ) ); 
+ 
 			EDSDK = (EdSdkLibrary)Native.loadLibrary( path, EdSdkLibrary.class, options);
-			System.out.println( "Found EDSDK.dll in " + path ); 
+			System.out.println( "Found EDSDK.dll in " + path );
+			
+			System.out.println( "A" ); 
+//			NativeLibrary.getInstance( "EDSDK.dll" ); 
+			System.out.println( "B" );
+			System.out.println( "C" ); 
 			return true; 
 		}
 		catch( UnsatisfiedLinkError e ){
@@ -188,6 +203,26 @@ public class CanonCamera implements EdsObjectEventHandler {
 	public <T> T executeNow( CanonCommand<T> cmd ){
 		execute( cmd ); 
 		return cmd.get(); 
+	}
+	
+	public void beginDirect(){
+		MainThreadCommand cmd = mainThreadCommand.get();  
+		if( cmd == null ){
+			cmd = new MainThreadCommand();
+			executeNow( cmd ); 
+			mainThreadCommand.set( cmd );
+			cmd.begin();
+		}
+		else{
+			// we already have access! 
+		}
+	}
+	
+	public void endDirect(){
+		MainThreadCommand cmd = mainThreadCommand.get(); 
+		if( cmd != null ){
+			cmd.end(); 
+		}
 	}
 	
 	public boolean setError( int result, String message ){

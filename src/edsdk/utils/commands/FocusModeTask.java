@@ -1,39 +1,45 @@
 package edsdk.utils.commands;
 
-import edsdk.EdSdkLibrary;
-import edsdk.utils.CanonConstants;
+import edsdk.utils.CanonConstant.EdsAFMode;
+import edsdk.utils.CanonConstant.EdsCameraCommand;
+import edsdk.utils.CanonConstant.EdsEvfAFMode;
+import edsdk.utils.CanonConstant.EdsEvfAf;
+import edsdk.utils.CanonConstant.EdsPropertyID;
 import edsdk.utils.CanonTask;
 import edsdk.utils.CanonUtils;
 
-public class FocusModeTask extends CanonTask<Boolean>{
-	
-	public enum Mode{
-		AUTO, MANUAL
-	}
-	
-	private Mode mode;
-	
-	public FocusModeTask( Mode mode ){
-		this.mode = mode; 
-	}
-	
-	@Override
-	public void run() {
-		System.out.println( "AAA" ); 
-		switch( mode ){
-		case AUTO: 
-			CanonUtils.setPropertyData( edsCamera, EdSdkLibrary.kEdsPropID_AFMode, CanonConstants.AFMode_OneShot );
-			sendCommand( EdSdkLibrary.kEdsCameraCommand_DoEvfAf, EdSdkLibrary.EdsEvfAf.kEdsCameraCommand_EvfAf_ON );
-			break; 
-		case MANUAL:
-			System.out.println( "Set to manual!!" );
-			CanonUtils.setPropertyData( edsCamera, EdSdkLibrary.kEdsPropID_AFMode, CanonConstants.AFMode_Manual );
-			CanonUtils.setPropertyData( edsCamera, EdSdkLibrary.kEdsPropID_Evf_AFMode, EdSdkLibrary.EdsEvfAFMode.Evf_AFMode_Live );
-			sendCommand( EdSdkLibrary.kEdsCameraCommand_DoEvfAf, EdSdkLibrary.EdsEvfAf.kEdsCameraCommand_EvfAf_OFF );
-			break; 
-		}
-		
-		System.out.println( "DONE!" ); 
-		setResult( true ); 
-	}
+public class FocusModeTask extends CanonTask<Boolean> {
+
+    public enum Mode {
+        AUTO,
+        MANUAL
+    }
+
+    private final Mode mode;
+
+    public FocusModeTask( final Mode mode ) {
+        this.mode = mode;
+    }
+
+    @Override
+    public void run() {
+        System.out.println( "Begin setting camera to " +
+                            mode.name().toLowerCase() + " focus" );
+
+        switch ( mode ) {
+            case AUTO:
+                CanonUtils.setPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_AFMode, EdsAFMode.kEdsAFMode_OneShot );
+                sendCommand( EdsCameraCommand.kEdsCameraCommand_DoEvfAf, EdsEvfAf.kEdsCameraCommand_EvfAf_ON );
+                break;
+            case MANUAL:
+                CanonUtils.setPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_AFMode, EdsAFMode.kEdsAFMode_Manual );
+                CanonUtils.setPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_Evf_AFMode, EdsEvfAFMode.Evf_AFMode_Live );
+                sendCommand( EdsCameraCommand.kEdsCameraCommand_DoEvfAf, EdsEvfAf.kEdsCameraCommand_EvfAf_OFF );
+                break;
+        }
+
+        System.out.println( "DONE!" );
+        setResult( true );
+    }
+
 }

@@ -2,26 +2,40 @@
 <project name="edsdk4j" default="jar" basedir=".">
 
   <property name="version"          value="snapshot" />
-    
+  
   <property name="src"              value="src"/>
   <property name="lib"              value="lib"/>
   <property name="build"            value="build"/>
   <property name="dist"             value="dist"/>
+  <property name="edsdk.dir"        value="${basedir}/EDSDK"/>
+  <property name="edsdk64.dir"      value="${basedir}/EDSDK_64"/>
   <property name="distver"          value="${dist}/edsdk4j-${version}"/>
   
   <property name="jar.file"         value="${distver}/edsdk4j.jar" />
   
   <property environment="env"/>
-	
-	<property name="jnaerator.lib"    value="${lib}/jnaerator-0.9.5.jar"/>
+  
+  <property name="jnaerator.lib"    value="${lib}/jnaerator*.jar"/>
   
   <fileset id="jna.libs" dir="${lib}">
-    <include name="jna.jar"/>
-    <include name="platform.jar"/>
+    <include name="jna*.jar"/>
+  </fileset>
+  
+  <fileset id="imgscalr.libs" dir="${lib}">
+    <include name="imgscalr*.jar"/>
+  </fileset>
+  
+  <fileset id="edsdk.libs" dir="${edsdk.dir}">
+    <include name="**/*.*"/>
+  </fileset>
+  
+  <fileset id="edsdk64.libs" dir="${edsdk64.dir}">
+    <include name="**/*.*"/>
   </fileset>
   
   <path id="compile.path">
     <fileset refid="jna.libs"/>
+    <fileset refid="imgscalr.libs"/>
   </path>
   
   <target name="setup">
@@ -29,18 +43,19 @@
       <format property="build.current.date" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC"/>
     </tstamp>
   </target>
-
+  
   <target name="clean">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>
-
-	<target name="generate-wrapper">
+  
+  <target name="generate-wrapper">
     <exec logerror="true" executable="java">
+      <env key="EDSDK_HOME" value="${edsdk.dir}"/>
       <arg line="-jar ${jnaerator.lib} config.jnaerator"/>
     </exec>
-	</target>
-	
+  </target>
+  
   <target name="compile" depends="setup">
     <mkdir dir="${build}/classes" />
     <javac
@@ -53,20 +68,49 @@
     </javac>
   </target>
   
+  <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+  <pathconvert property="libs.classpath" pathsep=" ">
+    <mapper>
+      <chainedmapper>
+
+        <!-- remove absolute path -->
+        <flattenmapper />
+
+        <!-- add lib/ prefix -->
+        <globmapper from="*" to="lib/*" />
+      </chainedmapper>
+    </mapper>
+    
+    <path>
+      <fileset refid="jna.libs"/>
+      <fileset refid="imgscalr.libs"/>
+    </path>
+  </pathconvert>
+  
   <target name="jar" depends="compile">
     <mkdir dir="${distver}"/>
     <jar destfile="${jar.file}">
       <manifest>
-        <attribute name="Build-Creator"           value="${user.name}"/>
-        <attribute name="Build-Date"              value="${build.current.date}"/>
-        <attribute name="Specification-Title"     value="EdSdk4J API Spec"/>
-        <attribute name="Specification-Version"   value="${version}"/>
-        <attribute name="Implementation-Title"    value="EdSdk4J"/>
-        <attribute name="Implementation-Version"  value="${version} build ${build.current.revision}"/>
+      	<attribute name="Class-Path"             value="${libs.classpath}"/>
+        <attribute name="Build-Creator"          value="${user.name}"/>
+        <attribute name="Build-Date"             value="${build.current.date}"/>
+        <attribute name="Specification-Title"    value="EdSdk4J API Spec"/>
+        <attribute name="Specification-Version"  value="${version}"/>
+        <attribute name="Implementation-Title"   value="EdSdk4J"/>
+        <attribute name="Implementation-Version" value="${version} build ${build.current.revision}"/>
       </manifest>
       <fileset dir="${build}/classes"/>
-    	<zipgroupfileset refid="jna.libs"/>
     </jar>
+  	<copy todir="${distver}/lib" overwrite="true">
+      <fileset refid="jna.libs"/>
+      <fileset refid="imgscalr.libs"/>
+  	</copy>
+    <copy todir="${distver}/EDSDK" overwrite="true">
+      <fileset refid="edsdk.libs"/>
+    </copy>
+    <copy todir="${distver}/EDSDK_64" overwrite="true">
+      <fileset refid="edsdk64.libs"/>
+    </copy>
   </target>
   
 </project>

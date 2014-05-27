@@ -1,12 +1,10 @@
 -o src
--noJar
--noComp
+-f
+-mode Directory
 -noMangling
 -runtime JNA
 -package edsdk
 -library EdSdk
-$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDKErrors.h
-$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDKTypes.h
-$(EDSDK_HOME)/Windows/EDSDK/Header/EDSDK.h
-
-
+$(EDSDK_HOME)/Header/EDSDKErrors.h
+$(EDSDK_HOME)/Header/EDSDKTypes.h
+$(EDSDK_HOME)/Header/EDSDK.h

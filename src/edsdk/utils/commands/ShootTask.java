@@ -1,72 +1,186 @@
 package edsdk.utils.commands;
 
 import java.io.File;
+import java.io.IOException;
 
-import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 
-import edsdk.EdSdkLibrary;
-import edsdk.EdSdkLibrary.EdsVoid;
-import edsdk.EdSdkLibrary.__EdsObject;
+import edsdk.EdSdkLibrary.EdsBaseRef;
+import edsdk.EdSdkLibrary.EdsDirectoryItemRef;
+import edsdk.utils.CanonConstant.EdsCameraCommand;
+import edsdk.utils.CanonConstant.EdsError;
+import edsdk.utils.CanonConstant.EdsImageType;
+import edsdk.utils.CanonConstant.EdsObjectEvent;
+import edsdk.utils.CanonConstant.EdsPropertyID;
+import edsdk.utils.CanonConstant.EdsSaveTo;
+import edsdk.utils.CanonConstant.EdsShutterButton;
 import edsdk.utils.CanonTask;
 import edsdk.utils.CanonUtils;
 
 /**
  * Takes an image and downloads it to the file system
+ * 
  * @author hansi
- *
+ * 
  */
-public class ShootTask extends CanonTask<File>{
-	private File dest = null; 
-	private boolean deleteAfterDownload;
-	private boolean oldEvfMode;
-	
-	public ShootTask(){
-		this( null, false ); 
-	}
-	
-	public ShootTask( File dest ){
-		this( dest, false ); 
-	}
-	public ShootTask( File dest, boolean deleteAfterDownload ){
-		this.dest = dest; 
-		this.deleteAfterDownload = deleteAfterDownload; 
-	}
-	
-	
-	
-	@Override
-	public void run() {
-		int result = -1; 
-		while( result != EdSdkLibrary.EDS_ERR_OK ){
-			System.out.println( "Trying to take image..." );
-			oldEvfMode = CanonUtils.isLiveViewEnabled( edsCamera ); 
-			System.out.println( "> LV on? " + oldEvfMode ); 
-			
-			if( oldEvfMode ) CanonUtils.endLiveView( edsCamera );  
-			
-			result = sendCommand( EdSdkLibrary.kEdsCameraCommand_TakePicture, 0 ); 
-			System.out.println( "> result= " + result + ", might mean " + CanonUtils.toString( result ) ); 
-			try {
-				Thread.sleep( 1000 );
-			}
-			catch( InterruptedException e ){
-				e.printStackTrace();
-			} 
-		}
-		System.out.println( "Took image, waiting for file" ); 
-		notYetFinished(); 
-	}
-	
-	@Override
-	public NativeLong apply( NativeLong inEvent, __EdsObject inRef, EdsVoid inContext ) {
-		if( inEvent.intValue() == EdSdkLibrary.kEdsObjectEvent_DirItemCreated ){
-			System.out.println( "Looks like we got a file!" ); 
-			setResult( CanonUtils.download( inRef, dest, deleteAfterDownload ) );
-			
-			if( oldEvfMode ) CanonUtils.beginLiveView( edsCamera ); 
-			finish(); 
-		}
-		
-		return null;
-	}
+public class ShootTask extends CanonTask<File[]> {
+
+    private final EdsSaveTo saveTo;
+    private final boolean appendFileExtension;
+    private File[] dest = null;
+    private boolean oldEvfMode;
+    private int shotAttempts;
+    private int count;
+
+    public ShootTask() {
+        this( EdsSaveTo.kEdsSaveTo_Both );
+    }
+
+    public ShootTask( final EdsSaveTo saveTo ) {
+        this( saveTo, Integer.MAX_VALUE, (File[]) null, false );
+    }
+
+    public ShootTask( final EdsSaveTo saveTo, final int shotAttempts ) {
+        this( saveTo, shotAttempts, (File[]) null, false );
+    }
+
+    public ShootTask( final EdsSaveTo saveTo, final int shotAttempts,
+                      final File dest ) {
+        this( saveTo, shotAttempts, new File[] { dest }, false );
+    }
+
+    public ShootTask( final EdsSaveTo saveTo, final int shotAttempts,
+                      final File[] dest ) {
+        this( saveTo, shotAttempts, dest, false );
+    }
+
+    public ShootTask( final EdsSaveTo saveTo, final int shotAttempts,
+                      final File[] dest, final boolean appendFileExtension ) {
+        this.saveTo = saveTo;
+        this.shotAttempts = shotAttempts;
+        this.appendFileExtension = appendFileExtension;
+        count = 1;
+
+        if ( dest != null && ( dest.length < 0 || dest.length > 2 ) ) {
+            throw new IllegalArgumentException( "dest must contain one or two file paths (depending on camera image quality settings)" );
+        }
+        this.dest = dest;
+    }
+
+    @Override
+    public void run() {
+        EdsError err = EdsError.EDS_ERR_OK;
+
+        if ( camera.getEdsCamera() != null ) {
+
+            // Check if there is more than one image
+            final long imageQuality;
+            try {
+                imageQuality = CanonUtils.getPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_ImageQuality );
+            }
+            catch ( final IllegalArgumentException e ) {
+                System.err.println( e.getMessage() );
+                return;
+            }
+
+            final EdsImageType secondaryImageType = EdsImageType.enumOfValue( (int) ( imageQuality >>> 4 & 0xf ) );
+            if ( secondaryImageType != EdsImageType.kEdsImageType_Unknown ) {
+                count = 2;
+            }
+
+            if ( dest == null ) {
+                dest = new File[count];
+            } else if ( dest.length < count ) {
+                dest = new File[] { dest[0], null };
+            }
+
+            for ( final File f : dest ) {
+                if ( f != null ) {
+                    try {
+                        f.getCanonicalPath();
+                    }
+                    catch ( final IOException e ) {
+                        System.err.println( "The file path \"" + f.getPath() +
+                                            "\" contains characters that are invalid for this filesystem, stopping..." );
+                        return;
+                    }
+                }
+            }
+
+            err = CanonUtils.setPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_SaveTo, saveTo );
+            if ( err == EdsError.EDS_ERR_OK &&
+                 !EdsSaveTo.kEdsSaveTo_Camera.equals( saveTo ) ) {
+                CanonUtils.setCapacity( camera.getEdsCamera() );
+            }
+
+            err = EdsError.EDS_ERR_UNIMPLEMENTED;
+            while ( shotAttempts > 0 && err != EdsError.EDS_ERR_OK ) {
+                System.out.println( "Trying to take image..." );
+                oldEvfMode = CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), true );
+                System.out.println( "> LiveView on? " +
+                                    ( oldEvfMode ? "yes" : "no" ) );
+                if ( oldEvfMode ) {
+                    CanonUtils.endLiveView( camera.getEdsCamera() );
+                }
+                err = sendCommand( EdsCameraCommand.kEdsCameraCommand_TakePicture, 0 );
+                System.out.println( "> result " + err.value() + ": " +
+                                    err.name() + " - " + err.description() );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    try {
+                        Thread.sleep( 1000 );
+                    }
+                    catch ( final InterruptedException e ) {
+                        System.out.println( "Interrupt received by ShootTask, stopping..." );
+                        Thread.currentThread().interrupt(); // restore interrupted status
+                        return;
+                    }
+                } else {
+                    if ( CanonUtils.isMirrorLockupEnabled( camera.getEdsCamera() ) ) {
+                        System.out.println( "> Mirror Lockup: Enabled" );
+                        sendCommand( EdsCameraCommand.kEdsCameraCommand_PressShutterButton, EdsShutterButton.kEdsCameraCommand_ShutterButton_Completely_NonAF );
+                        sendCommand( EdsCameraCommand.kEdsCameraCommand_PressShutterButton, EdsShutterButton.kEdsCameraCommand_ShutterButton_OFF );
+                    }
+                }
+                shotAttempts--;
+            }
+        }
+        if ( err == EdsError.EDS_ERR_OK ) {
+            System.out.println( "Took image, waiting for camera" );
+            notYetFinished();
+        } else {
+            System.out.println( "No image could be taken, stopping..." );
+        }
+    }
+
+    @Override
+    public EdsError apply( final EdsObjectEvent inEvent,
+                           final EdsBaseRef inRef, final Pointer inContext ) {
+        return apply( inEvent, new EdsDirectoryItemRef( inRef.getPointer() ), inContext );
+    }
+
+    public EdsError apply( final EdsObjectEvent inEvent,
+                           final EdsDirectoryItemRef inRef,
+                           final Pointer inContext ) {
+        if ( inEvent == EdsObjectEvent.kEdsObjectEvent_DirItemCreated ||
+             inEvent == EdsObjectEvent.kEdsObjectEvent_DirItemRequestTransfer ) {
+            count--;
+            System.out.println( "Camera saved an image file" +
+                                ( count > 0 ? ", " + count + " file remains"
+                                           : "" ) );
+            if ( !EdsSaveTo.kEdsSaveTo_Camera.equals( saveTo ) ) {
+                dest[dest.length - count - 1] = CanonUtils.download( inRef, dest[dest.length -
+                                                                                 count -
+                                                                                 1], appendFileExtension );
+            }
+            if ( count == 0 ) {
+                setResult( dest );
+                if ( oldEvfMode ) {
+                    CanonUtils.beginLiveView( camera.getEdsCamera() );
+                }
+                finish();
+            }
+        }
+
+        return EdsError.EDS_ERR_OK;
+    }
 }

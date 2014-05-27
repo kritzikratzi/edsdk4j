@@ -4,12 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
 
+import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -17,356 +16,926 @@ import com.sun.jna.Structure;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-import edsdk.EdSdkLibrary;
-import edsdk.EdSdkLibrary.EdsVoid;
-import edsdk.EdSdkLibrary.__EdsObject;
+import edsdk.EdSdkLibrary.EdsBaseRef;
+import edsdk.EdSdkLibrary.EdsCameraRef;
+import edsdk.EdSdkLibrary.EdsDirectoryItemRef;
+import edsdk.EdSdkLibrary.EdsEvfImageRef;
+import edsdk.EdSdkLibrary.EdsStreamRef;
+import edsdk.EdsCapacity;
 import edsdk.EdsDirectoryItemInfo;
+import edsdk.EdsFocusInfo;
+import edsdk.EdsPictureStyleDesc;
+import edsdk.EdsPoint;
+import edsdk.EdsPropertyDesc;
+import edsdk.EdsRational;
+import edsdk.EdsRect;
+import edsdk.EdsTime;
+import edsdk.utils.CanonConstant.DescriptiveEnum;
+import edsdk.utils.CanonConstant.EdsAEMode;
+import edsdk.utils.CanonConstant.EdsAFMode;
+import edsdk.utils.CanonConstant.EdsAccess;
+import edsdk.utils.CanonConstant.EdsAv;
+import edsdk.utils.CanonConstant.EdsColorSpace;
+import edsdk.utils.CanonConstant.EdsCustomFunction;
+import edsdk.utils.CanonConstant.EdsDataType;
+import edsdk.utils.CanonConstant.EdsDriveMode;
+import edsdk.utils.CanonConstant.EdsError;
+import edsdk.utils.CanonConstant.EdsEvfAFMode;
+import edsdk.utils.CanonConstant.EdsEvfOutputDevice;
+import edsdk.utils.CanonConstant.EdsExposureCompensation;
+import edsdk.utils.CanonConstant.EdsFileCreateDisposition;
+import edsdk.utils.CanonConstant.EdsISOSpeed;
+import edsdk.utils.CanonConstant.EdsImageQuality;
+import edsdk.utils.CanonConstant.EdsMeteringMode;
+import edsdk.utils.CanonConstant.EdsPictureStyle;
+import edsdk.utils.CanonConstant.EdsPropertyID;
+import edsdk.utils.CanonConstant.EdsTv;
+import edsdk.utils.CanonConstant.EdsWhiteBalance;
 
 /**
- * Here are some great helpers. 
- * _All_ the functions in here are not thread save, so you'll want to encapsulate them in 
- * a CanonTask and then send them to the camera, like so for instance : 
+ * Here are some great helpers.
+ * _All_ the functions in here are not thread safe, so you'll want to
+ * encapsulate them in
+ * a CanonTask and then send them to the camera, like so for instance :
  * 
  * 
- * canonCamera.executeNow( new CanonTask<Boolean>(){
- * 	 public void run(){
- * 		CanonUtils.doSomethingLikeDownloadOrWhatever(); 
- *   }
+ * canonCamera.executeNow( new CanonTask<Boolean>() {
+ * public void run(){
+ * CanonUtils.doSomethingLikeDownloadOrWhatever();
  * }
+ * } );
  * 
  * @author hansi
- *
+ * 
  */
+// TODO - think about having CanonUtils handle state/property changes to handle cases described by CanonUtils.isLiveViewEnabled()
 public class CanonUtils {
-	/**
-	 * Converts a bunch of bytes to a string. 
-	 * This is a little different from new String( myBytes ) because
-	 * byte-arrays received from C will be crazy long and just have a null-terminator
-	 * somewhere in the middle. 
-	 */
-	public static String toString( byte bytes[] ){
-		for( int i = 0; i < bytes.length; i++ ){
-			if( bytes[i] == 0 ){
-				return new String( bytes, 0, i ); 
-			}
-		}
-		
-		return new String( bytes ); 
-	}
-	
-	/**
-	 * Tries to find name of an error code. 
-	 * 
-	 * @param errorCode
-	 * @return
-	 */
-	public static String toString( int errorCode ){
-		Field[] fields = EdSdkLibrary.class.getFields();
-		
-		for( Field field : fields ){
-			try {
-				if( field.getType().toString().equals( "int" ) && field.getInt( EdSdkLibrary.class ) == errorCode ){
-					if( field.getName().startsWith( "EDS_" ) ){
-						return field.getName(); 
-					}
-				}
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return "unknown error code"; 
-	}
-	
 
-	public static String propertyIdToString(long property) {
-		Field[] fields = EdSdkLibrary.class.getFields();
-		
-		for( Field field : fields ){
-			try {
-				if( field.getType().toString().equals( "int" ) && field.getInt( EdSdkLibrary.class ) == property ){
-					if( field.getName().startsWith( "kEdsPropID_" ) ){
-						return field.getName(); 
-					}
-				}
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return "unknown error code"; 
-	}
-	
-	/**
-	 * Finds the size of a class
-	 * Use only with JNA stuff! 
-	 */
-	public static int sizeof( Object o ){
-		int size = 0;
-		for(Field field : o.getClass().getDeclaredFields()) {
-			Class<?> fieldtype = field.getType();
-			if( fieldtype.equals( NativeLong.class ) ){
-				size += NativeLong.SIZE; 
-			}
-			else{
-				System.out.println( "unknown field type: " + field ); 
-			}
-			// sofern nur char[] m�glich, keinerlei weitere Pr�fung, ansonsten typenpr�fung anbauen
-			//char[] sub =(char[]) field.get(o);
-			//size+=sub.length;
-		}
-		
-		return size;
-	}
+    public static final int classIntField( final Class<?> klass,
+                                           final String fieldName ) {
+        Throwable t = null;
+        try {
+            final int value = klass.getField( fieldName ).getInt( null );
+            return value;
+        }
+        catch ( final IllegalArgumentException e ) {
+            t = e;
+        }
+        catch ( final IllegalAccessException e ) {
+            t = e;
+        }
+        catch ( final NoSuchFieldException e ) {
+            t = e;
+        }
+        catch ( final SecurityException e ) {
+            t = e;
+        }
+        throw new IllegalArgumentException( klass.getCanonicalName() +
+                                            " does not contain field " +
+                                            fieldName, t );
+    }
 
-	
-	/**
-	 * Downloads an image and saves it somewhere
-	 * @param directoryItem The item you want to download
-	 * @param destination A path in the filesystem where you want to save the file. Can also be null or a directory. In case of null the temp directory will be used, in case of a directory the file name of the item will be used. 
-	 * @param deleteAfterDownload Should the image be deleted right after successful download  
-	 * @return Either null, or the location the file was ultimately saved to on success. 
-	 */
-	public static File download( __EdsObject directoryItem, File destination, boolean deleteAfterDownload ){
-		int err = EdSdkLibrary.EDS_ERR_OK;
-		__EdsObject[] stream = new __EdsObject[1]; 
-		EdsDirectoryItemInfo dirItemInfo = new EdsDirectoryItemInfo();
+    /**
+     * Downloads an image and saves it somewhere.
+     * 
+     * @param directoryItem The item you want to download
+     * @param destination A path in the filesystem where you want to save the
+     *            file. Can also be null or a directory. In case of null the
+     *            temp directory will be used, in case of a directory the file
+     *            name of the item will be used.
+     * @param appendFileExtension Adds the extension of the photo onto File to
+     *            ensure that supplied File name extension matches the image
+     *            being downloaded from the camera. This is especially important
+     *            if the camera is set to RAW+JPEG where the order of the images
+     *            is not consistent.
+     * @return Either null, or the location the file was ultimately saved to on
+     *         success.
+     */
+    public static File download( final EdsDirectoryItemRef directoryItem,
+                                 File destination,
+                                 final boolean appendFileExtension ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+        final EdsStreamRef.ByReference stream = new EdsStreamRef.ByReference();
+        final EdsDirectoryItemInfo dirItemInfo = new EdsDirectoryItemInfo();
 
-		boolean success = false;
+        boolean success = false;
 
-		long timeStart = System.currentTimeMillis();
+        final long timeStart = System.currentTimeMillis();
 
-		err = CanonCamera.EDSDK.EdsGetDirectoryItemInfo(directoryItem, dirItemInfo).intValue();
-		if (err == EdSdkLibrary.EDS_ERR_OK) {
-			if( destination == null ){
-				destination = new File( System.getProperty("java.io.tmpdir") ); 
-			}
-			if (destination.isDirectory()) {
-				destination = new File(destination, toString( dirItemInfo.szFileName ) );
-			}
-			
-			destination.getParentFile().mkdirs(); 
-			
-			System.out.println("Downloading image "
-					+ toString(dirItemInfo.szFileName) + " to "
-					+ destination.getAbsolutePath());
+        try {
 
-			err = CanonCamera.EDSDK.EdsCreateFileStream(
-					ByteBuffer.wrap( Native.toByteArray( destination.getAbsolutePath() ) ), 
-					EdSdkLibrary.EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways,
-					EdSdkLibrary.EdsAccess.kEdsAccess_ReadWrite, 
-					stream
-			).intValue();
-		}
+            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetDirectoryItemInfo( directoryItem, dirItemInfo ) );
+            if ( err == EdsError.EDS_ERR_OK ) {
+                if ( destination == null ) {
+                    destination = new File( System.getProperty( "java.io.tmpdir" ) );
+                }
+                if ( destination.isDirectory() ) {
+                    destination = new File( destination, Native.toString( dirItemInfo.szFileName ) );
+                } else if ( appendFileExtension ) {
+                    final String sourceFileName = Native.toString( dirItemInfo.szFileName );
+                    final int i = sourceFileName.lastIndexOf( "." );
+                    if ( i > 0 ) {
+                        final String extension = sourceFileName.substring( i );
+                        if ( !destination.getName().toLowerCase().endsWith( extension ) ) {
+                            destination = new File( destination.getPath() +
+                                                    extension );
+                        }
+                    }
+                }
 
-		if(err == EdSdkLibrary.EDS_ERR_OK ){
-			err = CanonCamera.EDSDK.EdsDownload( directoryItem, dirItemInfo.size, stream[0] ).intValue();
-		}
+                if ( destination.getParentFile() != null ) {
+                    destination.getParentFile().mkdirs();
+                }
 
-		if( err == EdSdkLibrary.EDS_ERR_OK ){
-			System.out.println( "Image downloaded in " +  ( System.currentTimeMillis() - timeStart ) );
+                System.out.println( "Downloading image " +
+                                    Native.toString( dirItemInfo.szFileName ) +
+                                    " to " + destination.getCanonicalPath() );
 
-			err = CanonCamera.EDSDK.EdsDownloadComplete( directoryItem ).intValue();
-			if( deleteAfterDownload ){
-				System.out.println( "Image deleted" );
-				CanonCamera.EDSDK.EdsDeleteDirectoryItem( directoryItem );
-			}
-			
-			success = true;
-		}
-		
-		if( stream[0] != null ){
-			CanonCamera.EDSDK.EdsRelease( stream[0] ); 
-		}
-		
-		return success? destination : null;
-	}
+                // TODO - see if using an EdsCreateMemoryStream would be faster and whether the image could be read directly without saving to file first - see: http://stackoverflow.com/questions/1083446/canon-edsdk-memorystream-image
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCreateFileStream( Native.toByteArray( destination.getCanonicalPath() ), EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways.value(), EdsAccess.kEdsAccess_ReadWrite.value(), stream ) );
+            }
 
+            if ( err == EdsError.EDS_ERR_OK ) {
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownload( directoryItem, dirItemInfo.size, stream.getValue() ) );
+            }
 
-	
-	/*public static long getPropertySize( __EdsObject ref, long property ){
-		IntBuffer type = IntBuffer.allocate( 1 ); 
-		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
-		NativeLong res = CanonCamera.EDSDK.EdsGetPropertySize( ref, new NativeLong( property ), new NativeLong( 0 ), type, number );
-		
-		System.out.println( "A=" + res.intValue() ); 
-		System.out.println( "B=" + number.getValue().intValue() );
-		return 0; 
-	}*/
-	
-	
-	
-	public static int setPropertyData( __EdsObject ref, long property, long param, int size, EdsVoid data ){
-		return CanonCamera.EDSDK.EdsSetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ).intValue(); 
-	}
-	
-	public static int setPropertyData( __EdsObject ref, long property, long value ){
-		NativeLongByReference number = new NativeLongByReference( new NativeLong( value ) ); 
-		EdsVoid data = new EdsVoid( number.getPointer() ); 
+            if ( err == EdsError.EDS_ERR_OK ) {
+                System.out.println( "Image downloaded in " +
+                                    ( System.currentTimeMillis() - timeStart ) +
+                                    " ms" );
 
-		return setPropertyData( ref, property, 0, NativeLong.SIZE, data ); 
-	}
-	
-	public static int getPropertyData( __EdsObject ref, long property, long param, int size, EdsVoid data ){
-		return CanonCamera.EDSDK.EdsGetPropertyData( ref, new NativeLong( property ), new NativeLong( param ), new NativeLong( size ), data ).intValue(); 
-	}
-	
-	public static int getPropertyData( __EdsObject ref, long property ){
-		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
-		EdsVoid data = new EdsVoid( number.getPointer() ); 
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownloadComplete( directoryItem ) );
 
-		getPropertyData( ref, property, 0, NativeLong.SIZE, data );
-		
-		return number.getValue().intValue(); 
-	}
-	
-	public static boolean beginLiveView( __EdsObject camera ){
-		int err = EdSdkLibrary.EDS_ERR_OK;
+                success = true;
+            }
 
-		NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) ); 
-		EdsVoid data = new EdsVoid( number.getPointer() ); 
-		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't start live view, error=" + err + ", " + toString( err ) ); 
-			return false; 
-		}
-		
-		//TODO:delete! 
-		//getPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
-		//System.out.println( "===" + number.getValue() ); 
-		
-		number = new NativeLongByReference( new NativeLong( EdSdkLibrary.EdsEvfOutputDevice.kEdsEvfOutputDevice_PC ) ); 
-		data = new EdsVoid( number.getPointer() ); 
-		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data ); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't start live view, error=" + err + ", " + toString( err ) ); 
-			return false; 
-		}
-		
-		
-		return true; 
-	}
-	
-	public static boolean endLiveView( __EdsObject camera ){
-		int err = EdSdkLibrary.EDS_ERR_OK;
+            if ( stream != null ) {
+                CanonCamera.EDSDK.EdsRelease( stream.getValue() );
+            }
+        }
+        catch ( final Exception e ) {
+            e.printStackTrace();
+        }
 
-		NativeLongByReference number = new NativeLongByReference( new NativeLong( 0 ) ); 
-		EdsVoid data = new EdsVoid( number.getPointer() ); 
-		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data ); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
-			return false; 
-		}
-		
-		number = new NativeLongByReference( new NativeLong( EdSdkLibrary.EdsEvfOutputDevice.kEdsEvfOutputDevice_TFT ) ); 
-		data = new EdsVoid( number.getPointer() ); 
-		err = setPropertyData( camera, EdSdkLibrary.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data ); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Couldn't end live view, error=" + err + ", " + toString( err ) ); 
-			return false; 
-		}
-		
-		
-		return true; 
-	}
-	
-	public static boolean isLiveViewEnabled( __EdsObject camera ){
-		return getPropertyData( camera , EdSdkLibrary.kEdsPropID_Evf_Mode ) == 1;
-	}
-	
-	public static BufferedImage downloadLiveViewImage( __EdsObject camera ){
-		int err = EdSdkLibrary.EDS_ERR_OK;
-		//EdsStreamRef stream = NULL;
-		//EdsEvfImageRef = NULL;
-		__EdsObject stream[] = new __EdsObject[1]; 
-		__EdsObject image[] = new __EdsObject[1]; 
-		
-		// Create memory stream.
-		err = CanonCamera.EDSDK.EdsCreateMemoryStream( new NativeLong( 0 ), stream ).intValue(); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Failed to download life view image, memory stream couldn't be created: code=" + err + ", " + toString( err ) ); 
-			release( image[0], stream[0] ); 
-			return null; 
-		}
+        return success ? destination : null;
+    }
 
-		err = CanonCamera.EDSDK.EdsCreateEvfImageRef( stream[0], image ).intValue(); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Failed to download life view image, image ref couldn't be created: code=" + err + ", " + toString( err ) ); 
-			release( image[0], stream[0] ); 
-			return null; 
-		}
+    public static EdsError setPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final DescriptiveEnum<? extends Number> value ) {
+        return CanonUtils.setPropertyDataAdvanced( ref, property, 0, value.value().longValue() );
+    }
 
-		// Now try to follow the guidelines from 
-		// http://tech.groups.yahoo.com/group/CanonSDK/message/1225
-		// instead of what the edsdk example has to offer! 
-		
-		// Download live view image data.
-		err = CanonCamera.EDSDK.EdsDownloadEvfImage( camera, image[0] ).intValue(); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Failed to download life view image, code=" + err + ", " + toString( err ) ); 
-			release( image[0], stream[0] ); 
-			return null; 
-		}
-//
-//		// Get the incidental data of the image.
-//		NativeLongByReference zoom = new NativeLongByReference();
-//		EdsVoid data = new EdsVoid(); 
-//		err = getPropertyData( image[0], CanonSDK.kEdsPropID_Evf_ZoomPosition, 0, NativeLong.SIZE, data ); 
-//		if( err != CanonSDK.EDS_ERR_OK ){
-//			System.err.println( "Failed to download life view image, zoom value wasn't read: code=" + err + ", " + toString( err ) ); 
-//			return false; 
-//		}
-//
-//		// Get the focus and zoom border position
-//		EdsPoint point = new EdsPoint();
-//		data = new EdsVoid( point.getPointer() ); 
-//		err = getPropertyData( image[0], CanonSDK.kEdsPropID_Evf_ZoomPosition, 0 , sizeof( point ), data );
-//		if( err != CanonSDK.EDS_ERR_OK ){
-//			System.err.println( "Failed to download life view image, focus point wasn't read: code=" + err + ", " + toString( err ) ); 
-//			return false; 
-//		}
-//		
-//		return true; 
-		
-		NativeLongByReference length = new NativeLongByReference(); 
-		err = CanonCamera.EDSDK.EdsGetLength( stream[0], length ).intValue(); 
-		if( err != EdSdkLibrary.EDS_ERR_OK ){
-			System.err.println( "Failed to download life view image, failed to read stream length: code=" + err + ", " + toString( err ) ); 
-			release( image[0], stream[0] ); 
-			return null; 
-		}
-		
-		PointerByReference ref = new PointerByReference(); 
-		err = CanonCamera.EDSDK.EdsGetPointer( stream[0], ref ).intValue(); 
+    public static EdsError setPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final long param,
+                                            final DescriptiveEnum<? extends Number> value ) {
+        return CanonUtils.setPropertyDataAdvanced( ref, property, param, value.value().longValue() );
+    }
 
-		long address = ref.getPointer().getNativeLong( 0 ).longValue(); 
-		Pointer pp = new Pointer( address ); 
-		byte data[] = pp.getByteArray( 0, length.getValue().intValue() ); 
-		try {
-			BufferedImage img = ImageIO.read( new ByteArrayInputStream( data ) );
-			System.out.println( img.getWidth() + ",," + img.getHeight() ); 
-			return img; 
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally{
-			release( image[0], stream[0] ); 
-		}
-		
-		return null; 
-	}
-	
-	
-	
-	public static void release( __EdsObject ... objects ){
-		for( __EdsObject obj : objects ){
-			if( obj != null ){
-				CanonCamera.EDSDK.EdsRelease( obj ); 
-			}
-		}
-	}
+    public static EdsError setPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final long value ) {
+        return CanonUtils.setPropertyDataAdvanced( ref, property, 0, value );
+    }
+
+    public static EdsError setPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final long param, final long value ) {
+        return CanonUtils.setPropertyDataAdvanced( ref, property, param, value );
+    }
+
+    public static EdsError setPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final long param, final int size,
+                                            final Pointer data ) {
+        return CanonUtils.toEdsError( CanonCamera.EDSDK.EdsSetPropertyData( ref, new NativeLong( property.value() ), new NativeLong( param ), new NativeLong( size ), data ) );
+    }
+
+    public static EdsError setPropertyDataAdvanced( final EdsBaseRef ref,
+                                                    final EdsPropertyID property,
+                                                    final Object value ) {
+        return CanonUtils.setPropertyDataAdvanced( ref, property, 0, value );
+    }
+
+    /**
+     * Only use this if you know that the type of the property you input is
+     * compatible with the value you supply.
+     * 
+     * @param ref Camera/image/live view reference
+     * @param property Property to get from the camera
+     * @param param See EDSDK API
+     * @return
+     * @throws IllegalStateException
+     */
+    //TODO - this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
+    public static EdsError setPropertyDataAdvanced( final EdsBaseRef ref,
+                                                    final EdsPropertyID property,
+                                                    final long param,
+                                                    final Object value ) throws IllegalStateException {
+
+        final EdsDataType type = CanonUtils.getPropertyType( ref, property, param );
+
+        final Pointer pointer;
+        final int size;
+
+        switch ( type ) {
+            case kEdsDataType_String: { //EdsChar[]
+                final String string = (String) value;
+                size = string.length() + 1;
+                pointer = new Memory( size );
+                pointer.setString( 0, string );
+                break;
+            }
+            case kEdsDataType_Int8: //EdsInt8
+            case kEdsDataType_UInt8: { //EdsUInt8
+                size = 1;
+                pointer = new Memory( size );
+                pointer.setByte( 0, (Byte) value );
+                break;
+            }
+            case kEdsDataType_Int16: //EdsInt16
+            case kEdsDataType_UInt16: { //EdsUInt16
+                size = 2;
+                pointer = new Memory( size );
+                pointer.setShort( 0, (Short) value );
+                break;
+            }
+            case kEdsDataType_Int32: //EdsInt32
+            case kEdsDataType_UInt32: { //EdsUInt32
+                size = 4;
+                pointer = new Memory( size );
+                pointer.setNativeLong( 0, new NativeLong( (Long) value ) );
+                break;
+            }
+            case kEdsDataType_Int64: //EdsInt64
+            case kEdsDataType_UInt64: { //EdsUInt64
+                size = 8;
+                pointer = new Memory( size );
+                pointer.setLong( 0, (Long) value );
+                break;
+            }
+            case kEdsDataType_Float: { //EdsFloat
+                size = 4;
+                pointer = new Memory( size );
+                pointer.setFloat( 0, (Float) value );
+                break;
+            }
+            case kEdsDataType_Double: { //EdsDouble
+                size = 8;
+                pointer = new Memory( size );
+                pointer.setDouble( 0, (Double) value );
+                break;
+            }
+            case kEdsDataType_ByteBlock: { //Byte Block // TODO - According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
+                final int[] array = (int[]) value;
+                size = 4 * array.length;
+                pointer = new Memory( size );
+                pointer.write( 0, array, 0, array.length );
+                break;
+            }
+            case kEdsDataType_Rational: //EdsRational
+            case kEdsDataType_Point: //EdsPoint
+            case kEdsDataType_Rect: //EdsRect
+            case kEdsDataType_Time: //EdsTime
+            case kEdsDataType_FocusInfo: //EdsFocusInfo
+            case kEdsDataType_PictureStyleDesc: { //EdsPictureStyleDesc
+                final Structure structure = (Structure) value;
+                structure.write();
+                pointer = structure.getPointer();
+                size = structure.size();
+                break;
+            }
+            case kEdsDataType_Int8_Array: //EdsInt8[]
+            case kEdsDataType_UInt8_Array: { //EdsUInt8[]
+                final byte[] array = (byte[]) value;
+                size = array.length;
+                pointer = new Memory( size );
+                pointer.write( 0, array, 0, array.length );
+                break;
+            }
+            case kEdsDataType_Int16_Array: //EdsInt16[]
+            case kEdsDataType_UInt16_Array: { //EdsUInt16[]
+                final short[] array = (short[]) value;
+                size = 2 * array.length;
+                pointer = new Memory( size );
+                pointer.write( 0, array, 0, array.length );
+                break;
+            }
+            case kEdsDataType_Int32_Array: //EdsInt32[]
+            case kEdsDataType_UInt32_Array: { //EdsUInt32[]
+                final int[] array = (int[]) value;
+                size = 4 * array.length;
+                pointer = new Memory( size );
+                pointer.write( 0, array, 0, array.length );
+                break;
+            }
+            case kEdsDataType_Bool: //EdsBool // TODO - implement
+            case kEdsDataType_Bool_Array: //EdsBool[] // TODO - implement
+            case kEdsDataType_Rational_Array: //EdsRational[] // TODO - implement
+            case kEdsDataType_Unknown: //Unknown
+            default:
+                throw new IllegalStateException( type.description() + " (" +
+                                                 type.name() +
+                                                 ") is not currently supported by GetPropertyTask" );
+        }
+        return CanonUtils.setPropertyData( ref, property, param, size, pointer );
+    }
+
+    public static Long getPropertyData( final EdsBaseRef ref,
+                                        final EdsPropertyID property ) {
+        return CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
+    }
+
+    public static Long getPropertyData( final EdsBaseRef ref,
+                                        final EdsPropertyID property,
+                                        final long param ) {
+        return CanonUtils.getPropertyDataAdvanced( ref, property, param );
+    }
+
+    public static EdsError getPropertyData( final EdsBaseRef ref,
+                                            final EdsPropertyID property,
+                                            final long param, final long size,
+                                            final Pointer data ) {
+        return CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertyData( ref, new NativeLong( property.value() ), new NativeLong( param ), new NativeLong( size ), data ) );
+    }
+
+    public static <T> T getPropertyDataAdvanced( final EdsBaseRef ref,
+                                                 final EdsPropertyID property ) {
+        return CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
+    }
+
+    /**
+     * Only use this if you know that the type of the property you input is
+     * compatible with the return type assignment you expect.
+     * 
+     * @param ref Camera/image/live view reference
+     * @param property Property to get from the camera
+     * @param param See EDSDK API
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     */
+    //TODO - this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
+    @SuppressWarnings( "unchecked" )
+    public static <T> T getPropertyDataAdvanced( final EdsBaseRef ref,
+                                                 final EdsPropertyID property,
+                                                 final long param ) throws IllegalArgumentException, IllegalStateException {
+
+        final int size = (int) CanonUtils.getPropertySize( ref, property, param );
+        final EdsDataType type = CanonUtils.getPropertyType( ref, property, param );
+
+        final Memory memory = new Memory( size > 0 ? size : 1 );
+
+        final EdsError err = CanonUtils.getPropertyData( ref, property, param, size, memory );
+        if ( err == EdsError.EDS_ERR_OK ) {
+            switch ( type ) {
+                case kEdsDataType_Unknown: //Unknown
+                    return null;
+                case kEdsDataType_String: //EdsChar[]
+                    return (T) memory.getString( 0 );
+                case kEdsDataType_Int8: //EdsInt8
+                case kEdsDataType_UInt8: //EdsUInt8
+                    return (T) Byte.valueOf( memory.getByte( 0 ) );
+                case kEdsDataType_Int16: //EdsInt16
+                case kEdsDataType_UInt16: //EdsUInt16
+                    return (T) Short.valueOf( memory.getShort( 0 ) );
+                case kEdsDataType_Int32: //EdsInt32
+                case kEdsDataType_UInt32: //EdsUInt32
+                    return (T) Long.valueOf( memory.getNativeLong( 0 ).longValue() );
+                case kEdsDataType_Int64: //EdsInt64
+                case kEdsDataType_UInt64: //EdsUInt64
+                    return (T) Long.valueOf( memory.getLong( 0 ) );
+                case kEdsDataType_Float: //EdsFloat
+                    return (T) Float.valueOf( memory.getFloat( 0 ) );
+                case kEdsDataType_Double: //EdsDouble
+                    return (T) Double.valueOf( memory.getDouble( 0 ) );
+                case kEdsDataType_ByteBlock: //Byte Block // TODO - According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
+                    return (T) memory.getIntArray( 0, size / 4 );
+                case kEdsDataType_Rational: //EdsRational
+                    return (T) new EdsRational( memory );
+                case kEdsDataType_Point: //EdsPoint
+                    return (T) new EdsPoint( memory );
+                case kEdsDataType_Rect: //EdsRect
+                    return (T) new EdsRect( memory );
+                case kEdsDataType_Time: //EdsTime
+                    return (T) new EdsTime( memory );
+                case kEdsDataType_FocusInfo: //EdsFocusInfo
+                    return (T) new EdsFocusInfo( memory );
+                case kEdsDataType_PictureStyleDesc: //EdsPictureStyleDesc
+                    return (T) new EdsPictureStyleDesc( memory );
+                case kEdsDataType_Int8_Array: //EdsInt8[]
+                case kEdsDataType_UInt8_Array: //EdsUInt8[]
+                    return (T) memory.getByteArray( 0, size );
+                case kEdsDataType_Int16_Array: //EdsInt16[]
+                case kEdsDataType_UInt16_Array: //EdsUInt16[]
+                    return (T) memory.getShortArray( 0, size / 2 );
+                case kEdsDataType_Int32_Array: //EdsInt32[]
+                case kEdsDataType_UInt32_Array: //EdsUInt32[]
+                    return (T) memory.getIntArray( 0, size / 4 );
+                case kEdsDataType_Bool: //EdsBool // TODO - implement
+                case kEdsDataType_Bool_Array: //EdsBool[] // TODO - implement
+                case kEdsDataType_Rational_Array: //EdsRational[] // TODO - implement
+                default:
+                    throw new IllegalStateException( type.description() + " (" +
+                                                     type.name() +
+                                                     ") is not currently supported by GetPropertyTask" );
+            }
+        }
+
+        throw new IllegalArgumentException( "An error occurred while getting " +
+                                            property.name() + " data (error " +
+                                            err.value() + ": " + err.name() +
+                                            " - " + err.description() + ")" );
+    }
+
+    public static EdsDataType getPropertyType( final EdsBaseRef ref,
+                                               final EdsPropertyID property ) {
+        return CanonUtils.getPropertyType( ref, property, 0 );
+    }
+
+    public static EdsDataType getPropertyType( final EdsBaseRef ref,
+                                               final EdsPropertyID property,
+                                               final long param ) {
+        final int bufferSize = 1;
+        final IntBuffer type = IntBuffer.allocate( bufferSize );
+        final NativeLongByReference number = new NativeLongByReference( new NativeLong( bufferSize ) );
+        final EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertySize( ref, new NativeLong( property.value() ), new NativeLong( param ), type, number ) );
+        if ( err == EdsError.EDS_ERR_OK ) {
+            final EdsDataType edsDataType = EdsDataType.enumOfValue( type.get( 0 ) );
+            if ( edsDataType != null ) {
+                //System.out.println( " > property type = " + edsDataType.value() + " : " + edsDataType.name() + " : " + edsDataType.description() );
+                return edsDataType;
+            }
+        }
+        // TODO - would it be better to return NULL?
+        return EdsDataType.kEdsDataType_Unknown;
+    }
+
+    public static long getPropertySize( final EdsBaseRef ref,
+                                        final EdsPropertyID property ) {
+        return CanonUtils.getPropertySize( ref, property, 0 );
+    }
+
+    public static long getPropertySize( final EdsBaseRef ref,
+                                        final EdsPropertyID property,
+                                        final long param ) {
+        final int bufferSize = 1;
+        final IntBuffer type = IntBuffer.allocate( bufferSize );
+        final NativeLongByReference number = new NativeLongByReference( new NativeLong( bufferSize ) );
+        final EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertySize( ref, new NativeLong( property.value() ), new NativeLong( param ), type, number ) );
+        if ( err == EdsError.EDS_ERR_OK ) {
+            //System.out.println( "> property size = " + number.getValue().longValue() );
+            return number.getValue().longValue();
+        }
+        return -1;
+    }
+
+    /**
+     * Returns an array of DescriptiveEnum values for a given EdsPropertyID
+     * enum. Some of the EdsPropertyID enums that this function is known to
+     * support are listed in the EDSDK documentation, others were obtained by
+     * trial-and-error. Note that not all EdsPropertyID values are supported in
+     * all camera modes or with all models.
+     * 
+     * @param camera The camera to get the available property settings of
+     * @param property
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_DriveMode
+     *            kEdsPropID_DriveMode}
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ISOSpeed
+     *            kEdsPropID_ISOSpeed},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_MeteringMode
+     *            kEdsPropID_MeteringMode},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_AFMode
+     *            kEdsPropID_AFMode},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Av
+     *            kEdsPropID_Av},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Tv
+     *            kEdsPropID_Tv},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ExposureCompensation
+     *            kEdsPropID_ExposureCompensation},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_AEMode
+     *            kEdsPropID_AEMode},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ImageQuality
+     *            kEdsPropID_ImageQuality},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_WhiteBalance
+     *            kEdsPropID_WhiteBalance},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ColorSpace
+     *            kEdsPropID_ColorSpace},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_PictureStyle
+     *            kEdsPropID_PictureStyle},
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Evf_WhiteBalance
+     *            kEdsPropID_Evf_WhiteBalance}, or
+     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Evf_AFMode
+     *            kEdsPropID_Evf_AFMode}
+     * @return A DescriptiveEnum array of the available settings for the given
+     *         property
+     */
+    public static final DescriptiveEnum<?>[] getPropertyDesc( final EdsCameraRef camera,
+                                                              final EdsPropertyID property ) throws IllegalArgumentException, IllegalStateException {
+
+        System.out.println( "Getting available property values for " +
+                            property.description() + " (" + property.name() +
+                            ")" );
+
+        final EdsPropertyDesc propertyDesc = CanonUtils.getPropertyDesc( (EdsBaseRef) camera, property );
+
+        if ( propertyDesc.numElements.intValue() > 0 ) {
+            System.out.println( "Number of elements: " +
+                                propertyDesc.numElements );
+
+            final NativeLong[] propDesc = propertyDesc.propDesc;
+            final DescriptiveEnum<?>[] properties = new DescriptiveEnum<?>[propertyDesc.numElements.intValue()];
+            for ( int i = 0; i < propertyDesc.numElements.intValue(); i++ ) {
+                DescriptiveEnum<?> de = null;
+                switch ( property ) {
+                    case kEdsPropID_DriveMode:
+                        de = EdsDriveMode.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_ISOSpeed:
+                        de = EdsISOSpeed.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_MeteringMode:
+                        de = EdsMeteringMode.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_AFMode:
+                        de = EdsAFMode.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_Av:
+                        de = EdsAv.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_Tv:
+                        de = EdsTv.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_ExposureCompensation:
+                        de = EdsExposureCompensation.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_AEMode:
+                        de = EdsAEMode.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_ImageQuality:
+                        de = EdsImageQuality.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_WhiteBalance:
+                        de = EdsWhiteBalance.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_ColorSpace:
+                        de = EdsColorSpace.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_PictureStyle:
+                        de = EdsPictureStyle.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    // Doesn't seem possible to query available output devices
+                    //                    case kEdsPropID_Evf_OutputDevice:
+                    //                        de = EdsEvfOutputDevice.enumOfValue( propDesc[i].intValue() );
+                    //                        break;
+                    case kEdsPropID_Evf_WhiteBalance:
+                        de = EdsWhiteBalance.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    case kEdsPropID_Evf_AFMode:
+                        de = EdsEvfAFMode.enumOfValue( propDesc[i].intValue() );
+                        break;
+                    default:
+                        throw new IllegalArgumentException( "Property '" +
+                                                            property.name() +
+                                                            "' is not supported." );
+                }
+                if ( de == null ) {
+                    throw new IllegalStateException( "Could not find " +
+                                                     property.name() +
+                                                     " enum with value of: " +
+                                                     propDesc[i].intValue() );
+                } else {
+                    //System.out.println( e.name() + " ( " + e.value() + " ) " + e.description() );
+                }
+                properties[i] = de;
+            }
+            //System.out.println( "DONE!\n" );
+
+            return properties;
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param ref The camera to get the available property settings of
+     * @param property One of the supported EdsPropertyID values
+     * @return The EdsPropertyDesc containing the available settings for the
+     *         given property
+     */
+    public static EdsPropertyDesc getPropertyDesc( final EdsBaseRef ref,
+                                                   final EdsPropertyID property ) throws IllegalArgumentException {
+        final EdsPropertyDesc propertyDesc = new EdsPropertyDesc();
+        final EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertyDesc( ref, new NativeLong( property.value() ), propertyDesc ) );
+        if ( err == EdsError.EDS_ERR_OK ) {
+            //System.out.println( "> available values = " + propertyDesc.numElements );
+            return propertyDesc;
+        }
+        throw new IllegalArgumentException( "An error occurred while getting detailed " +
+                                            property.name() +
+                                            " data (error " +
+                                            err.value() +
+                                            ": " +
+                                            err.name() +
+                                            " - " + err.description() + ")" );
+    }
+
+    public static EdsError setCapacity( final EdsCameraRef ref ) {
+        return CanonUtils.setCapacity( ref, Integer.MAX_VALUE );
+    }
+
+    public static EdsError setCapacity( final EdsCameraRef ref,
+                                        final int capacity ) {
+        final EdsCapacity.ByValue edsCapacity = new EdsCapacity.ByValue();
+        edsCapacity.bytesPerSector = new NativeLong( 512 );
+        edsCapacity.numberOfFreeClusters = new NativeLong( capacity /
+                                                           edsCapacity.bytesPerSector.intValue() );
+        edsCapacity.reset = 1;
+        return CanonUtils.toEdsError( CanonCamera.EDSDK.EdsSetCapacity( ref, edsCapacity ) );
+    }
+
+    public static boolean isMirrorLockupEnabled( final EdsCameraRef camera ) {
+        try {
+            return 1l == CanonUtils.getPropertyData( camera, EdsPropertyID.kEdsPropID_CFn, EdsCustomFunction.kEdsCustomFunction_MirrorLockup.value() );
+        }
+        catch ( final IllegalArgumentException e ) {
+            System.err.println( "Could not check if mirror lockup enabled: " +
+                                e.getMessage() );
+        }
+        return false;
+    }
+
+    public static boolean beginLiveView( final EdsCameraRef camera ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+
+        NativeLongByReference number = new NativeLongByReference( new NativeLong( 1 ) );
+        Pointer data = number.getPointer();
+        err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Could not start live view (set image mode) (error " +
+                                err.value() +
+                                ": " +
+                                err.name() +
+                                " - " +
+                                err.description() + ")" );
+            return false;
+        }
+
+        number = new NativeLongByReference( new NativeLong( EdsEvfOutputDevice.kEdsEvfOutputDevice_PC.value() ) );
+        data = number.getPointer();
+        err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Could not start live view (set output device) (error " +
+                                err.value() +
+                                ": " +
+                                err.name() +
+                                " - " +
+                                err.description() + ")" );
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean endLiveView( final EdsCameraRef camera ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+
+        NativeLongByReference number = new NativeLongByReference( new NativeLong( EdsEvfOutputDevice.kEdsEvfOutputDevice_TFT.value() ) );
+        Pointer data = number.getPointer();
+        err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Could not end live view (error " +
+                                err.value() + ": " + err.name() + " - " +
+                                err.description() + ")" );
+            return false;
+        }
+
+        //TODO - decide whether skip deactivating the live view system. Canon's EOS Utility leaves it enabled, so should consider leaving it enabled as well.
+        number = new NativeLongByReference( new NativeLong( 0 ) );
+        data = number.getPointer();
+        err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Could not end live view (error " +
+                                err.value() + ": " + err.name() + " - " +
+                                err.description() + ")" );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether live view is allowed to be activated (enabled) and
+     * alternately whether the camera is actively transmitting live view images.
+     * <p>
+     * The default result from the camera may be misleading since
+     * {@link CanonConstant.EdsPropertyID#kEdsPropID_Evf_Mode
+     * kEdsPropID_Evf_Mode} only indicates whether live view is allowed to be
+     * enabled or not, not whether it is currently active and transmitting
+     * images.
+     * <p>
+     * Additionally, we cannot simply query
+     * {@link CanonConstant.EdsPropertyID#kEdsPropID_Evf_OutputDevice
+     * kEdsPropID_Evf_OutputDevice} because the camera seems to give
+     * inconsistent results, sometimes providing an answer but mostly returning
+     * {@code 0xFFFFFFFF}.
+     * <p>
+     * Instead, if {@code checkLiveViewActive} is {@code true} this function
+     * will try to download a live view frame and if it cannot, the function
+     * assumes that live view is off and {@code false} is returned.
+     * <p>
+     * Note that if {@code checkLiveViewActive} is {@code true}, then if live
+     * view is turned off while
+     * {@link CanonUtils#getLiveViewImageReference(EdsCameraRef)
+     * getLiveViewImageReference()} is queried, the tread will hang because the
+     * EDSDK will not return, so call this from a thread-handled environment
+     * such as {@link CanonCamera}.
+     * 
+     * @param camera the camera to query
+     * @param checkLiveViewActive set {@code true} to check whether the camera
+     *            is actively transmitting live view images
+     * @return {@code true} if live view is allowed to be enabled, or if
+     *         checkLiveViewActive, then {@code true} if the camera is actively
+     *         transmitting live view images
+     */
+    public static boolean isLiveViewEnabled( final EdsCameraRef camera,
+                                             final boolean checkLiveViewActive ) {
+        try {
+            if ( checkLiveViewActive ) {
+                final EdsBaseRef.ByReference[] references = CanonUtils.getLiveViewImageReference( camera );
+                if ( references != null ) {
+                    CanonUtils.release( references );
+                    return true;
+                }
+                return false;
+            }
+            return 1 == CanonUtils.getPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_Mode );
+        }
+        catch ( final IllegalArgumentException e ) {
+            System.err.println( "Could not check live view status: " +
+                                e.getMessage() );
+        }
+        return false;
+    }
+
+    /**
+     * Creates a stream and corresponding live view image. You MUST call
+     * {@link CanonUtils#release(edsdk.EdSdkLibrary.EdsBaseRef.ByReference...)
+     * release()} on the returned array when you are done using it or
+     * you will cause a memory leak!
+     * 
+     * @param camera the camera to query
+     * @return EdsEvfImageRef.ByReference and EdsStreamRef.ByReference as
+     *         indexes 0 and 1 respectively
+     */
+    public static EdsBaseRef.ByReference[] getLiveViewImageReference( final EdsCameraRef camera ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+
+        final EdsStreamRef.ByReference streamRef = new EdsStreamRef.ByReference();
+        final EdsEvfImageRef.ByReference imageRef = new EdsEvfImageRef.ByReference();
+
+        // Create memory stream.
+        err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCreateMemoryStream( new NativeLong( 0 ), streamRef ) );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Failed to download live view image, memory stream could not be created (error " +
+                                err.value() +
+                                ": " +
+                                err.name() +
+                                " - " +
+                                err.description() + ")" );
+            CanonUtils.release( imageRef, streamRef );
+            return null;
+        }
+
+        err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCreateEvfImageRef( new EdsStreamRef( streamRef.getPointer().getPointer( 0 ) ), imageRef ) );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Failed to download live view image, image ref could not be created (error " +
+                                err.value() +
+                                ": " +
+                                err.name() +
+                                " - " +
+                                err.description() + ")" );
+            CanonUtils.release( imageRef, streamRef );
+            return null;
+        }
+
+        // Now try to follow the guidelines from 
+        // http://tech.groups.yahoo.com/group/CanonSDK/message/1225
+        // instead of what the edsdk example has to offer! 
+
+        // Download live view image data.
+        err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownloadEvfImage( camera, imageRef.getValue() ) );
+        if ( err != EdsError.EDS_ERR_OK ) {
+            System.err.println( "Failed to download live view image (error " +
+                                err.value() + ": " + err.name() + " - " +
+                                err.description() + ")" );
+            CanonUtils.release( imageRef, streamRef );
+            return null;
+        }
+
+        return new EdsBaseRef.ByReference[] { imageRef, streamRef };
+    }
+
+    public static BufferedImage downloadLiveViewImage( final EdsCameraRef camera ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+
+        final EdsBaseRef.ByReference[] references = CanonUtils.getLiveViewImageReference( camera );
+        if ( references != null ) {
+            final EdsStreamRef.ByReference streamRef = (EdsStreamRef.ByReference) references[1];
+            final EdsEvfImageRef.ByReference imageRef = (EdsEvfImageRef.ByReference) references[0];
+
+            //		// Get the incidental data of the image.
+            //		NativeLongByReference zoom = new NativeLongByReference( new NativeLong( 0 ) );
+            //		Pointer data = zoom.getPointer(); 
+            //		err = getPropertyData( image.getValue(), EdSdkLibrary.kEdsPropID_Evf_ZoomPosition, 0, NativeLong.SIZE, data ); 
+            //		if( err != EdsError.EDS_ERR_OK ){
+            //			System.err.println( "Failed to download live view image, zoom value wasn't read (error "+ err.value() + ": "+ err.name() + " - " + err.description() + ")" );
+            //			return null; 
+            //		}
+            //
+            //		// Get the focus and zoom border position
+            //		EdsPoint point = new EdsPoint();
+            //		data = point.getPointer(); 
+            //		err = getPropertyData( image.getValue(), EdSdkLibrary.kEdsPropID_Evf_ZoomPosition, 0 , sizeof( point ), data );
+            //		if( err != EdsError.EDS_ERR_OK ){
+            //			System.err.println( "Failed to download live view image, focus point wasn't read (error "+ err.value() + ": "+ err.name() + " - " + err.description() + ")" );
+            //			return null; 
+            //		}
+
+            final NativeLongByReference length = new NativeLongByReference();
+            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetLength( streamRef.getValue(), length ) );
+            if ( err != EdsError.EDS_ERR_OK ) {
+                System.err.println( "Failed to download live view image, failed to read stream length (error " +
+                                    err.value() +
+                                    ": " +
+                                    err.name() +
+                                    " - " +
+                                    err.description() + ")" );
+                CanonUtils.release( imageRef, streamRef );
+                return null;
+            }
+
+            final PointerByReference ref = new PointerByReference();
+            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPointer( streamRef.getValue(), ref ) );
+            if ( err != EdsError.EDS_ERR_OK ) {
+                System.err.println( "Failed to download live view image, failed to get reference to image in memory (error " +
+                                    err.value() +
+                                    ": " +
+                                    err.name() +
+                                    " - " +
+                                    err.description() + ")" );
+                CanonUtils.release( imageRef, streamRef );
+                return null;
+            }
+
+            final byte[] data = ref.getValue().getByteArray( 0, length.getValue().intValue() );
+            try {
+                final BufferedImage img = ImageIO.read( new ByteArrayInputStream( data ) );
+                System.out.println( img.getWidth() + " x " + img.getHeight() );
+                return img;
+            }
+            catch ( final IOException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            finally {
+                CanonUtils.release( imageRef, streamRef );
+            }
+        }
+
+        return null;
+    }
+
+    public static EdsError toEdsError( final NativeLong value ) {
+        return CanonUtils.toEdsError( value.intValue() );
+    }
+
+    public static EdsError toEdsError( final long value ) {
+        return CanonUtils.toEdsError( value );
+    }
+
+    public static EdsError toEdsError( final int value ) {
+        final EdsError error = EdsError.enumOfValue( value );
+        if ( error != null ) {
+            return error;
+        }
+        return EdsError.EDS_ERR_UNEXPECTED_EXCEPTION;
+    }
+
+    public static void release( final EdsBaseRef.ByReference ... objects ) {
+        for ( final EdsBaseRef.ByReference obj : objects ) {
+            if ( obj != null ) {
+                CanonUtils.release( obj.getValue() );
+            }
+        }
+    }
+
+    public static void release( final EdsBaseRef ... objects ) {
+        for ( final EdsBaseRef obj : objects ) {
+            if ( obj != null ) {
+                CanonCamera.EDSDK.EdsRelease( obj );
+            }
+        }
+    }
 }

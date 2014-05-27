@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
 
 /**
  * A live view example

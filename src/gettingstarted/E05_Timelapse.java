@@ -16,13 +16,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
+import edsdk.api.commands.ShootCommand;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAv;
 import edsdk.utils.CanonConstant.EdsISOSpeed;
 import edsdk.utils.CanonConstant.EdsSaveTo;
 import edsdk.utils.CanonConstant.EdsTv;
-import edsdk.utils.commands.ShootTask;
 
 public class E05_Timelapse {
 
@@ -38,7 +38,7 @@ public class E05_Timelapse {
                 System.out.println( "Battery Level = " +
                                     camera.getBatteryLevel() );
 
-                camera.execute( new ShootTask( EdsSaveTo.kEdsSaveTo_Host, 20, E05_Timelapse.filename() ) );
+                camera.execute( new ShootCommand( EdsSaveTo.kEdsSaveTo_Host, 20, E05_Timelapse.filename() ) );
 
                 try {
                     Thread.sleep( 15000 );

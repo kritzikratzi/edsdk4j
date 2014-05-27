@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
-import edsdk.EdSdkLibrary;
+import edsdk.bindings.EdSdkLibrary;
 
 public class CanonConstant {
 
@@ -114,7 +114,7 @@ public class CanonConstant {
 
     /**
      * Ensure that {@link edsdk.utils.CanonConstant CanonConstant} contains all
-     * constant values from {@link edsdk.EdSdkLibrary}
+     * constant values from {@link edsdk.bindings.EdSdkLibrary}
      * 
      * @return true if {@link edsdk.utils.CanonConstant CanonConstant} contains
      *         all values, bar those in

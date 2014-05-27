@@ -1,0 +1,51 @@
+package edsdk.api.commands;
+
+import java.awt.image.BufferedImage;
+
+import edsdk.api.CanonCommand;
+import edsdk.utils.CanonUtils;
+
+// TODO - probably a bad idea that Begin/End/Download are static
+public class LiveViewCommand {
+
+    public static class Begin extends CanonCommand<Boolean> {
+
+        @Override
+        public void run() {
+            setResult( CanonUtils.beginLiveView( camera.getEdsCamera() ) );
+        }
+    }
+
+    public static class End extends CanonCommand<Boolean> {
+
+        @Override
+        public void run() {
+            setResult( CanonUtils.endLiveView( camera.getEdsCamera() ) );
+        }
+    }
+
+    public static class Download extends CanonCommand<BufferedImage> {
+
+        @Override
+        public void run() {
+            setResult( CanonUtils.downloadLiveViewImage( camera.getEdsCamera() ) );
+        }
+    }
+
+    public static class IsLiveViewEnabled extends CanonCommand<Boolean> {
+
+        @Override
+        public void run() {
+            setResult( CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), false ) );
+        }
+    }
+
+    public static class IsLiveViewActive extends CanonCommand<Boolean> {
+
+        @Override
+        public void run() {
+            setResult( CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), true ) );
+        }
+    }
+
+}

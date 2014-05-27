@@ -1,7 +1,7 @@
 package gettingstarted;
 
-import edsdk.utils.CanonCamera;
-import edsdk.utils.CanonTask;
+import edsdk.api.CanonCamera;
+import edsdk.api.CanonCommand;
 
 /**
  * In most situations you'll want to mix/match the raw power of the EDSDK,
@@ -24,7 +24,7 @@ public class E03_Mixed {
         final CanonCamera camera = new CanonCamera();
         if ( camera.openSession() ) {
 
-            final boolean result = camera.executeNow( new CanonTask<Boolean>() {
+            final boolean result = camera.executeNow( new CanonCommand<Boolean>() {
 
                 @Override
                 public void run() {

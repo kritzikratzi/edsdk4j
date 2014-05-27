@@ -16,20 +16,21 @@ import com.sun.jna.Structure;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-import edsdk.EdSdkLibrary.EdsBaseRef;
-import edsdk.EdSdkLibrary.EdsCameraRef;
-import edsdk.EdSdkLibrary.EdsDirectoryItemRef;
-import edsdk.EdSdkLibrary.EdsEvfImageRef;
-import edsdk.EdSdkLibrary.EdsStreamRef;
-import edsdk.EdsCapacity;
-import edsdk.EdsDirectoryItemInfo;
-import edsdk.EdsFocusInfo;
-import edsdk.EdsPictureStyleDesc;
-import edsdk.EdsPoint;
-import edsdk.EdsPropertyDesc;
-import edsdk.EdsRational;
-import edsdk.EdsRect;
-import edsdk.EdsTime;
+import edsdk.api.CanonCamera;
+import edsdk.bindings.EdsCapacity;
+import edsdk.bindings.EdsDirectoryItemInfo;
+import edsdk.bindings.EdsFocusInfo;
+import edsdk.bindings.EdsPictureStyleDesc;
+import edsdk.bindings.EdsPoint;
+import edsdk.bindings.EdsPropertyDesc;
+import edsdk.bindings.EdsRational;
+import edsdk.bindings.EdsRect;
+import edsdk.bindings.EdsTime;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
+import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
+import edsdk.bindings.EdSdkLibrary.EdsEvfImageRef;
+import edsdk.bindings.EdSdkLibrary.EdsStreamRef;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
 import edsdk.utils.CanonConstant.EdsAFMode;
@@ -781,7 +782,7 @@ public class CanonUtils {
 
     /**
      * Creates a stream and corresponding live view image. You MUST call
-     * {@link CanonUtils#release(edsdk.EdSdkLibrary.EdsBaseRef.ByReference...)
+     * {@link CanonUtils#release(edsdk.bindings.EdSdkLibrary.EdsBaseRef.ByReference...)
      * release()} on the returned array when you are done using it or
      * you will cause a memory leak!
      * 

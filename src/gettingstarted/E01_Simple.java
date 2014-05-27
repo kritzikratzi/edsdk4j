@@ -6,13 +6,13 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
 
-import edsdk.EdSdkLibrary;
-import edsdk.EdSdkLibrary.EdsBaseRef;
-import edsdk.EdSdkLibrary.EdsCameraListRef;
-import edsdk.EdSdkLibrary.EdsCameraRef;
-import edsdk.EdSdkLibrary.EdsDirectoryItemRef;
-import edsdk.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
+import edsdk.bindings.EdSdkLibrary;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
+import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
+import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
 import edsdk.utils.CanonConstant.EdsError;
 import edsdk.utils.CanonUtils;
 

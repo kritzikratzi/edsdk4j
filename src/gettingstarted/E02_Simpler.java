@@ -3,7 +3,7 @@ package gettingstarted;
 import java.io.File;
 import java.io.IOException;
 
-import edsdk.utils.CanonCamera;
+import edsdk.api.CanonCamera;
 import edsdk.utils.CanonConstant.EdsSaveTo;
 
 /** Simple example of JNA interface mapping and usage. */

@@ -5,13 +5,13 @@ import java.lang.reflect.Array;
 import com.sun.jna.NativeLong;
 
 import edsdk.api.CanonCommand;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdsFocusInfo;
 import edsdk.bindings.EdsPictureStyleDesc;
 import edsdk.bindings.EdsPoint;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsSize;
 import edsdk.bindings.EdsTime;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.utils.CanonConstant;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
@@ -70,31 +70,34 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
     }
 
     public GetPropertyCommand( final EdsPropertyID property,
-                            final boolean isLiveViewTask ) {
+                               final boolean isLiveViewTask ) {
         this( property, 0, null, isLiveViewTask );
     }
 
     public GetPropertyCommand( final EdsPropertyID property, final long param,
-                            final boolean isLiveViewTask ) {
+                               final boolean isLiveViewTask ) {
         this( property, param, null, isLiveViewTask );
     }
 
-    public GetPropertyCommand( final EdsPropertyID property, final Class<T> klass ) {
+    public GetPropertyCommand( final EdsPropertyID property,
+                               final Class<T> klass ) {
         this( property, 0, klass, false );
     }
 
     public GetPropertyCommand( final EdsPropertyID property, final long param,
-                            final Class<T> klass ) {
+                               final Class<T> klass ) {
         this( property, param, klass, false );
     }
 
-    public GetPropertyCommand( final EdsPropertyID property, final Class<T> klass,
-                            final boolean isLiveViewTask ) {
+    public GetPropertyCommand( final EdsPropertyID property,
+                               final Class<T> klass,
+                               final boolean isLiveViewTask ) {
         this( property, 0, klass, isLiveViewTask );
     }
 
     public GetPropertyCommand( final EdsPropertyID property, final long param,
-                            final Class<T> klass, final boolean isLiveViewTask ) {
+                               final Class<T> klass,
+                               final boolean isLiveViewTask ) {
         this.property = property;
         this.param = param;
         this.klass = klass;

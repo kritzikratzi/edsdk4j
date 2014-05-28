@@ -1,5 +1,18 @@
 package edsdk.utils;
 
+/**
+ * A Lot of constants.
+ * 
+ * @author Ananta Palani
+ * @author hansi
+ * 
+ *         Copyright © 2014 Ananta Palani <anantapalani@gmail.com>, Hansi Raber
+ *         <super@superduper.org>
+ *         This work is free. You can redistribute it and/or modify it under the
+ *         terms of the Do What The Fuck You Want To Public License, Version 2,
+ *         as published by Sam Hocevar. See the COPYING file for more details.
+ */
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -910,7 +923,7 @@ public class CanonConstant {
            ED-SDK Generic Error IDs
         ------------------------------------------------------------------------*/
         /* Miscellaneous errors */
-        EDS_ERR_UNIMPLEMENTED( "Unimplimented" ),
+        EDS_ERR_UNIMPLEMENTED( "Unimplemented" ),
         EDS_ERR_INTERNAL_ERROR( "Internal Error" ),
         EDS_ERR_MEM_ALLOC_FAILED( "Memory Allocation Failed" ),
         EDS_ERR_MEM_FREE_FAILED( "Memory Release Failed" ),
@@ -947,7 +960,7 @@ public class CanonConstant {
         EDS_ERR_DIR_NOT_EMPTY( "Directory Full" ),
 
         /* Property errors */
-        EDS_ERR_PROPERTIES_UNAVAILABLE( "Property Unvailable" ),
+        EDS_ERR_PROPERTIES_UNAVAILABLE( "Property Unavailable" ),
         EDS_ERR_PROPERTIES_MISMATCH( "Property Mismatch" ),
         EDS_ERR_PROPERTIES_NOT_LOADED( "Property Not Loaded" ),
 

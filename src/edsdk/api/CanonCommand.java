@@ -5,12 +5,12 @@ import com.sun.jna.Pointer;
 
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonUtils;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsCameraCommand;
 import edsdk.utils.CanonConstant.EdsCameraStatusCommand;
 import edsdk.utils.CanonConstant.EdsError;
 import edsdk.utils.CanonConstant.EdsObjectEvent;
+import edsdk.utils.CanonUtils;
 
 /**
  * The SLRCommand class tries to make your life a whole lot easier when you

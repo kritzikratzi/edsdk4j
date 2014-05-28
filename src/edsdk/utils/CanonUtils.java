@@ -17,6 +17,11 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 import edsdk.api.CanonCamera;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
+import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
+import edsdk.bindings.EdSdkLibrary.EdsEvfImageRef;
+import edsdk.bindings.EdSdkLibrary.EdsStreamRef;
 import edsdk.bindings.EdsCapacity;
 import edsdk.bindings.EdsDirectoryItemInfo;
 import edsdk.bindings.EdsFocusInfo;
@@ -26,11 +31,6 @@ import edsdk.bindings.EdsPropertyDesc;
 import edsdk.bindings.EdsRational;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsTime;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
-import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
-import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
-import edsdk.bindings.EdSdkLibrary.EdsEvfImageRef;
-import edsdk.bindings.EdSdkLibrary.EdsStreamRef;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
 import edsdk.utils.CanonConstant.EdsAFMode;
@@ -59,14 +59,22 @@ import edsdk.utils.CanonConstant.EdsWhiteBalance;
  * encapsulate them in
  * a CanonTask and then send them to the camera, like so for instance :
  * 
- * 
+ * <pre>
  * canonCamera.executeNow( new CanonTask<Boolean>() {
- * public void run(){
- * CanonUtils.doSomethingLikeDownloadOrWhatever();
+ *     public void run(){
+ *         CanonUtils.doSomethingLikeDownloadOrWhatever();
+ *     }
  * }
- * } );
+ * </pre>
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
  * 
  * @author hansi
+ * @author Ananta Palani
  * 
  */
 // TODO - think about having CanonUtils handle state/property changes to handle cases described by CanonUtils.isLiveViewEnabled()
@@ -97,6 +105,26 @@ public class CanonUtils {
     }
 
     /**
+     * Finds the filename for a directory item
+     * 
+     * @param directoryItem The item you want to download
+     * @return Either null, or the filename of the item
+     */
+    public static EdsDirectoryItemInfo getDirectoryItemInfo( final EdsDirectoryItemRef directoryItem ) {
+        EdsError err = EdsError.EDS_ERR_OK;
+        final EdsDirectoryItemInfo dirItemInfo = new EdsDirectoryItemInfo();
+
+        try {
+            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetDirectoryItemInfo( directoryItem, dirItemInfo ) );
+        }
+        catch ( final Exception e ) {
+            e.printStackTrace();
+        }
+
+        return err == EdsError.EDS_ERR_OK ? dirItemInfo : null;
+    }
+
+    /**
      * Downloads an image and saves it somewhere.
      * 
      * @param directoryItem The item you want to download
@@ -124,7 +152,6 @@ public class CanonUtils {
         final long timeStart = System.currentTimeMillis();
 
         try {
-
             err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetDirectoryItemInfo( directoryItem, dirItemInfo ) );
             if ( err == EdsError.EDS_ERR_OK ) {
                 if ( destination == null ) {
@@ -706,9 +733,11 @@ public class CanonUtils {
         Pointer data = number.getPointer();
         err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_OutputDevice, 0, NativeLong.SIZE, data );
         if ( err != EdsError.EDS_ERR_OK ) {
-            System.err.println( "Could not end live view (error " +
-                                err.value() + ": " + err.name() + " - " +
-                                err.description() + ")" );
+            /*
+             * System.err.println( "Could not end live view (error " +
+             * err.value() + ": " + err.name() + " - " +
+             * err.description() + ")" );
+             */
             return false;
         }
 
@@ -717,9 +746,11 @@ public class CanonUtils {
         data = number.getPointer();
         err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data );
         if ( err != EdsError.EDS_ERR_OK ) {
-            System.err.println( "Could not end live view (error " +
-                                err.value() + ": " + err.name() + " - " +
-                                err.description() + ")" );
+            /*
+             * System.err.println( "Could not end live view (error " +
+             * err.value() + ": " + err.name() + " - " +
+             * err.description() + ")" );
+             */
             return false;
         }
 
@@ -828,9 +859,12 @@ public class CanonUtils {
         // Download live view image data.
         err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownloadEvfImage( camera, imageRef.getValue() ) );
         if ( err != EdsError.EDS_ERR_OK ) {
-            System.err.println( "Failed to download live view image (error " +
-                                err.value() + ": " + err.name() + " - " +
-                                err.description() + ")" );
+            /*
+             * System.err.println( "Failed to download live view image (error "
+             * +
+             * err.value() + ": " + err.name() + " - " +
+             * err.description() + ")" );
+             */
             CanonUtils.release( imageRef, streamRef );
             return null;
         }
@@ -893,7 +927,6 @@ public class CanonUtils {
             final byte[] data = ref.getValue().getByteArray( 0, length.getValue().intValue() );
             try {
                 final BufferedImage img = ImageIO.read( new ByteArrayInputStream( data ) );
-                System.out.println( img.getWidth() + " x " + img.getHeight() );
                 return img;
             }
             catch ( final IOException e ) {

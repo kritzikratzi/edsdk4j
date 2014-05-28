@@ -3,8 +3,8 @@ package edsdk.api.commands;
 import java.util.Arrays;
 
 import edsdk.api.CanonCommand;
-import edsdk.bindings.EdsPropertyDesc;
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdsPropertyDesc;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
 import edsdk.utils.CanonConstant.EdsAFMode;

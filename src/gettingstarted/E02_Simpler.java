@@ -18,7 +18,8 @@ public class E02_Simpler {
             if ( photos != null ) {
                 for ( final File photo : photos ) {
                     if ( photo != null ) {
-                        System.out.println( photo.getCanonicalPath() );
+                        System.out.println( "Saved photo as: " +
+                                            photo.getCanonicalPath() );
                     }
                 }
             }

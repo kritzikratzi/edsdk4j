@@ -3,11 +3,11 @@ package edsdk.api.commands;
 import com.sun.jna.NativeLong;
 
 import edsdk.api.CanonCommand;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdsPictureStyleDesc;
 import edsdk.bindings.EdsPoint;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsSize;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
 import edsdk.utils.CanonConstant.EdsAFMode;
@@ -65,18 +65,18 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     }
 
     public SetPropertyCommand( final EdsPropertyID property, final long param,
-                            final T value ) {
+                               final T value ) {
         this( property, param, value, false );
     }
 
     public SetPropertyCommand( final EdsPropertyID property, final T value,
-                            final boolean isLiveViewTask ) {
+                               final boolean isLiveViewTask ) {
         this( property, 0, value, isLiveViewTask );
     }
 
     @SuppressWarnings( "unchecked" )
     public SetPropertyCommand( final EdsPropertyID property, final long param,
-                            final T value, final boolean isLiveViewTask ) {
+                               final T value, final boolean isLiveViewTask ) {
         this.property = property;
         this.param = param;
         this.value = value;

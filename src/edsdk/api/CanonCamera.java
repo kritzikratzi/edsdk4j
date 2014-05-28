@@ -18,12 +18,16 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
 import edsdk.api.commands.FocusModeCommand;
-import edsdk.api.commands.GetPropertyDescCommand;
 import edsdk.api.commands.GetPropertyCommand;
+import edsdk.api.commands.GetPropertyDescCommand;
 import edsdk.api.commands.LiveViewCommand;
 import edsdk.api.commands.SetPropertyCommand;
 import edsdk.api.commands.ShootCommand;
 import edsdk.bindings.EdSdkLibrary;
+import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
+import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
 import edsdk.bindings.EdsFocusInfo;
 import edsdk.bindings.EdsPictureStyleDesc;
 import edsdk.bindings.EdsPoint;
@@ -31,11 +35,6 @@ import edsdk.bindings.EdsPropertyDesc;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsSize;
 import edsdk.bindings.EdsTime;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
-import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
-import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
-import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonUtils;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
 import edsdk.utils.CanonConstant.EdsAFMode;
@@ -63,6 +62,7 @@ import edsdk.utils.CanonConstant.EdsSaveTo;
 import edsdk.utils.CanonConstant.EdsTonigEffect;
 import edsdk.utils.CanonConstant.EdsTv;
 import edsdk.utils.CanonConstant.EdsWhiteBalance;
+import edsdk.utils.CanonUtils;
 
 /**
  * This class should be the easiest way to use the canon sdk.
@@ -297,6 +297,14 @@ public class CanonCamera implements EdsObjectEventHandler {
         System.err.println( errorMessage );
 
         return false;
+    }
+
+    public EdsError getLastError() {
+        return errorCode;
+    }
+
+    public String getLastErrorMessage() {
+        return errorMessage;
     }
 
     /**

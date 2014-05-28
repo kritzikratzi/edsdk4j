@@ -19,9 +19,6 @@ import edsdk.utils.CanonUtils;
 /** Simple example of JNA interface mapping and usage. */
 public class E01_Simple {
 
-    //TODO - remove
-    //static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("Me");
-
     public static void main( final String[] args ) throws InterruptedException {
         int result;
 
@@ -111,7 +108,6 @@ public class E01_Simple {
 
     public static void dispatchMessages() {
         // This bit never returns from GetMessage
-        //int count = 0; 
         int result = -1;
         final MSG msg = new MSG();
 
@@ -121,7 +117,6 @@ public class E01_Simple {
                 System.err.println( "error in get message" );
                 break;
             } else {
-                //count++; 
                 User32.INSTANCE.TranslateMessage( msg );
                 try {
                     User32.INSTANCE.DispatchMessage( msg );

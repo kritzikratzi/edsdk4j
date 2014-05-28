@@ -45,17 +45,17 @@ public class ShootCommand extends CanonCommand<File[]> {
     }
 
     public ShootCommand( final EdsSaveTo saveTo, final int shotAttempts,
-                      final File dest ) {
+                         final File dest ) {
         this( saveTo, shotAttempts, new File[] { dest }, false );
     }
 
     public ShootCommand( final EdsSaveTo saveTo, final int shotAttempts,
-                      final File[] dest ) {
+                         final File[] dest ) {
         this( saveTo, shotAttempts, dest, false );
     }
 
     public ShootCommand( final EdsSaveTo saveTo, final int shotAttempts,
-                      final File[] dest, final boolean appendFileExtension ) {
+                         final File[] dest, final boolean appendFileExtension ) {
         this.saveTo = saveTo;
         this.shotAttempts = shotAttempts;
         this.appendFileExtension = appendFileExtension;
@@ -115,28 +115,22 @@ public class ShootCommand extends CanonCommand<File[]> {
 
             err = EdsError.EDS_ERR_UNIMPLEMENTED;
             while ( shotAttempts > 0 && err != EdsError.EDS_ERR_OK ) {
-                System.out.println( "Trying to take image..." );
                 oldEvfMode = CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), true );
-                System.out.println( "> LiveView on? " +
-                                    ( oldEvfMode ? "yes" : "no" ) );
                 if ( oldEvfMode ) {
                     CanonUtils.endLiveView( camera.getEdsCamera() );
                 }
                 err = sendCommand( EdsCameraCommand.kEdsCameraCommand_TakePicture, 0 );
-                System.out.println( "> result " + err.value() + ": " +
-                                    err.name() + " - " + err.description() );
+                // System.out.println( "> result " + err.value() + ": " + err.name() + " - " + err.description() );
                 if ( err != EdsError.EDS_ERR_OK ) {
                     try {
                         Thread.sleep( 1000 );
                     }
                     catch ( final InterruptedException e ) {
-                        System.out.println( "Interrupt received by ShootTask, stopping..." );
                         Thread.currentThread().interrupt(); // restore interrupted status
                         return;
                     }
                 } else {
                     if ( CanonUtils.isMirrorLockupEnabled( camera.getEdsCamera() ) ) {
-                        System.out.println( "> Mirror Lockup: Enabled" );
                         sendCommand( EdsCameraCommand.kEdsCameraCommand_PressShutterButton, EdsShutterButton.kEdsCameraCommand_ShutterButton_Completely_NonAF );
                         sendCommand( EdsCameraCommand.kEdsCameraCommand_PressShutterButton, EdsShutterButton.kEdsCameraCommand_ShutterButton_OFF );
                     }
@@ -145,11 +139,13 @@ public class ShootCommand extends CanonCommand<File[]> {
             }
         }
         if ( err == EdsError.EDS_ERR_OK ) {
-            System.out.println( "Took image, waiting for camera" );
+            //System.out.println( "Took image, waiting for camera" );
             notYetFinished();
-        } else {
-            System.out.println( "No image could be taken, stopping..." );
-        }
+        }/*
+          * else {
+          * System.out.println( "No image could be taken, stopping..." );
+          * }
+          */
     }
 
     @Override

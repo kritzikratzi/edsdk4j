@@ -1,5 +1,6 @@
 package edsdk.api;
 
+import java.nio.channels.InterruptedByTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -133,6 +134,31 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler{
 	
 	/**
 	 * Waits until the task is completed and returns the result. 
+	 * If the result is not returned in time an interrupted exception is thrown. 
+	 * @throws InterruptedException 
+	 */
+	public T get( long timeout ) throws InterruptedException{
+		long now = System.currentTimeMillis(); 
+		try{
+			while( !finished() && ( timeout == 0 || System.currentTimeMillis() - now < timeout ) ){
+				Thread.sleep( 1 );
+			}
+		}
+		catch( InterruptedException e ){
+			throw e; 
+		}
+		
+		if( finished() ){
+			return result; 
+		}
+		else{
+			throw new InterruptedException("edsdkp5 - command didn't return the result in time" ); 
+		}
+	}
+	
+	
+	/**
+	 * Waits until the task is completed and returns the result. 
 	 * @return
 	 */
 	public T get(){
@@ -146,7 +172,6 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler{
 		while( !finished() ){
 			try {
 				Thread.sleep( 1 );
-				Thread.yield();
 			}
 			catch ( InterruptedException e ) {
 				return null; 

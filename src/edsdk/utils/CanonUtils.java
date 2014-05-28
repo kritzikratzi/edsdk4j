@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -20,6 +22,7 @@ import edsdk.bindings.EdSdkLibrary;
 import edsdk.bindings.EdsDirectoryItemInfo;
 import edsdk.bindings.EdSdkLibrary.EdsVoid;
 import edsdk.bindings.EdSdkLibrary.__EdsObject;
+import edsdk.bindings.EdsPropertyDesc;
 
 /**
  * Here are some great helpers. 
@@ -101,6 +104,80 @@ public class CanonUtils {
 		}
 		
 		return "unknown error code"; 
+	}
+	
+	public static String getQualityDescriptionForShortDescription( String str ){
+		/* Jpeg Only */
+		if("LJ".equals( str ) ) return "Jpeg Large"; 
+		if("M1J".equals( str ) ) return "Jpeg Middle1"; 
+		if("M2J".equals( str ) ) return "Jpeg Middle2"; 
+		if("SJ".equals( str ) ) return "Jpeg Small"; 
+		if("LJF".equals( str ) ) return "Jpeg Large Fine"; 
+		if("LJN".equals( str ) ) return "Jpeg Large Normal"; 
+		if("MJF".equals( str ) ) return "Jpeg Middle Fine"; 
+		if("MJN".equals( str ) ) return "Jpeg Middle Normal"; 
+		if("SJF".equals( str ) ) return "Jpeg Small Fine"; 
+		if("SJN".equals( str ) ) return "Jpeg Small Normal"; 
+		if("S1JF".equals( str ) ) return "Jpeg Small1 Fine"; 
+		if("S1JN".equals( str ) ) return "Jpeg Small1 Normal"; 
+		if("S2JF".equals( str ) ) return "Jpeg Small2"; 
+		if("S3JF".equals( str ) ) return "Jpeg Small3"; 
+
+		/* RAW + Jpeg */
+		if("LR".equals( str ) ) return "RAW"; 
+		if("LRLJF".equals( str ) ) return "RAW + Jpeg Large Fine"; 
+		if("LRLJN".equals( str ) ) return "RAW + Jpeg Large Normal"; 
+		if("LRMJF".equals( str ) ) return "RAW + Jpeg Middle Fine"; 
+		if("LRMJN".equals( str ) ) return "RAW + Jpeg Middle Normal"; 
+		if("LRSJF".equals( str ) ) return "RAW + Jpeg Small Fine"; 
+		if("LRSJN".equals( str ) ) return "RAW + Jpeg Small Normal"; 
+		if("LRS1JF".equals( str ) ) return "RAW + Jpeg Small1 Fine"; 
+		if("LRS1JN".equals( str ) ) return "RAW + Jpeg Small1 Normal"; 
+		if("LRS2JF".equals( str ) ) return "RAW + Jpeg Small2"; 
+		if("LRS3JF".equals( str ) ) return "RAW + Jpeg Small3"; 
+
+		if("LRLJ".equals( str ) ) return "RAW + Jpeg Large"; 
+		if("LRM1J".equals( str ) ) return "RAW + Jpeg Middle1"; 
+		if("LRM2J".equals( str ) ) return "RAW + Jpeg Middle2"; 
+		if("LRSJ".equals( str ) ) return "RAW + Jpeg Small"; 
+
+		/* MRAW(SRAW1) + Jpeg */
+		if("MR".equals( str ) ) return "MRAW(SRAW1)"; 
+		if("MRLJF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Large Fine"; 
+		if("MRLJN".equals( str ) ) return "MRAW(SRAW1) + Jpeg Large Normal"; 
+		if("MRMJF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Middle Fine"; 
+		if("MRMJN".equals( str ) ) return "MRAW(SRAW1) + Jpeg Middle Normal"; 
+		if("MRSJF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small Fine"; 
+		if("MRSJN".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small Normal"; 
+		if("MRS1JF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small1 Fine"; 
+		if("MRS1JN".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small1 Normal"; 
+		if("MRS2JF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small2"; 
+		if("MRS3JF".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small3"; 
+
+		if("MRLJ".equals( str ) ) return "MRAW(SRAW1) + Jpeg Large"; 
+		if("MRM1J".equals( str ) ) return "MRAW(SRAW1) + Jpeg Middle1"; 
+		if("MRM2J".equals( str ) ) return "MRAW(SRAW1) + Jpeg Middle2"; 
+		if("MRSJ".equals( str ) ) return "MRAW(SRAW1) + Jpeg Small"; 
+
+		/* SRAW(SRAW2) + Jpeg */
+		if("SR".equals( str ) ) return "SRAW(SRAW2)"; 
+		if("SRLJF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Large Fine"; 
+		if("SRLJN".equals( str ) ) return "SRAW(SRAW2) + Jpeg Large Normal"; 
+		if("SRMJF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Middle Fine"; 
+		if("SRMJN".equals( str ) ) return "SRAW(SRAW2) + Jpeg Middle Normal"; 
+		if("SRSJF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small Fine"; 
+		if("SRSJN".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small Normal"; 
+		if("SRS1JF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small1 Fine"; 
+		if("SRS1JN".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small1 Normal"; 
+		if("SRS2JF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small2"; 
+		if("SRS3JF".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small3"; 
+
+		if("SRLJ".equals( str ) ) return "SRAW(SRAW2) + Jpeg Large"; 
+		if("SRM1J".equals( str ) ) return "SRAW(SRAW2) + Jpeg Middle1"; 
+		if("SRM2J".equals( str ) ) return "SRAW(SRAW2) + Jpeg Middle2"; 
+		if("SRSJ".equals( str ) ) return "SRAW(SRAW2) + Jpeg Small"; 
+		
+		return "Unknown Image Quality"; 
 	}
 	
 	/**
@@ -188,11 +265,11 @@ public class CanonUtils {
 		}
 
 		if( err == EdSdkLibrary.EDS_ERR_OK ){
-			System.out.println( "Image downloaded in " +  ( System.currentTimeMillis() - timeStart ) );
+//			System.out.println( "Image downloaded in " +  ( System.currentTimeMillis() - timeStart ) );
 
 			err = CanonCamera.EDSDK.EdsDownloadComplete( directoryItem ).intValue();
 			if( deleteAfterDownload ){
-				System.out.println( "Image deleted" );
+//				System.out.println( "Image deleted" );
 				CanonCamera.EDSDK.EdsDeleteDirectoryItem( directoryItem );
 			}
 			
@@ -205,8 +282,6 @@ public class CanonUtils {
 		
 		return success? destination : null;
 	}
-
-
 	
 	/*public static long getPropertySize( __EdsObject ref, long property ){
 		IntBuffer type = IntBuffer.allocate( 1 ); 
@@ -331,6 +406,7 @@ public class CanonUtils {
 			release( image[0], stream[0] ); 
 			return null; 
 		}
+		
 //
 //		// Get the incidental data of the image.
 //		NativeLongByReference zoom = new NativeLongByReference();
@@ -381,7 +457,43 @@ public class CanonUtils {
 		return null; 
 	}
 	
+	public static EdsPropertyDesc getPropertyDesc( __EdsObject camera, long inPropertyID ){
+		EdsPropertyDesc.ByReference desc = new EdsPropertyDesc.ByReference(); 
+		
+		NativeLong err = CanonCamera.EDSDK.EdsGetPropertyDesc( camera, new NativeLong(inPropertyID), desc ); 
+		if( err.longValue() != EdSdkLibrary.EDS_ERR_OK ){
+			System.out.println( "EdsGetPropertyDesc Error#" + err.longValue() + ": " + CanonUtils.toString( err.intValue() ) ); 
+		}
+		return desc; 
+	}
 	
+	public static LinkedHashMap<String, Integer> listImageQualities( __EdsObject camera ){
+		LinkedHashMap<String,Integer> result = new LinkedHashMap<String,Integer>(); 
+		EdsPropertyDesc desc = CanonUtils.getPropertyDesc( camera, EdSdkLibrary.kEdsPropID_ImageQuality ); 
+		Field[] fields = EdSdkLibrary.EdsImageQuality.class.getFields(); 
+		
+		next:
+		for( int i = 0; i < desc.numElements.intValue(); i++ ){
+			int value = desc.propDesc[i].intValue(); 
+			for( Field field : fields ){
+				try {
+					if( field.getType().toString().equals( "int" ) && field.getInt( EdSdkLibrary.class ) == value ){
+						if( field.getName().startsWith( "EdsImageQuality_" ) ){
+							result.put( field.getName().substring( 16 ), value ); 
+							continue next; 
+						}
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			result.put( "Unknown:" + value, value ); 
+		}
+
+		return result; 
+	}
 	
 	public static void release( __EdsObject ... objects ){
 		for( __EdsObject obj : objects ){

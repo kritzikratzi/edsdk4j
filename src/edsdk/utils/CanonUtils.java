@@ -31,27 +31,27 @@ import edsdk.bindings.EdsPropertyDesc;
 import edsdk.bindings.EdsRational;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsTime;
-import edsdk.utils.CanonConstant.DescriptiveEnum;
-import edsdk.utils.CanonConstant.EdsAEMode;
-import edsdk.utils.CanonConstant.EdsAFMode;
-import edsdk.utils.CanonConstant.EdsAccess;
-import edsdk.utils.CanonConstant.EdsAv;
-import edsdk.utils.CanonConstant.EdsColorSpace;
-import edsdk.utils.CanonConstant.EdsCustomFunction;
-import edsdk.utils.CanonConstant.EdsDataType;
-import edsdk.utils.CanonConstant.EdsDriveMode;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsEvfAFMode;
-import edsdk.utils.CanonConstant.EdsEvfOutputDevice;
-import edsdk.utils.CanonConstant.EdsExposureCompensation;
-import edsdk.utils.CanonConstant.EdsFileCreateDisposition;
-import edsdk.utils.CanonConstant.EdsISOSpeed;
-import edsdk.utils.CanonConstant.EdsImageQuality;
-import edsdk.utils.CanonConstant.EdsMeteringMode;
-import edsdk.utils.CanonConstant.EdsPictureStyle;
-import edsdk.utils.CanonConstant.EdsPropertyID;
-import edsdk.utils.CanonConstant.EdsTv;
-import edsdk.utils.CanonConstant.EdsWhiteBalance;
+import edsdk.utils.CanonConstants.DescriptiveEnum;
+import edsdk.utils.CanonConstants.EdsAEMode;
+import edsdk.utils.CanonConstants.EdsAFMode;
+import edsdk.utils.CanonConstants.EdsAccess;
+import edsdk.utils.CanonConstants.EdsAv;
+import edsdk.utils.CanonConstants.EdsColorSpace;
+import edsdk.utils.CanonConstants.EdsCustomFunction;
+import edsdk.utils.CanonConstants.EdsDataType;
+import edsdk.utils.CanonConstants.EdsDriveMode;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsEvfAFMode;
+import edsdk.utils.CanonConstants.EdsEvfOutputDevice;
+import edsdk.utils.CanonConstants.EdsExposureCompensation;
+import edsdk.utils.CanonConstants.EdsFileCreateDisposition;
+import edsdk.utils.CanonConstants.EdsISOSpeed;
+import edsdk.utils.CanonConstants.EdsImageQuality;
+import edsdk.utils.CanonConstants.EdsMeteringMode;
+import edsdk.utils.CanonConstants.EdsPictureStyle;
+import edsdk.utils.CanonConstants.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsTv;
+import edsdk.utils.CanonConstants.EdsWhiteBalance;
 
 /**
  * Here are some great helpers.
@@ -532,33 +532,33 @@ public class CanonUtils {
      * 
      * @param camera The camera to get the available property settings of
      * @param property
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_DriveMode
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_DriveMode
      *            kEdsPropID_DriveMode}
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ISOSpeed
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_ISOSpeed
      *            kEdsPropID_ISOSpeed},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_MeteringMode
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_MeteringMode
      *            kEdsPropID_MeteringMode},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_AFMode
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_AFMode
      *            kEdsPropID_AFMode},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Av
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_Av
      *            kEdsPropID_Av},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Tv
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_Tv
      *            kEdsPropID_Tv},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ExposureCompensation
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_ExposureCompensation
      *            kEdsPropID_ExposureCompensation},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_AEMode
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_AEMode
      *            kEdsPropID_AEMode},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ImageQuality
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_ImageQuality
      *            kEdsPropID_ImageQuality},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_WhiteBalance
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_WhiteBalance
      *            kEdsPropID_WhiteBalance},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_ColorSpace
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_ColorSpace
      *            kEdsPropID_ColorSpace},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_PictureStyle
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_PictureStyle
      *            kEdsPropID_PictureStyle},
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Evf_WhiteBalance
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_Evf_WhiteBalance
      *            kEdsPropID_Evf_WhiteBalance}, or
-     *            {@link edsdk.utils.CanonConstant.EdsPropertyID#kEdsPropID_Evf_AFMode
+     *            {@link edsdk.utils.CanonConstants.EdsPropertyID#kEdsPropID_Evf_AFMode
      *            kEdsPropID_Evf_AFMode}
      * @return A DescriptiveEnum array of the available settings for the given
      *         property
@@ -770,13 +770,13 @@ public class CanonUtils {
      * alternately whether the camera is actively transmitting live view images.
      * <p>
      * The default result from the camera may be misleading since
-     * {@link CanonConstant.EdsPropertyID#kEdsPropID_Evf_Mode
+     * {@link CanonConstants.EdsPropertyID#kEdsPropID_Evf_Mode
      * kEdsPropID_Evf_Mode} only indicates whether live view is allowed to be
      * enabled or not, not whether it is currently active and transmitting
      * images.
      * <p>
      * Additionally, we cannot simply query
-     * {@link CanonConstant.EdsPropertyID#kEdsPropID_Evf_OutputDevice
+     * {@link CanonConstants.EdsPropertyID#kEdsPropID_Evf_OutputDevice
      * kEdsPropID_Evf_OutputDevice} because the camera seems to give
      * inconsistent results, sometimes providing an answer but mostly returning
      * {@code 0xFFFFFFFF}.

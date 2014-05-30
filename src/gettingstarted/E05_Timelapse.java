@@ -18,11 +18,11 @@ import javax.swing.JPanel;
 
 import edsdk.api.CanonCamera;
 import edsdk.api.commands.ShootCommand;
-import edsdk.utils.CanonConstant.DescriptiveEnum;
-import edsdk.utils.CanonConstant.EdsAv;
-import edsdk.utils.CanonConstant.EdsISOSpeed;
-import edsdk.utils.CanonConstant.EdsSaveTo;
-import edsdk.utils.CanonConstant.EdsTv;
+import edsdk.utils.CanonConstants.DescriptiveEnum;
+import edsdk.utils.CanonConstants.EdsAv;
+import edsdk.utils.CanonConstants.EdsISOSpeed;
+import edsdk.utils.CanonConstants.EdsSaveTo;
+import edsdk.utils.CanonConstants.EdsTv;
 
 /**
  * An example of taking multiple sequential shots.
@@ -84,29 +84,29 @@ public class E05_Timelapse {
         gbc.insets = new Insets( 3, 3, 3, 3 );
         gbc.gridy = 1;
 
-        final EdsTv currentShutterSpeed = camera.getShutterSpeed().get();
-        final EdsAv currentApertureValue = camera.getApertureValue().get();
-        final EdsISOSpeed currentISOSpeed = camera.getISOSpeed().get();
+        final EdsTv currentShutterSpeed = camera.getShutterSpeed();
+        final EdsAv currentApertureValue = camera.getApertureValue();
+        final EdsISOSpeed currentISOSpeed = camera.getISOSpeed();
 
-        final EdsTv[] availableShutterSpeed = camera.getAvailableShutterSpeed().get();
-        final EdsAv[] availableApertureValue = camera.getAvailableApertureValue().get();
-        final EdsISOSpeed[] availableISOSpeed = camera.getAvailableISOSpeed().get();
+        final EdsTv[] availableShutterSpeeds = camera.getAvailableShutterSpeeds();
+        final EdsAv[] availableApertureValues = camera.getAvailableApertureValues();
+        final EdsISOSpeed[] availableISOSpeeds = camera.getAvailableISOSpeeds();
 
-        E05_Timelapse.addCombobox( content, gbc, "Shutter Speed", availableShutterSpeed, currentShutterSpeed, new Callback() {
+        E05_Timelapse.addCombobox( content, gbc, "Shutter Speed", availableShutterSpeeds, currentShutterSpeed, new Callback() {
 
             @Override
             public void call( final String name ) {
                 camera.setShutterSpeed( EdsTv.enumOfDescription( name ) );
             }
         } );
-        E05_Timelapse.addCombobox( content, gbc, "Aperture", availableApertureValue, currentApertureValue, new Callback() {
+        E05_Timelapse.addCombobox( content, gbc, "Aperture", availableApertureValues, currentApertureValue, new Callback() {
 
             @Override
             public void call( final String name ) {
                 camera.setApertureValue( EdsAv.enumOfDescription( name ) );
             }
         } );
-        E05_Timelapse.addCombobox( content, gbc, "ISO", availableISOSpeed, currentISOSpeed, new Callback() {
+        E05_Timelapse.addCombobox( content, gbc, "ISO", availableISOSpeeds, currentISOSpeed, new Callback() {
 
             @Override
             public void call( final String name ) {

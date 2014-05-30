@@ -3,10 +3,10 @@ package probe;
 import java.io.IOException;
 
 import edsdk.api.CanonCamera;
-import edsdk.utils.CanonConstant.EdsCompressQuality;
-import edsdk.utils.CanonConstant.EdsImageSize;
-import edsdk.utils.CanonConstant.EdsImageType;
-import edsdk.utils.CanonConstant.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsCompressQuality;
+import edsdk.utils.CanonConstants.EdsImageSize;
+import edsdk.utils.CanonConstants.EdsImageType;
+import edsdk.utils.CanonConstants.EdsPropertyID;
 
 /**
  * 
@@ -23,10 +23,10 @@ import edsdk.utils.CanonConstant.EdsPropertyID;
 public class CameraImageQuality {
 
     public static void main( final String[] args ) throws InterruptedException, IOException {
-        final CanonCamera slr = new CanonCamera();
-        slr.openSession();
+        final CanonCamera camera = new CanonCamera();
+        camera.openSession();
 
-        final long imageQuality = slr.getProperty( EdsPropertyID.kEdsPropID_ImageQuality ).get();
+        final long imageQuality = camera.getProperty( EdsPropertyID.kEdsPropID_ImageQuality );
 
         /*
          * kEdsPropID_ImageQuality
@@ -54,7 +54,7 @@ public class CameraImageQuality {
         final EdsImageType secondaryImageType = EdsImageType.enumOfValue( (int) ( imageQuality >>> 4 & 0xf ) );
         final EdsCompressQuality secondaryImageCompressQuality = EdsCompressQuality.enumOfValue( (int) ( imageQuality & 0xf ) );
 
-        slr.closeSession();
+        camera.closeSession();
         CanonCamera.close();
 
         System.out.println();

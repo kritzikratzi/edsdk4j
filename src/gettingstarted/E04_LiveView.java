@@ -28,9 +28,9 @@ import edsdk.api.CanonCamera;
 public class E04_LiveView {
 
     public static void main( final String[] args ) throws InterruptedException {
-        final CanonCamera cam = new CanonCamera();
-        if ( cam.openSession() ) {
-            if ( cam.beginLiveView().get() ) {
+        final CanonCamera camera = new CanonCamera();
+        if ( camera.openSession() ) {
+            if ( camera.beginLiveView() ) {
                 final JFrame frame = new JFrame( "Live view" );
                 final JLabel label = new JLabel();
                 frame.getContentPane().add( label, BorderLayout.CENTER );
@@ -39,8 +39,8 @@ public class E04_LiveView {
 
                     @Override
                     public void windowClosing( final WindowEvent e ) {
-                        cam.endLiveView();
-                        cam.closeSession();
+                        camera.endLiveView();
+                        camera.closeSession();
                         CanonCamera.close();
                         System.exit( 0 );
                     }
@@ -49,7 +49,7 @@ public class E04_LiveView {
 
                 while ( true ) {
                     Thread.sleep( 50 );
-                    final BufferedImage image = cam.downloadLiveView().get();
+                    final BufferedImage image = camera.downloadLiveView();
                     if ( image != null ) {
                         label.setIcon( new ImageIcon( image ) );
                         frame.pack();
@@ -58,7 +58,7 @@ public class E04_LiveView {
 
                 }
             }
-            cam.closeSession();
+            camera.closeSession();
         }
         CanonCamera.close();
         System.exit( 0 );

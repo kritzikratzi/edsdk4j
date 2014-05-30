@@ -12,30 +12,30 @@ import edsdk.bindings.EdsPoint;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsSize;
 import edsdk.bindings.EdsTime;
-import edsdk.utils.CanonConstant;
-import edsdk.utils.CanonConstant.DescriptiveEnum;
-import edsdk.utils.CanonConstant.EdsAEMode;
-import edsdk.utils.CanonConstant.EdsAFMode;
-import edsdk.utils.CanonConstant.EdsAv;
-import edsdk.utils.CanonConstant.EdsBatteryQuality;
-import edsdk.utils.CanonConstant.EdsBracket;
-import edsdk.utils.CanonConstant.EdsColorSpace;
-import edsdk.utils.CanonConstant.EdsCustomFunction;
-import edsdk.utils.CanonConstant.EdsDataType;
-import edsdk.utils.CanonConstant.EdsDriveMode;
-import edsdk.utils.CanonConstant.EdsEvfAFMode;
-import edsdk.utils.CanonConstant.EdsEvfHistogramStatus;
-import edsdk.utils.CanonConstant.EdsEvfOutputDevice;
-import edsdk.utils.CanonConstant.EdsEvfZoom;
-import edsdk.utils.CanonConstant.EdsExposureCompensation;
-import edsdk.utils.CanonConstant.EdsISOSpeed;
-import edsdk.utils.CanonConstant.EdsImageQuality;
-import edsdk.utils.CanonConstant.EdsMeteringMode;
-import edsdk.utils.CanonConstant.EdsPictureStyle;
-import edsdk.utils.CanonConstant.EdsPropertyID;
-import edsdk.utils.CanonConstant.EdsSaveTo;
-import edsdk.utils.CanonConstant.EdsTv;
-import edsdk.utils.CanonConstant.EdsWhiteBalance;
+import edsdk.utils.CanonConstants;
+import edsdk.utils.CanonConstants.DescriptiveEnum;
+import edsdk.utils.CanonConstants.EdsAEMode;
+import edsdk.utils.CanonConstants.EdsAFMode;
+import edsdk.utils.CanonConstants.EdsAv;
+import edsdk.utils.CanonConstants.EdsBatteryQuality;
+import edsdk.utils.CanonConstants.EdsBracket;
+import edsdk.utils.CanonConstants.EdsColorSpace;
+import edsdk.utils.CanonConstants.EdsCustomFunction;
+import edsdk.utils.CanonConstants.EdsDataType;
+import edsdk.utils.CanonConstants.EdsDriveMode;
+import edsdk.utils.CanonConstants.EdsEvfAFMode;
+import edsdk.utils.CanonConstants.EdsEvfHistogramStatus;
+import edsdk.utils.CanonConstants.EdsEvfOutputDevice;
+import edsdk.utils.CanonConstants.EdsEvfZoom;
+import edsdk.utils.CanonConstants.EdsExposureCompensation;
+import edsdk.utils.CanonConstants.EdsISOSpeed;
+import edsdk.utils.CanonConstants.EdsImageQuality;
+import edsdk.utils.CanonConstants.EdsMeteringMode;
+import edsdk.utils.CanonConstants.EdsPictureStyle;
+import edsdk.utils.CanonConstants.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsSaveTo;
+import edsdk.utils.CanonConstants.EdsTv;
+import edsdk.utils.CanonConstants.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
 /**
@@ -64,7 +64,7 @@ import edsdk.utils.CanonUtils;
 //read by the user
 //
 //If return type T differs from data type for property (for instance,
-//conversion for EdsUInt32 to a CanonConstant enum), the Class<T> must be
+//conversion for EdsUInt32 to a CanonConstants enum), the Class<T> must be
 //provided by the constructor
 public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
 
@@ -168,7 +168,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
                         } else if ( klass != null &&
                                     DescriptiveEnum.class.isAssignableFrom( klass ) ) {
                             // DescriptiveEnum
-                            result = (T) CanonConstant.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass, data.intValue() );
+                            result = (T) CanonConstants.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass, data.intValue() );
                         } else {
                             // Long
                             result = (T) Long.valueOf( data );
@@ -218,7 +218,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
                             // DescriptiveEnum[]
                             final DescriptiveEnum<?>[] array = (DescriptiveEnum<?>[]) Array.newInstance( klass.getComponentType(), data.length );
                             for ( int i = 0; i < data.length; i++ ) {
-                                array[i] = CanonConstant.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass.getComponentType(), data[i] );
+                                array[i] = CanonConstants.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass.getComponentType(), data[i] );
                             }
                             result = (T) array;
                         } else if ( klass != null &&
@@ -227,7 +227,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
                             if ( data.length > 1 ) {
                                 throw new IllegalStateException( "Only single result expected but multiple results returned!" );
                             }
-                            result = (T) CanonConstant.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass, data[0] );
+                            result = (T) CanonConstants.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass, data[0] );
                         } else if ( klass != null &&
                                     EdsRect.class.isAssignableFrom( klass ) ) {
                             // EdsRect

@@ -8,15 +8,15 @@ import com.sun.jna.Pointer;
 
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonConstant.DescriptiveEnum;
-import edsdk.utils.CanonConstant.EdsCameraCommand;
-import edsdk.utils.CanonConstant.EdsCameraStatusCommand;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsObjectEvent;
+import edsdk.utils.CanonConstants.DescriptiveEnum;
+import edsdk.utils.CanonConstants.EdsCameraCommand;
+import edsdk.utils.CanonConstants.EdsCameraStatusCommand;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsObjectEvent;
 import edsdk.utils.CanonUtils;
 
 /**
- * The SLRCommand class tries to make your life a whole lot easier when you
+ * The CanonCommand class tries to make your life a whole lot easier when you
  * would like
  * to create new commands for your camera.
  * 
@@ -74,7 +74,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     }
 
     /**
-     * By default a SLRCommand will be marked as finished as soon as
+     * By default a CanonCommand will be marked as finished as soon as
      * the run method completed. If you attached listens inside run
      * and are waiting for a special event to happen before you're done
      * please call the notYetFinished() at the end of run().

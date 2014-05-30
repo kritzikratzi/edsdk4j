@@ -9,9 +9,9 @@ import com.sun.jna.Pointer;
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonConstant.EdsCameraCommand;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsObjectEvent;
+import edsdk.utils.CanonConstants.EdsCameraCommand;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsObjectEvent;
 import edsdk.utils.CanonUtils;
 
 /**

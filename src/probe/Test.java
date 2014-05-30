@@ -23,28 +23,28 @@ import edsdk.bindings.EdsRational;
 import edsdk.bindings.EdsRect;
 import edsdk.bindings.EdsSize;
 import edsdk.bindings.EdsTime;
-import edsdk.utils.CanonConstant;
-import edsdk.utils.CanonConstant.DescriptiveEnum;
-import edsdk.utils.CanonConstant.EdsAEMode;
-import edsdk.utils.CanonConstant.EdsAFMode;
-import edsdk.utils.CanonConstant.EdsAv;
-import edsdk.utils.CanonConstant.EdsColorSpace;
-import edsdk.utils.CanonConstant.EdsCustomFunction;
-import edsdk.utils.CanonConstant.EdsDataType;
-import edsdk.utils.CanonConstant.EdsDriveMode;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsEvfAFMode;
-import edsdk.utils.CanonConstant.EdsEvfOutputDevice;
-import edsdk.utils.CanonConstant.EdsExposureCompensation;
-import edsdk.utils.CanonConstant.EdsFilterEffect;
-import edsdk.utils.CanonConstant.EdsISOSpeed;
-import edsdk.utils.CanonConstant.EdsImageQuality;
-import edsdk.utils.CanonConstant.EdsMeteringMode;
-import edsdk.utils.CanonConstant.EdsPictureStyle;
-import edsdk.utils.CanonConstant.EdsPropertyID;
-import edsdk.utils.CanonConstant.EdsTonigEffect;
-import edsdk.utils.CanonConstant.EdsTv;
-import edsdk.utils.CanonConstant.EdsWhiteBalance;
+import edsdk.utils.CanonConstants;
+import edsdk.utils.CanonConstants.DescriptiveEnum;
+import edsdk.utils.CanonConstants.EdsAEMode;
+import edsdk.utils.CanonConstants.EdsAFMode;
+import edsdk.utils.CanonConstants.EdsAv;
+import edsdk.utils.CanonConstants.EdsColorSpace;
+import edsdk.utils.CanonConstants.EdsCustomFunction;
+import edsdk.utils.CanonConstants.EdsDataType;
+import edsdk.utils.CanonConstants.EdsDriveMode;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsEvfAFMode;
+import edsdk.utils.CanonConstants.EdsEvfOutputDevice;
+import edsdk.utils.CanonConstants.EdsExposureCompensation;
+import edsdk.utils.CanonConstants.EdsFilterEffect;
+import edsdk.utils.CanonConstants.EdsISOSpeed;
+import edsdk.utils.CanonConstants.EdsImageQuality;
+import edsdk.utils.CanonConstants.EdsMeteringMode;
+import edsdk.utils.CanonConstants.EdsPictureStyle;
+import edsdk.utils.CanonConstants.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsTonigEffect;
+import edsdk.utils.CanonConstants.EdsTv;
+import edsdk.utils.CanonConstants.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
 /**
@@ -62,9 +62,9 @@ import edsdk.utils.CanonUtils;
 public class Test {
 
     public static void main( final String[] args ) throws InterruptedException, IOException {
-        final CanonCamera cam = new CanonCamera();
+        final CanonCamera camera = new CanonCamera();
 
-        if ( cam.openSession() ) {
+        if ( camera.openSession() ) {
 
             //            Long value = Test.printProperty( cam, EdsPropertyID.kEdsPropID_BatteryLevel );
             //            System.out.println( value == 0xffffffff
@@ -76,12 +76,12 @@ public class Test {
             //            value = Test.printProperty( cam, EdsPropertyID.kEdsPropID_DriveMode );
 
             //            for ( final EdsPropertyID id : EdsPropertyID.values() ) {
-            //                getPropertyDesc( cam.getEdsCamera(), id, true );
+            //                getPropertyDesc( camera.getEdsCamera(), id, true );
             //            }
 
-            //            final EdsISOSpeed currentISOSpeed = EdsISOSpeed.enumOfValue( cam.getProperty( EdsPropertyID.kEdsPropID_ISOSpeed ).intValue() );
-            //            final EdsISOSpeed[] availableISOSpeed = cam.getAvailableISOSpeed();
-            //            for ( final EdsISOSpeed e : availableISOSpeed ) {
+            //            final EdsISOSpeed currentISOSpeed = EdsISOSpeed.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_ISOSpeed ).intValue() );
+            //            final EdsISOSpeed[] availableISOSpeeds = camera.getAvailableISOSpeeds();
+            //            for ( final EdsISOSpeed e : availableISOSpeesd ) {
             //                System.out.println( "ISO Speed " +
             //                                    e.description() +
             //                                    ( e.equals( currentISOSpeed )
@@ -89,9 +89,9 @@ public class Test {
             //                                                                 : "" ) );
             //            }
             //
-            //            final EdsTv currentShutterSpeed = EdsTv.enumOfValue( cam.getProperty( EdsPropertyID.kEdsPropID_Tv ).intValue() );
-            //            final EdsTv[] availableShutterSpeed = cam.getAvailableShutterSpeed();
-            //            for ( final EdsTv e : availableShutterSpeed ) {
+            //            final EdsTv currentShutterSpeed = EdsTv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Tv ).intValue() );
+            //            final EdsTv[] availableShutterSpeed = camera.getAvailableShutterSpeed();
+            //            for ( final EdsTv e : availableShutterSpeeds ) {
             //                System.out.println( "Shutter Speed " +
             //                                    e.description() +
             //                                    ( e.equals( currentShutterSpeed )
@@ -99,9 +99,9 @@ public class Test {
             //                                                                     : "" ) );
             //            }
             //
-            //            final EdsAv currentApertureValue = EdsAv.enumOfValue( cam.getProperty( EdsPropertyID.kEdsPropID_Av ).intValue() );
-            //            final EdsAv[] availableApertureValue = cam.getAvailableApertureValue();
-            //            for ( final EdsAv e : availableApertureValue ) {
+            //            final EdsAv currentApertureValue = EdsAv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Av ).intValue() );
+            //            final EdsAv[] availableApertureValues = camera.getAvailableApertureValues();
+            //            for ( final EdsAv e : availableApertureValues ) {
             //                System.out.println( "Aperture " +
             //                                    e.description() +
             //                                    ( e.equals( currentApertureValue )
@@ -119,27 +119,27 @@ public class Test {
             }
 
             System.out.println( "Mirror Lockup Setting: " +
-                                cam.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
+                                camera.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
 
-            cam.beginLiveView();
+            camera.beginLiveView();
 
             // sleep a few seconds so live view can start
             Thread.sleep( 2000 );
 
             final ArrayList<EdsBaseRef> baserefs = new ArrayList<EdsBaseRef>();
-            baserefs.add( cam.getEdsCamera() );
+            baserefs.add( camera.getEdsCamera() );
 
-            final ByReference[] liverefs = CanonUtils.getLiveViewImageReference( cam.getEdsCamera() );
+            final ByReference[] liverefs = CanonUtils.getLiveViewImageReference( camera.getEdsCamera() );
             if ( liverefs != null && liverefs.length > 0 && liverefs[0] != null ) {
                 System.out.println( "live view active so adding evf image reference" );
                 baserefs.add( liverefs[0].getValue() );
             }
 
             System.out.println( "Mirror Lockup Setting: " +
-                                cam.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
+                                camera.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
 
             System.out.println( "Live View Histogram Status: " +
-                                cam.getLiveViewHistogramStatus() );
+                                camera.getLiveViewHistogramStatus() );
 
             final boolean hideNegativeSizeProperties = true;
             final boolean hideNegativeSizeCustomFunctions = true;
@@ -228,9 +228,9 @@ public class Test {
             System.out.println( "Custom Function" );
             System.out.println( "---------------------------------------" );
             for ( int i = -10000; i < 10000; i++ ) {
-                final long size = CanonUtils.getPropertySize( cam.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
+                final long size = CanonUtils.getPropertySize( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
 
-                final EdsDataType type = CanonUtils.getPropertyType( cam.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
+                final EdsDataType type = CanonUtils.getPropertyType( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
 
                 if ( size > -1 || !hideNegativeSizeCustomFunctions ) {
                     System.out.println( "Number: " + i );
@@ -240,7 +240,7 @@ public class Test {
                          type.equals( EdsDataType.kEdsDataType_Unknown ) ) {
                         System.out.println( " VALUE NOT AVAILABLE ON THIS CAMERA AND/OR WITH CURRENT SETTINGS" );
                     } else {
-                        final Long value = CanonUtils.getPropertyData( cam.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
+                        final Long value = CanonUtils.getPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
                         System.out.println( " Value: " + value );
                     }
                 }
@@ -253,13 +253,13 @@ public class Test {
             //TEST GETTERS FROM CanonCamera
             System.out.println( "Property Getters in CanonCamera" );
             System.out.println( "---------------------------------------" );
-            final Method[] methods = cam.getClass().getMethods();
+            final Method[] methods = camera.getClass().getMethods();
             for ( final Method method : methods ) {
                 if ( method.getName().startsWith( "get" ) &&
                      method.getParameterTypes().length == 0 ) {
                     System.out.println( "\nTrying " + method.getName() );
                     try {
-                        final Object o = method.invoke( cam, (Object[]) null );
+                        final Object o = method.invoke( camera, (Object[]) null );
                         System.out.println( " Result: " + Test.toString( o ) );
                     }
                     catch ( final IllegalAccessException e ) {
@@ -283,7 +283,7 @@ public class Test {
             for ( final EdsCustomFunction e : EdsCustomFunction.values() ) {
                 System.out.println( "\nTrying " + e.description() + " (" +
                                     e.name() + ")" );
-                final Long result = cam.getCustomFunction( e ).get();
+                final Long result = camera.getCustomFunction( e );
                 System.out.println( "    Value: " + Test.toString( result ) );
             }
 
@@ -295,7 +295,7 @@ public class Test {
                     final int bufferSize = 1;
                     final IntBuffer type = IntBuffer.allocate( bufferSize );
                     final NativeLongByReference number = new NativeLongByReference( new NativeLong( bufferSize ) );
-                    EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertySize( cam.getEdsCamera(), new NativeLong( i ), new NativeLong( 0 ), type, number ) );
+                    EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertySize( camera.getEdsCamera(), new NativeLong( i ), new NativeLong( 0 ), type, number ) );
                     if ( !err.equals( EdsError.EDS_ERR_PROPERTIES_UNAVAILABLE ) ) {
                         System.out.println( i + ": " + err.description() );
                     }
@@ -312,7 +312,7 @@ public class Test {
                                 final Memory memory = new Memory( size > 0
                                                                           ? size
                                                                           : 1 );
-                                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertyData( cam.getEdsCamera(), new NativeLong( i ), new NativeLong( 0 ), new NativeLong( size ), memory ) );
+                                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertyData( camera.getEdsCamera(), new NativeLong( i ), new NativeLong( 0 ), new NativeLong( size ), memory ) );
                                 if ( err == EdsError.EDS_ERR_OK ) {
                                     if ( edsType.equals( EdsDataType.kEdsDataType_Int32 ) ||
                                          edsType.equals( EdsDataType.kEdsDataType_UInt32 ) ) {
@@ -345,11 +345,11 @@ public class Test {
                 }
             }
 
-            cam.endLiveView();
+            camera.endLiveView();
 
-            //CanonUtils.isMirrorLockupEnabled( cam.getEdsCamera() );
+            //CanonUtils.isMirrorLockupEnabled( camera.getEdsCamera() );
 
-            cam.closeSession();
+            camera.closeSession();
         }
 
         CanonCamera.close();
@@ -511,10 +511,10 @@ public class Test {
         return null;
     }
 
-    public static final Long printProperty( final CanonCamera cam,
-                                            final EdsPropertyID prop ) {
-        final Long value = cam.getProperty( prop ).get();
-        System.out.println( prop.name() + " - " + prop.description() + ": " +
+    public static final Long printProperty( final CanonCamera camera,
+                                            final EdsPropertyID property ) {
+        final Long value = camera.getProperty( property );
+        System.out.println( property.name() + " - " + property.description() + ": " +
                             value + "\n" );
         return value;
     }
@@ -605,7 +605,7 @@ public class Test {
                                                 final int[] data ) {
         final DescriptiveEnum<?>[] array = (DescriptiveEnum<?>[]) Array.newInstance( klass.getComponentType(), data.length );
         for ( int i = 0; i < data.length; i++ ) {
-            array[i] = CanonConstant.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass.getComponentType(), data[i] );
+            array[i] = CanonConstants.enumOfValue( (Class<? extends DescriptiveEnum<?>>) klass.getComponentType(), data[i] );
         }
         return (T) array;
     }

@@ -23,7 +23,7 @@ import javax.swing.WindowConstants;
 import org.imgscalr.Scalr;
 
 import edsdk.api.CanonCamera;
-import edsdk.utils.CanonConstant.EdsSaveTo;
+import edsdk.utils.CanonConstants.EdsSaveTo;
 
 /**
  * 
@@ -45,7 +45,7 @@ public class SinglePhoto {
 
         SwingUtilities.invokeLater( new Runnable() {
 
-            final CanonCamera cam = new CanonCamera();
+            final CanonCamera camera = new CanonCamera();
             JFrame frame;
             JLabel label;
             JButton button;
@@ -88,7 +88,7 @@ public class SinglePhoto {
 
                         @Override
                         protected File[] doInBackground() throws Exception {
-                            return SinglePhoto.takePhoto( cam );
+                            return SinglePhoto.takePhoto( camera );
                         }
 
                         @Override
@@ -144,7 +144,7 @@ public class SinglePhoto {
 
     public static File[] takePhoto( final CanonCamera cam ) {
         if ( cam.openSession() ) {
-            final File[] photos = cam.shoot( EdsSaveTo.kEdsSaveTo_Host, SinglePhoto.shotAttempts ).get();
+            final File[] photos = cam.shoot( EdsSaveTo.kEdsSaveTo_Host, SinglePhoto.shotAttempts );
             cam.closeSession();
             return photos;
         }

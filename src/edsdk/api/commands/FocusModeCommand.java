@@ -1,9 +1,9 @@
 package edsdk.api.commands;
 
 import edsdk.api.CanonCommand;
-import edsdk.utils.CanonConstant.EdsAFMode;
-import edsdk.utils.CanonConstant.EdsEvfAFMode;
-import edsdk.utils.CanonConstant.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsAFMode;
+import edsdk.utils.CanonConstants.EdsEvfAFMode;
+import edsdk.utils.CanonConstants.EdsPropertyID;
 import edsdk.utils.CanonUtils;
 
 /**

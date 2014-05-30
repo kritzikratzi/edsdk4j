@@ -1,10 +1,10 @@
 package edsdk.api.commands;
 
 import edsdk.api.CanonCommand;
-import edsdk.utils.CanonConstant;
-import edsdk.utils.CanonConstant.EdsCameraCommand;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsEvfDriveLens;
+import edsdk.utils.CanonConstants;
+import edsdk.utils.CanonConstants.EdsCameraCommand;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsEvfDriveLens;
 
 /**
  * Drives the lens in a direction.
@@ -24,7 +24,7 @@ public class DriveLensCommand extends CanonCommand<Boolean> {
     private final EdsEvfDriveLens direction;
 
     /**
-     * @param direction pick a value {@link CanonConstant.EdsEvfDriveLens}
+     * @param direction pick a value {@link CanonConstants.EdsEvfDriveLens}
      */
     public DriveLensCommand( final EdsEvfDriveLens direction ) {
         this.direction = direction;

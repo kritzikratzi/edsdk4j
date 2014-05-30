@@ -8,13 +8,13 @@ import com.sun.jna.Pointer;
 import edsdk.api.CanonCommand;
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
-import edsdk.utils.CanonConstant.EdsCameraCommand;
-import edsdk.utils.CanonConstant.EdsError;
-import edsdk.utils.CanonConstant.EdsImageType;
-import edsdk.utils.CanonConstant.EdsObjectEvent;
-import edsdk.utils.CanonConstant.EdsPropertyID;
-import edsdk.utils.CanonConstant.EdsSaveTo;
-import edsdk.utils.CanonConstant.EdsShutterButton;
+import edsdk.utils.CanonConstants.EdsCameraCommand;
+import edsdk.utils.CanonConstants.EdsError;
+import edsdk.utils.CanonConstants.EdsImageType;
+import edsdk.utils.CanonConstants.EdsObjectEvent;
+import edsdk.utils.CanonConstants.EdsPropertyID;
+import edsdk.utils.CanonConstants.EdsSaveTo;
+import edsdk.utils.CanonConstants.EdsShutterButton;
 import edsdk.utils.CanonUtils;
 
 /**

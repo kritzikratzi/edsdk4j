@@ -13,7 +13,7 @@ import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
 import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.bindings.EdSdkLibrary.EdsDirectoryItemRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.utils.CanonConstant.EdsError;
+import edsdk.utils.CanonConstants.EdsError;
 import edsdk.utils.CanonUtils;
 
 /**

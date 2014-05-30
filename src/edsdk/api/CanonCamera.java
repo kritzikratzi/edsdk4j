@@ -85,7 +85,7 @@ import edsdk.utils.CanonUtils;
  * This is required to forward camera events into the edsdk. Currently there is
  * no way to disable this if it conflicts with your software.
  * 
- * Copyright U+00A9 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
  * <anantapalani@gmail.com>
  * This work is free. You can redistribute it and/or modify it under the
  * terms of the Do What The Fuck You Want To Public License, Version 2,

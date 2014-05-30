@@ -19,7 +19,7 @@ import edsdk.utils.CanonUtils;
 /**
  * Simple example of JNA interface mapping and usage.
  * 
- * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * Copyright Â© 2014 Hansi Raber <super@superduper.org>, Ananta Palani
  * <anantapalani@gmail.com>
  * This work is free. You can redistribute it and/or modify it under the
  * terms of the Do What The Fuck You Want To Public License, Version 2,

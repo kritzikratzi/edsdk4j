@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="edsdk4j" default="jar" basedir=".">
 
   <property name="version"          value="snapshot" />
@@ -59,6 +59,7 @@
   <target name="compile" depends="setup">
     <mkdir dir="${build}/classes" />
     <javac
+      encoding="UTF-8"
       srcdir="${src}"
       destdir="${build}/classes"
       source="1.6"

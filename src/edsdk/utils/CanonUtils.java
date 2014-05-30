@@ -67,7 +67,7 @@ import edsdk.utils.CanonConstant.EdsWhiteBalance;
  * }
  * </pre>
  * 
- * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * Copyright Â© 2014 Hansi Raber <super@superduper.org>, Ananta Palani
  * <anantapalani@gmail.com>
  * This work is free. You can redistribute it and/or modify it under the
  * terms of the Do What The Fuck You Want To Public License, Version 2,
@@ -500,7 +500,7 @@ public class CanonUtils {
                 return edsDataType;
             }
         }
-        // TODO: would it be better to return NULL?
+        // TODO: would it be better to return NULL if EDS_ERR_NOT_SUPPORTED is returned?
         return EdsDataType.kEdsDataType_Unknown;
     }
 

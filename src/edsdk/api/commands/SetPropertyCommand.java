@@ -36,7 +36,7 @@ import edsdk.utils.CanonUtils;
 /**
  * Sets a property on the camera.
  * 
- * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * Copyright Â© 2014 Hansi Raber <super@superduper.org>, Ananta Palani
  * <anantapalani@gmail.com>
  * This work is free. You can redistribute it and/or modify it under the
  * terms of the Do What The Fuck You Want To Public License, Version 2,
@@ -142,7 +142,8 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
 
             final EdsDataType type = CanonUtils.getPropertyType( baseRef, property, param );
 
-            EdsError err = null;
+            //TODO: it would be better to get the actual error from CanonUtils.getPropertyType(), but in testing a valid value was always returned if something was supported
+            EdsError err = EdsError.EDS_ERR_NOT_SUPPORTED;
             switch ( type ) {
                 case kEdsDataType_Int32: //EdsInt32
                 case kEdsDataType_UInt32: { //EdsUInt32

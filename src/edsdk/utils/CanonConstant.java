@@ -3,16 +3,16 @@ package edsdk.utils;
 /**
  * A Lot of constants.
  * 
- * @author Ananta Palani
- * @author hansi
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
  * 
- *         Copyright © 2014 Ananta Palani <anantapalani@gmail.com>, Hansi Raber
- *         <super@superduper.org>
- *         This work is free. You can redistribute it and/or modify it under the
- *         terms of the Do What The Fuck You Want To Public License, Version 2,
- *         as published by Sam Hocevar. See the COPYING file for more details.
+ * @author hansi
+ * @author Ananta Palani
+ * 
  */
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -2540,7 +2540,7 @@ public class CanonConstant {
 /*-----------------------------------------------------------------------------
  Battery level
  -----------------------------------------------------------------------------*/
-    // TODO C++ enum values can have the same value, as in EdSdkLibrary.EdsBatteryLevel2... how to handle reverse lookup in JAVA? Have moved kEdsBatteryLevel2_Error as last identical value so that at least the user doesn't think something is OK when it might not be
+    // TODO: C++ enum values can have the same value, as in EdSdkLibrary.EdsBatteryLevel2... how to handle reverse lookup in JAVA? Have moved kEdsBatteryLevel2_Error as last identical value so that at least the user doesn't think something is OK when it might not be
     public enum EdsBatteryLevel2 implements DescriptiveEnum<Integer> {
         kEdsBatteryLevel2_Empty( "Empty" ),
         kEdsBatteryLevel2_Low( "Low" ),

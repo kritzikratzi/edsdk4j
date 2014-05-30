@@ -1,6 +1,5 @@
 package edsdk.api;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
+import edsdk.api.commands.DriveLensCommand;
 import edsdk.api.commands.FocusModeCommand;
 import edsdk.api.commands.GetPropertyCommand;
 import edsdk.api.commands.GetPropertyDescCommand;
@@ -28,26 +28,17 @@ import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
 import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.bindings.EdsFocusInfo;
 import edsdk.bindings.EdsPictureStyleDesc;
 import edsdk.bindings.EdsPoint;
-import edsdk.bindings.EdsPropertyDesc;
-import edsdk.bindings.EdsRect;
-import edsdk.bindings.EdsSize;
-import edsdk.bindings.EdsTime;
 import edsdk.utils.CanonConstant.DescriptiveEnum;
 import edsdk.utils.CanonConstant.EdsAEMode;
-import edsdk.utils.CanonConstant.EdsAFMode;
 import edsdk.utils.CanonConstant.EdsAv;
-import edsdk.utils.CanonConstant.EdsBatteryQuality;
-import edsdk.utils.CanonConstant.EdsBracket;
 import edsdk.utils.CanonConstant.EdsColorSpace;
 import edsdk.utils.CanonConstant.EdsCustomFunction;
-import edsdk.utils.CanonConstant.EdsDataType;
 import edsdk.utils.CanonConstant.EdsDriveMode;
 import edsdk.utils.CanonConstant.EdsError;
 import edsdk.utils.CanonConstant.EdsEvfAFMode;
-import edsdk.utils.CanonConstant.EdsEvfHistogramStatus;
+import edsdk.utils.CanonConstant.EdsEvfDriveLens;
 import edsdk.utils.CanonConstant.EdsEvfOutputDevice;
 import edsdk.utils.CanonConstant.EdsEvfZoom;
 import edsdk.utils.CanonConstant.EdsExposureCompensation;
@@ -74,20 +65,34 @@ import edsdk.utils.CanonUtils;
  * edsdk is not multithreaded so your vm might crash if you just call functions
  * from the library.
  * Instead I suggest you use the static method SLR.invoke( Runnable r );
- * or the method canonCamera.invoke( CanonTask task );
+ * or the method canonCamera.invoke( CanonCommand cmd );
  * 
  * The latter is basically the same, but allows you to easily get a return
- * integer value,
- * like int result = SLR.invoke( new CanonTask(){ public int run(){ return ...;
- * } } );
+ * integer value, like:
  * 
+ * <pre>
+ * int result = SLR.invoke(
+ *     new CanonCommand() {
+ *         public int run() {
+ *             return ...;
+ *         }
+ *     }
+ * );
+ * </pre>
  * 
  * This class also automatically processes and forwards all windows-style
  * messages.
  * This is required to forward camera events into the edsdk. Currently there is
  * no way to disable this if it conflicts with your software.
  * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
  * @author hansi
+ * @author Ananta Palani
  */
 public class CanonCamera implements EdsObjectEventHandler {
 
@@ -109,7 +114,7 @@ public class CanonCamera implements EdsObjectEventHandler {
                                                      ".class" );
                 url = new URL( url.getPath().substring( 0, url.getPath().indexOf( '!' ) ) );
             }
-            catch ( final Exception e1 ) {
+            catch ( final Exception e ) {
                 url = null;
             }
         }
@@ -141,7 +146,7 @@ public class CanonCamera implements EdsObjectEventHandler {
     }
 
     // This gives you direct access to the EDSDK
-    public static EdSdkLibrary EDSDK = (EdSdkLibrary) Native.loadLibrary( CanonCamera.edsdkDllLoc, EdSdkLibrary.class, CanonCamera.options );
+    public static final EdSdkLibrary EDSDK = (EdSdkLibrary) Native.loadLibrary( CanonCamera.edsdkDllLoc, EdSdkLibrary.class, CanonCamera.options );
 
     // Libraries needed to forward windows messages
     private static final User32 lib = User32.INSTANCE;
@@ -210,31 +215,32 @@ public class CanonCamera implements EdsObjectEventHandler {
         return edsCamera;
     }
 
-    public File[] shoot() {
-        return executeNow( new ShootCommand() );
+    public ShootCommand shoot() {
+        return execute( new ShootCommand() );
     }
 
-    public File[] shoot( final EdsSaveTo saveTo ) {
-        return executeNow( new ShootCommand( saveTo ) );
+    public ShootCommand shoot( final EdsSaveTo saveTo ) {
+        return execute( new ShootCommand( saveTo ) );
     }
 
-    public File[] shoot( final EdsSaveTo saveTo, final int shotAttempts ) {
-        return executeNow( new ShootCommand( saveTo, shotAttempts ) );
+    public ShootCommand shoot( final EdsSaveTo saveTo, final int shotAttempts ) {
+        return execute( new ShootCommand( saveTo, shotAttempts ) );
     }
 
-    public File[] shoot( final EdsSaveTo saveTo, final int shotAttempts,
-                         final File dest ) {
-        return executeNow( new ShootCommand( saveTo, shotAttempts, dest ) );
+    public ShootCommand shoot( final EdsSaveTo saveTo, final int shotAttempts,
+                               final File dest ) {
+        return execute( new ShootCommand( saveTo, shotAttempts, dest ) );
     }
 
-    public File[] shoot( final EdsSaveTo saveTo, final int shotAttempts,
-                         final File[] dest ) {
-        return executeNow( new ShootCommand( saveTo, shotAttempts, dest ) );
+    public ShootCommand shoot( final EdsSaveTo saveTo, final int shotAttempts,
+                               final File[] dest ) {
+        return execute( new ShootCommand( saveTo, shotAttempts, dest ) );
     }
 
-    public File[] shoot( final EdsSaveTo saveTo, final int shotAttempts,
-                         final File[] dest, final boolean appendFileExtension ) {
-        return executeNow( new ShootCommand( saveTo, shotAttempts, dest, appendFileExtension ) );
+    public ShootCommand shoot( final EdsSaveTo saveTo, final int shotAttempts,
+                               final File[] dest,
+                               final boolean appendFileExtension ) {
+        return execute( new ShootCommand( saveTo, shotAttempts, dest, appendFileExtension ) );
     }
 
     /**
@@ -244,34 +250,36 @@ public class CanonCamera implements EdsObjectEventHandler {
      * @param value
      * @return
      */
-    public Boolean setProperty( final EdsPropertyID property,
-                                final DescriptiveEnum<? extends Number> value ) {
-        return executeNow( new SetPropertyCommand.EnumData( property, value ) );
+    public SetPropertyCommand.EnumData setProperty( final EdsPropertyID property,
+                                                    final DescriptiveEnum<? extends Number> value ) {
+        return execute( new SetPropertyCommand.EnumData( property, value ) );
     }
 
     // some external users of edsdk4j (like Matlab) don't realize they can use setProperty(EdsPropertyID, long) with Integer values
-    public Boolean setProperty( final EdsPropertyID property, final int value ) {
-        return executeNow( new SetPropertyCommand.Data( property, value ) );
+    public SetPropertyCommand.Data setProperty( final EdsPropertyID property,
+                                                final int value ) {
+        return execute( new SetPropertyCommand.Data( property, value ) );
     }
 
-    public Boolean setProperty( final EdsPropertyID property, final long value ) {
-        return executeNow( new SetPropertyCommand.Data( property, value ) );
+    public SetPropertyCommand.Data setProperty( final EdsPropertyID property,
+                                                final long value ) {
+        return execute( new SetPropertyCommand.Data( property, value ) );
     }
 
-    public Long getProperty( final EdsPropertyID property ) {
-        return executeNow( new GetPropertyCommand.Data( property ) );
+    public GetPropertyCommand.Data getProperty( final EdsPropertyID property ) {
+        return execute( new GetPropertyCommand.Data( property ) );
     }
 
-    public Long getPropertySize( final EdsPropertyID property ) {
-        return executeNow( new GetPropertyCommand.Size( property ) );
+    public GetPropertyCommand.Size getPropertySize( final EdsPropertyID property ) {
+        return execute( new GetPropertyCommand.Size( property ) );
     }
 
-    public EdsDataType getPropertyType( final EdsPropertyID property ) {
-        return executeNow( new GetPropertyCommand.Type( property ) );
+    public GetPropertyCommand.Type getPropertyType( final EdsPropertyID property ) {
+        return execute( new GetPropertyCommand.Type( property ) );
     }
 
-    public EdsPropertyDesc getPropertyDesc( final EdsPropertyID property ) {
-        return executeNow( new GetPropertyDescCommand( property ) );
+    public GetPropertyDescCommand getPropertyDesc( final EdsPropertyID property ) {
+        return execute( new GetPropertyDescCommand( property ) );
     }
 
     public <T extends CanonCommand<?>> T execute( final T cmd ) {
@@ -283,8 +291,7 @@ public class CanonCamera implements EdsObjectEventHandler {
     public <T> T executeNow( final CanonCommand<T> cmd ) {
         if ( CanonCamera.dispatcherThread != null &&
              CanonCamera.dispatcherThread.isAlive() ) {
-            execute( cmd );
-            return cmd.result();
+            return execute( cmd ).get();
         }
         return null;
     }
@@ -324,9 +331,12 @@ public class CanonCamera implements EdsObjectEventHandler {
     @Override
     public NativeLong apply( final NativeLong inEvent, final EdsBaseRef inRef,
                              final Pointer inContext ) {
-        final EdsObjectEvent event = EdsObjectEvent.enumOfValue( inEvent.intValue() );
-        System.out.println( "Event " + event.value() + ": " + event.name() +
-                            " - " + event.description() + ", " + inContext );
+        /*
+         * final EdsObjectEvent event = EdsObjectEvent.enumOfValue(
+         * inEvent.intValue() );
+         * System.out.println( "Event " + event.value() + ": " + event.name() +
+         * " - " + event.description() + ", " + inContext );
+         */
 
         for ( final EdsObjectEventHandler handler : CanonCamera.objectEventHandlers ) {
             handler.apply( inEvent, inRef, inContext );
@@ -336,7 +346,7 @@ public class CanonCamera implements EdsObjectEventHandler {
     }
 
     /**
-     * Dispatches windows messages and executes tasks
+     * Dispatches windows messages and executes commands
      */
     private static void dispatchMessages() {
         // Do some initializing
@@ -348,7 +358,7 @@ public class CanonCamera implements EdsObjectEventHandler {
 
         final MSG msg = new MSG();
 
-        CanonCommand<?> task = null;
+        CanonCommand<?> cmd = null;
 
         while ( !Thread.currentThread().isInterrupted() ) {
             // do we have a new message? 
@@ -359,29 +369,32 @@ public class CanonCamera implements EdsObjectEventHandler {
             }
 
             // is there a command we're currently working on? 
-            if ( task != null ) {
-                if ( task.finished() ) {
-                    System.out.println( "Command finished" );
+            if ( cmd != null ) {
+                if ( cmd.finished() ) {
+                    //System.out.println( "Command finished" );
                     // great!
-                    task.camera.removeObjectEventHandler( task );
-                    task = null;
+                    cmd.camera.removeObjectEventHandler( cmd );
+                    cmd = null;
                 }
             }
 
             // are we free to do new work, and is there even new work to be done? 
-            if ( !CanonCamera.queue.isEmpty() && task == null ) {
-                task = CanonCamera.queue.poll();
-                System.out.println( "\nReceived new command, processing " +
-                                    task.getClass().getCanonicalName().substring( task.getClass().getPackage().getName().length() + 1 ) );
-                if ( ! ( task instanceof OpenSessionCommand ) ) {
-                    task.camera.addObjectEventHandler( task );
+            if ( !CanonCamera.queue.isEmpty() && cmd == null ) {
+                cmd = CanonCamera.queue.poll();
+                /*
+                 * System.out.println( "\nReceived new command, processing " +
+                 * cmd.getClass().getCanonicalName().substring(
+                 * cmd.getClass().getPackage().getName().length() + 1 ) );
+                 */
+                if ( ! ( cmd instanceof OpenSessionCommand ) ) {
+                    cmd.camera.addObjectEventHandler( cmd );
                 }
-                task.run();
-                task.ran();
+                cmd.run();
+                cmd.ran();
             }
 
             try {
-                Thread.sleep( 10 );
+                Thread.sleep( 1 );
             }
             catch ( final InterruptedException e ) {
                 System.out.println( "\nInterrupt received in CanonCamera, stopping..." );
@@ -391,7 +404,7 @@ public class CanonCamera implements EdsObjectEventHandler {
         }
 
         CanonCamera.EDSDK.EdsTerminateSDK();
-        System.out.println( "Dispatcher thread says bye!" );
+        System.out.println( "EDSDK Dispatcher thread says bye!" );
     }
 
     public static void close() {
@@ -466,7 +479,7 @@ public class CanonCamera implements EdsObjectEventHandler {
         }
 
         private boolean close() {
-            System.out.println( "closing session" );
+            //System.out.println( "closing session" );
             final EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCloseSession( edsCamera ) );
 
             if ( err != EdsError.EDS_ERR_OK ) {
@@ -477,16 +490,16 @@ public class CanonCamera implements EdsObjectEventHandler {
         }
     }
 
-    public Boolean beginLiveView() {
-        return executeNow( new LiveViewCommand.Begin() );
+    public LiveViewCommand.Begin beginLiveView() {
+        return execute( new LiveViewCommand.Begin() );
     }
 
-    public Boolean endLiveView() {
-        return executeNow( new LiveViewCommand.End() );
+    public LiveViewCommand.End endLiveView() {
+        return execute( new LiveViewCommand.End() );
     }
 
-    public BufferedImage downloadLiveView() {
-        return executeNow( new LiveViewCommand.Download() );
+    public LiveViewCommand.Download downloadLiveView() {
+        return execute( new LiveViewCommand.Download() );
     }
 
     /**
@@ -500,8 +513,8 @@ public class CanonCamera implements EdsObjectEventHandler {
      * 
      * @return true if live view is allowed be active
      */
-    public Boolean isLiveViewEnabled() {
-        return executeNow( new LiveViewCommand.IsLiveViewEnabled() );
+    public LiveViewCommand.IsLiveViewEnabled isLiveViewEnabled() {
+        return execute( new LiveViewCommand.IsLiveViewEnabled() );
     }
 
     /**
@@ -514,432 +527,445 @@ public class CanonCamera implements EdsObjectEventHandler {
      * 
      * @return true if live view currently active
      */
-    public Boolean isLiveViewActive() {
-        return executeNow( new LiveViewCommand.IsLiveViewActive() );
+    public LiveViewCommand.IsLiveViewActive isLiveViewActive() {
+        return execute( new LiveViewCommand.IsLiveViewActive() );
     }
 
-    public Boolean setFocusMode( final FocusModeCommand.Mode mode ) {
-        return executeNow( new FocusModeCommand( mode ) );
+    public FocusModeCommand setFocusMode( final FocusModeCommand.Mode mode ) {
+        return execute( new FocusModeCommand( mode ) );
     }
 
-    public EdsDriveMode[] getAvailableDriveMode() {
-        return executeNow( new GetPropertyDescCommand.DriveMode() );
+    public FocusModeCommand useAutoFocus() {
+        return execute( new FocusModeCommand( FocusModeCommand.Mode.AUTO ) );
     }
 
-    public EdsISOSpeed[] getAvailableISOSpeed() {
-        return executeNow( new GetPropertyDescCommand.ISOSpeed() );
+    public FocusModeCommand useManualFocus() {
+        return execute( new FocusModeCommand( FocusModeCommand.Mode.MANUAL ) );
     }
 
-    public EdsMeteringMode[] getAvailableMeteringMode() {
-        return executeNow( new GetPropertyDescCommand.MeteringMode() );
+    public DriveLensCommand driveLens( final EdsEvfDriveLens mode ) {
+        return execute( new DriveLensCommand( mode ) );
     }
 
-    public EdsAFMode[] getAvailableAutoFocusMode() {
-        return executeNow( new GetPropertyDescCommand.AutoFocusMode() );
+    public GetPropertyDescCommand.DriveMode getAvailableDriveMode() {
+        return execute( new GetPropertyDescCommand.DriveMode() );
     }
 
-    public EdsAv[] getAvailableApertureValue() {
-        return executeNow( new GetPropertyDescCommand.ApertureValue() );
+    public GetPropertyDescCommand.ISOSpeed getAvailableISOSpeed() {
+        return execute( new GetPropertyDescCommand.ISOSpeed() );
     }
 
-    public EdsTv[] getAvailableShutterSpeed() {
-        return executeNow( new GetPropertyDescCommand.ShutterSpeed() );
+    public GetPropertyDescCommand.MeteringMode getAvailableMeteringMode() {
+        return execute( new GetPropertyDescCommand.MeteringMode() );
     }
 
-    public EdsExposureCompensation[] getAvailableExposureCompensation() {
-        return executeNow( new GetPropertyDescCommand.ExposureCompensation() );
+    public GetPropertyDescCommand.AutoFocusMode getAvailableAutoFocusMode() {
+        return execute( new GetPropertyDescCommand.AutoFocusMode() );
     }
 
-    public EdsAEMode[] getAvailableShootingMode() {
-        return executeNow( new GetPropertyDescCommand.ShootingMode() );
+    public GetPropertyDescCommand.ApertureValue getAvailableApertureValue() {
+        return execute( new GetPropertyDescCommand.ApertureValue() );
     }
 
-    public EdsImageQuality[] getAvailableImageQuality() {
-        return executeNow( new GetPropertyDescCommand.ImageQuality() );
+    public GetPropertyDescCommand.ShutterSpeed getAvailableShutterSpeed() {
+        return execute( new GetPropertyDescCommand.ShutterSpeed() );
     }
 
-    public EdsWhiteBalance[] getAvailableWhiteBalance() {
-        return executeNow( new GetPropertyDescCommand.WhiteBalance() );
+    public GetPropertyDescCommand.ExposureCompensation getAvailableExposureCompensation() {
+        return execute( new GetPropertyDescCommand.ExposureCompensation() );
     }
 
-    public EdsColorSpace[] getAvailableColorSpace() {
-        return executeNow( new GetPropertyDescCommand.ColorSpace() );
+    public GetPropertyDescCommand.ShootingMode getAvailableShootingMode() {
+        return execute( new GetPropertyDescCommand.ShootingMode() );
     }
 
-    public EdsPictureStyle[] getAvailablePictureStyle() {
-        return executeNow( new GetPropertyDescCommand.PictureStyle() );
+    public GetPropertyDescCommand.ImageQuality getAvailableImageQuality() {
+        return execute( new GetPropertyDescCommand.ImageQuality() );
     }
 
-    public EdsWhiteBalance[] getAvailableLiveViewWhiteBalance() {
-        return executeNow( new GetPropertyDescCommand.LiveViewWhiteBalance() );
+    public GetPropertyDescCommand.WhiteBalance getAvailableWhiteBalance() {
+        return execute( new GetPropertyDescCommand.WhiteBalance() );
     }
 
-    public EdsEvfAFMode[] getAvailableLiveViewAutoFocusMode() {
-        return executeNow( new GetPropertyDescCommand.LiveViewAutoFocusMode() );
+    public GetPropertyDescCommand.ColorSpace getAvailableColorSpace() {
+        return execute( new GetPropertyDescCommand.ColorSpace() );
     }
 
-    public EdsDriveMode getDriveMode() {
-        return executeNow( new GetPropertyCommand.DriveMode() );
+    public GetPropertyDescCommand.PictureStyle getAvailablePictureStyle() {
+        return execute( new GetPropertyDescCommand.PictureStyle() );
     }
 
-    public EdsISOSpeed getISOSpeed() {
-        return executeNow( new GetPropertyCommand.ISOSpeed() );
+    public GetPropertyDescCommand.LiveViewWhiteBalance getAvailableLiveViewWhiteBalance() {
+        return execute( new GetPropertyDescCommand.LiveViewWhiteBalance() );
     }
 
-    public EdsMeteringMode getMeteringMode() {
-        return executeNow( new GetPropertyCommand.MeteringMode() );
+    public GetPropertyDescCommand.LiveViewAutoFocusMode getAvailableLiveViewAutoFocusMode() {
+        return execute( new GetPropertyDescCommand.LiveViewAutoFocusMode() );
     }
 
-    public EdsAFMode getAutoFocusMode() {
-        return executeNow( new GetPropertyCommand.AutoFocusMode() );
+    public GetPropertyCommand.DriveMode getDriveMode() {
+        return execute( new GetPropertyCommand.DriveMode() );
     }
 
-    public EdsAv getApertureValue() {
-        return executeNow( new GetPropertyCommand.ApertureValue() );
+    public GetPropertyCommand.ISOSpeed getISOSpeed() {
+        return execute( new GetPropertyCommand.ISOSpeed() );
     }
 
-    public EdsTv getShutterSpeed() {
-        return executeNow( new GetPropertyCommand.ShutterSpeed() );
+    public GetPropertyCommand.MeteringMode getMeteringMode() {
+        return execute( new GetPropertyCommand.MeteringMode() );
     }
 
-    public EdsExposureCompensation getExposureCompensation() {
-        return executeNow( new GetPropertyCommand.ExposureCompensation() );
+    public GetPropertyCommand.AutoFocusMode getAutoFocusMode() {
+        return execute( new GetPropertyCommand.AutoFocusMode() );
     }
 
-    public EdsAEMode getShootingMode() {
-        return executeNow( new GetPropertyCommand.ShootingMode() );
+    public GetPropertyCommand.ApertureValue getApertureValue() {
+        return execute( new GetPropertyCommand.ApertureValue() );
     }
 
-    public EdsImageQuality getImageQuality() {
-        return executeNow( new GetPropertyCommand.ImageQuality() );
+    public GetPropertyCommand.ShutterSpeed getShutterSpeed() {
+        return execute( new GetPropertyCommand.ShutterSpeed() );
     }
 
-    public EdsWhiteBalance getWhiteBalance() {
-        return executeNow( new GetPropertyCommand.WhiteBalance() );
+    public GetPropertyCommand.ExposureCompensation getExposureCompensation() {
+        return execute( new GetPropertyCommand.ExposureCompensation() );
     }
 
-    public EdsColorSpace getColorSpace() {
-        return executeNow( new GetPropertyCommand.ColorSpace() );
+    public GetPropertyCommand.ShootingMode getShootingMode() {
+        return execute( new GetPropertyCommand.ShootingMode() );
     }
 
-    public EdsPictureStyle getPictureStyle() {
-        return executeNow( new GetPropertyCommand.PictureStyle() );
+    public GetPropertyCommand.ImageQuality getImageQuality() {
+        return execute( new GetPropertyCommand.ImageQuality() );
     }
 
-    public EdsWhiteBalance getLiveViewWhiteBalance() {
-        return executeNow( new GetPropertyCommand.LiveViewWhiteBalance() );
+    public GetPropertyCommand.WhiteBalance getWhiteBalance() {
+        return execute( new GetPropertyCommand.WhiteBalance() );
     }
 
-    public EdsEvfAFMode getLiveViewAutoFocusMode() {
-        return executeNow( new GetPropertyCommand.LiveViewAutoFocusMode() );
+    public GetPropertyCommand.ColorSpace getColorSpace() {
+        return execute( new GetPropertyCommand.ColorSpace() );
     }
 
-    public Long getCustomFunction( final EdsCustomFunction customFunction ) {
-        return executeNow( new GetPropertyCommand.CustomFunction( customFunction ) );
+    public GetPropertyCommand.PictureStyle getPictureStyle() {
+        return execute( new GetPropertyCommand.PictureStyle() );
     }
 
-    public String getProductName() {
-        return executeNow( new GetPropertyCommand.ProductName() );
+    public GetPropertyCommand.LiveViewWhiteBalance getLiveViewWhiteBalance() {
+        return execute( new GetPropertyCommand.LiveViewWhiteBalance() );
     }
 
-    public EdsTime getDateTime() {
-        return executeNow( new GetPropertyCommand.DateTime() );
+    public GetPropertyCommand.LiveViewAutoFocusMode getLiveViewAutoFocusMode() {
+        return execute( new GetPropertyCommand.LiveViewAutoFocusMode() );
     }
 
-    public String getFirmwareVersion() {
-        return executeNow( new GetPropertyCommand.FirmwareVersion() );
+    public GetPropertyCommand.CustomFunction getCustomFunction( final EdsCustomFunction customFunction ) {
+        return execute( new GetPropertyCommand.CustomFunction( customFunction ) );
     }
 
-    public Long getBatteryLevel() {
-        return executeNow( new GetPropertyCommand.BatteryLevel() );
+    public GetPropertyCommand.ProductName getProductName() {
+        return execute( new GetPropertyCommand.ProductName() );
     }
 
-    public String getCurrentStorage() {
-        return executeNow( new GetPropertyCommand.CurrentStorage() );
+    public GetPropertyCommand.DateTime getDateTime() {
+        return execute( new GetPropertyCommand.DateTime() );
     }
 
-    public String getCurrentFolder() {
-        return executeNow( new GetPropertyCommand.CurrentFolder() );
+    public GetPropertyCommand.FirmwareVersion getFirmwareVersion() {
+        return execute( new GetPropertyCommand.FirmwareVersion() );
     }
 
-    public EdsBatteryQuality getBatteryQuality() {
-        return executeNow( new GetPropertyCommand.BatteryQuality() );
+    public GetPropertyCommand.BatteryLevel getBatteryLevel() {
+        return execute( new GetPropertyCommand.BatteryLevel() );
     }
 
-    public String getBodyIDEx() {
-        return executeNow( new GetPropertyCommand.BodyIDEx() );
+    public GetPropertyCommand.CurrentStorage getCurrentStorage() {
+        return execute( new GetPropertyCommand.CurrentStorage() );
     }
 
-    public EdsFocusInfo getFocusInfo() {
-        return executeNow( new GetPropertyCommand.FocusInfo() );
+    public GetPropertyCommand.CurrentFolder getCurrentFolder() {
+        return execute( new GetPropertyCommand.CurrentFolder() );
     }
 
-    public EdsExposureCompensation getFlashCompensation() {
-        return executeNow( new GetPropertyCommand.FlashCompensation() );
+    public GetPropertyCommand.BatteryQuality getBatteryQuality() {
+        return execute( new GetPropertyCommand.BatteryQuality() );
     }
 
-    public Long getAvailableShots() {
-        return executeNow( new GetPropertyCommand.AvailableShots() );
+    public GetPropertyCommand.BodyIDEx getBodyIDEx() {
+        return execute( new GetPropertyCommand.BodyIDEx() );
     }
 
-    public EdsBracket getBracket() {
-        return executeNow( new GetPropertyCommand.Bracket() );
+    public GetPropertyCommand.FocusInfo getFocusInfo() {
+        return execute( new GetPropertyCommand.FocusInfo() );
     }
 
-    public int[] getWhiteBalanceBracket() {
-        return executeNow( new GetPropertyCommand.WhiteBalanceBracket() );
+    public GetPropertyCommand.FlashCompensation getFlashCompensation() {
+        return execute( new GetPropertyCommand.FlashCompensation() );
     }
 
-    public Boolean getLensStatus() {
-        return executeNow( new GetPropertyCommand.LensStatus() );
+    public GetPropertyCommand.AvailableShots getAvailableShots() {
+        return execute( new GetPropertyCommand.AvailableShots() );
     }
 
-    public String getArtist() {
-        return executeNow( new GetPropertyCommand.Artist() );
+    public GetPropertyCommand.Bracket getBracket() {
+        return execute( new GetPropertyCommand.Bracket() );
     }
 
-    public String getCopyright() {
-        return executeNow( new GetPropertyCommand.Copyright() );
+    public GetPropertyCommand.WhiteBalanceBracket getWhiteBalanceBracket() {
+        return execute( new GetPropertyCommand.WhiteBalanceBracket() );
     }
 
-    public String getOwnerName() {
-        return executeNow( new GetPropertyCommand.OwnerName() );
+    public GetPropertyCommand.LensStatus getLensStatus() {
+        return execute( new GetPropertyCommand.LensStatus() );
     }
 
-    public EdsSaveTo getSaveTo() {
-        return executeNow( new GetPropertyCommand.SaveTo() );
+    public GetPropertyCommand.Artist getArtist() {
+        return execute( new GetPropertyCommand.Artist() );
     }
 
-    public String getHardDriveDirectoryStructure() {
-        return executeNow( new GetPropertyCommand.HardDriveDirectoryStructure() );
+    public GetPropertyCommand.Copyright getCopyright() {
+        return execute( new GetPropertyCommand.Copyright() );
     }
 
-    public Long getJPEGQuality() {
-        return executeNow( new GetPropertyCommand.JPEGQuality() );
+    public GetPropertyCommand.OwnerName getOwnerName() {
+        return execute( new GetPropertyCommand.OwnerName() );
     }
 
-    public Long getColorTemperature() {
-        return executeNow( new GetPropertyCommand.ColorTemperature() );
+    public GetPropertyCommand.SaveTo getSaveTo() {
+        return execute( new GetPropertyCommand.SaveTo() );
     }
 
-    public int[] getWhiteBalanceShift() {
-        return executeNow( new GetPropertyCommand.WhiteBalanceShift() );
+    public GetPropertyCommand.HardDriveDirectoryStructure getHardDriveDirectoryStructure() {
+        return execute( new GetPropertyCommand.HardDriveDirectoryStructure() );
     }
 
-    public Long getParameterSet() {
-        return executeNow( new GetPropertyCommand.ParameterSet() );
+    public GetPropertyCommand.JPEGQuality getJPEGQuality() {
+        return execute( new GetPropertyCommand.JPEGQuality() );
     }
 
-    public EdsPictureStyleDesc getPictureStyleDescription() {
-        return executeNow( new GetPropertyCommand.PictureStyleDescription() );
+    public GetPropertyCommand.ColorTemperature getColorTemperature() {
+        return execute( new GetPropertyCommand.ColorTemperature() );
     }
 
-    public Long getMovieShootingStatus() {
-        return executeNow( new GetPropertyCommand.MovieShootingStatus() );
+    public GetPropertyCommand.WhiteBalanceShift getWhiteBalanceShift() {
+        return execute( new GetPropertyCommand.WhiteBalanceShift() );
     }
 
-    //TODO - figure out why this generally returns null unless queried just after the output device has been changed
-    public EdsEvfOutputDevice getLiveViewOutputDevice() {
-        return executeNow( new GetPropertyCommand.LiveViewOutputDevice() );
+    public GetPropertyCommand.ParameterSet getParameterSet() {
+        return execute( new GetPropertyCommand.ParameterSet() );
     }
 
-    public Boolean getLiveViewMode() {
-        return executeNow( new GetPropertyCommand.LiveViewMode() );
+    public GetPropertyCommand.PictureStyleDescription getPictureStyleDescription() {
+        return execute( new GetPropertyCommand.PictureStyleDescription() );
     }
 
-    public Long getLiveViewColorTemperature() {
-        return executeNow( new GetPropertyCommand.LiveViewColorTemperature() );
+    public GetPropertyCommand.MovieShootingStatus getMovieShootingStatus() {
+        return execute( new GetPropertyCommand.MovieShootingStatus() );
     }
 
-    public Boolean getLiveViewDepthOfFieldInPreview() {
-        return executeNow( new GetPropertyCommand.LiveViewDepthOfFieldInPreview() );
+    //TODO: figure out why this generally returns null unless queried just after the output device has been changed
+    public GetPropertyCommand.LiveViewOutputDevice getLiveViewOutputDevice() {
+        return execute( new GetPropertyCommand.LiveViewOutputDevice() );
     }
 
-    public EdsEvfZoom getLiveViewZoomRatio() {
-        return executeNow( new GetPropertyCommand.LiveViewZoomRatio() );
+    public GetPropertyCommand.LiveViewMode getLiveViewMode() {
+        return execute( new GetPropertyCommand.LiveViewMode() );
     }
 
-    public EdsPoint getLiveViewZoomPosition() {
-        return executeNow( new GetPropertyCommand.LiveViewZoomPosition() );
+    public GetPropertyCommand.LiveViewColorTemperature getLiveViewColorTemperature() {
+        return execute( new GetPropertyCommand.LiveViewColorTemperature() );
     }
 
-    public int[] getLiveViewHistogram() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogram() );
+    public GetPropertyCommand.LiveViewDepthOfFieldInPreview getLiveViewDepthOfFieldInPreview() {
+        return execute( new GetPropertyCommand.LiveViewDepthOfFieldInPreview() );
     }
 
-    public int[] getLiveViewHistogramY() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogramY() );
+    public GetPropertyCommand.LiveViewZoomRatio getLiveViewZoomRatio() {
+        return execute( new GetPropertyCommand.LiveViewZoomRatio() );
     }
 
-    public int[] getLiveViewHistogramR() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogramR() );
+    public GetPropertyCommand.LiveViewZoomPosition getLiveViewZoomPosition() {
+        return execute( new GetPropertyCommand.LiveViewZoomPosition() );
     }
 
-    public int[] getLiveViewHistogramG() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogramG() );
+    public GetPropertyCommand.LiveViewHistogram getLiveViewHistogram() {
+        return execute( new GetPropertyCommand.LiveViewHistogram() );
     }
 
-    public int[] getLiveViewHistogramB() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogramB() );
+    public GetPropertyCommand.LiveViewHistogramY getLiveViewHistogramY() {
+        return execute( new GetPropertyCommand.LiveViewHistogramY() );
     }
 
-    public EdsPoint getLiveViewCropPosition() {
-        return executeNow( new GetPropertyCommand.LiveViewCropPosition() );
+    public GetPropertyCommand.LiveViewHistogramR getLiveViewHistogramR() {
+        return execute( new GetPropertyCommand.LiveViewHistogramR() );
     }
 
-    public EdsEvfHistogramStatus getLiveViewHistogramStatus() {
-        return executeNow( new GetPropertyCommand.LiveViewHistogramStatus() );
+    public GetPropertyCommand.LiveViewHistogramG getLiveViewHistogramG() {
+        return execute( new GetPropertyCommand.LiveViewHistogramG() );
     }
 
-    public EdsSize getLiveViewCoordinateSystem() {
-        return executeNow( new GetPropertyCommand.LiveViewCoordinateSystem() );
+    public GetPropertyCommand.LiveViewHistogramB getLiveViewHistogramB() {
+        return execute( new GetPropertyCommand.LiveViewHistogramB() );
     }
 
-    public EdsRect getLiveViewZoomRectangle() {
-        return executeNow( new GetPropertyCommand.LiveViewZoomRectangle() );
+    public GetPropertyCommand.LiveViewCropPosition getLiveViewCropPosition() {
+        return execute( new GetPropertyCommand.LiveViewCropPosition() );
     }
 
-    public int[] getLiveViewCropRectangle() {
-        return executeNow( new GetPropertyCommand.LiveViewCropRectangle() );
+    public GetPropertyCommand.LiveViewHistogramStatus getLiveViewHistogramStatus() {
+        return execute( new GetPropertyCommand.LiveViewHistogramStatus() );
     }
 
-    public Boolean setCustomFunction( final EdsCustomFunction customFunction,
-                                      final long value ) {
-        return executeNow( new SetPropertyCommand.CustomFunction( customFunction, value ) );
+    public GetPropertyCommand.LiveViewCoordinateSystem getLiveViewCoordinateSystem() {
+        return execute( new GetPropertyCommand.LiveViewCoordinateSystem() );
     }
 
-    public Boolean setArtist( final String value ) {
-        return executeNow( new SetPropertyCommand.Artist( value ) );
+    public GetPropertyCommand.LiveViewZoomRectangle getLiveViewZoomRectangle() {
+        return execute( new GetPropertyCommand.LiveViewZoomRectangle() );
     }
 
-    public Boolean setCopyright( final String value ) {
-        return executeNow( new SetPropertyCommand.Copyright( value ) );
+    public GetPropertyCommand.LiveViewCropRectangle getLiveViewCropRectangle() {
+        return execute( new GetPropertyCommand.LiveViewCropRectangle() );
     }
 
-    public Boolean setOwnerName( final String value ) {
-        return executeNow( new SetPropertyCommand.OwnerName( value ) );
+    public SetPropertyCommand.CustomFunction setCustomFunction( final EdsCustomFunction customFunction,
+                                                                final long value ) {
+        return execute( new SetPropertyCommand.CustomFunction( customFunction, value ) );
     }
 
-    public Boolean setSaveTo( final EdsSaveTo value ) {
-        return executeNow( new SetPropertyCommand.SaveTo( value ) );
+    public SetPropertyCommand.Artist setArtist( final String value ) {
+        return execute( new SetPropertyCommand.Artist( value ) );
     }
 
-    public Boolean setHardDriveDirectoryStructure( final String value ) {
-        return executeNow( new SetPropertyCommand.HardDriveDirectoryStructure( value ) );
+    public SetPropertyCommand.Copyright setCopyright( final String value ) {
+        return execute( new SetPropertyCommand.Copyright( value ) );
     }
 
-    public Boolean setImageQuality( final EdsImageQuality value ) {
-        return executeNow( new SetPropertyCommand.ImageQuality( value ) );
+    public SetPropertyCommand.OwnerName setOwnerName( final String value ) {
+        return execute( new SetPropertyCommand.OwnerName( value ) );
     }
 
-    public Boolean setJPEGQuality( final long value ) {
-        return executeNow( new SetPropertyCommand.JPEGQuality( value ) );
+    public SetPropertyCommand.SaveTo setSaveTo( final EdsSaveTo value ) {
+        return execute( new SetPropertyCommand.SaveTo( value ) );
     }
 
-    public Boolean setWhiteBalance( final EdsWhiteBalance value ) {
-        return executeNow( new SetPropertyCommand.WhiteBalance( value ) );
+    public SetPropertyCommand.HardDriveDirectoryStructure setHardDriveDirectoryStructure( final String value ) {
+        return execute( new SetPropertyCommand.HardDriveDirectoryStructure( value ) );
     }
 
-    public Boolean setColorTemperature( final long value ) {
-        return executeNow( new SetPropertyCommand.ColorTemperature( value ) );
+    public SetPropertyCommand.ImageQuality setImageQuality( final EdsImageQuality value ) {
+        return execute( new SetPropertyCommand.ImageQuality( value ) );
     }
 
-    public Boolean setWhiteBalanceShift( final int[] value ) {
-        return executeNow( new SetPropertyCommand.WhiteBalanceShift( value ) );
+    public SetPropertyCommand.JPEGQuality setJPEGQuality( final long value ) {
+        return execute( new SetPropertyCommand.JPEGQuality( value ) );
     }
 
-    public Boolean setColorSpace( final EdsColorSpace value ) {
-        return executeNow( new SetPropertyCommand.ColorSpace( value ) );
+    public SetPropertyCommand.WhiteBalance setWhiteBalance( final EdsWhiteBalance value ) {
+        return execute( new SetPropertyCommand.WhiteBalance( value ) );
     }
 
-    public Boolean setParameterSet( final long value ) {
-        return executeNow( new SetPropertyCommand.ParameterSet( value ) );
+    public SetPropertyCommand.ColorTemperature setColorTemperature( final long value ) {
+        return execute( new SetPropertyCommand.ColorTemperature( value ) );
     }
 
-    public Boolean setPictureStyle( final EdsPictureStyle value ) {
-        return executeNow( new SetPropertyCommand.PictureStyle( value ) );
+    public SetPropertyCommand.WhiteBalanceShift setWhiteBalanceShift( final int[] value ) {
+        return execute( new SetPropertyCommand.WhiteBalanceShift( value ) );
     }
 
-    public Boolean setPictureStyleDescription( final EdsPictureStyleDesc value ) {
-        return executeNow( new SetPropertyCommand.PictureStyleDescription( value ) );
+    public SetPropertyCommand.ColorSpace setColorSpace( final EdsColorSpace value ) {
+        return execute( new SetPropertyCommand.ColorSpace( value ) );
     }
 
-    public Boolean setPictureStyleDescription( final long contrast,
-                                               final long sharpness,
-                                               final long saturation,
-                                               final long colorTone,
-                                               final EdsFilterEffect filterEffect,
-                                               final EdsTonigEffect toningEffect ) {
-        return executeNow( new SetPropertyCommand.PictureStyleDescription( contrast, sharpness, saturation, colorTone, filterEffect, toningEffect ) );
+    public SetPropertyCommand.ParameterSet setParameterSet( final long value ) {
+        return execute( new SetPropertyCommand.ParameterSet( value ) );
     }
 
-    public Boolean setDriveMode( final EdsDriveMode value ) {
-        return executeNow( new SetPropertyCommand.DriveMode( value ) );
+    public SetPropertyCommand.PictureStyle setPictureStyle( final EdsPictureStyle value ) {
+        return execute( new SetPropertyCommand.PictureStyle( value ) );
     }
 
-    public Boolean setISOSpeed( final EdsISOSpeed value ) {
-        return executeNow( new SetPropertyCommand.ISOSpeed( value ) );
+    public SetPropertyCommand.PictureStyleDescription setPictureStyleDescription( final EdsPictureStyleDesc value ) {
+        return execute( new SetPropertyCommand.PictureStyleDescription( value ) );
     }
 
-    public Boolean setMeteringMode( final EdsMeteringMode value ) {
-        return executeNow( new SetPropertyCommand.MeteringMode( value ) );
+    public SetPropertyCommand.PictureStyleDescription setPictureStyleDescription( final long contrast,
+                                                                                  final long sharpness,
+                                                                                  final long saturation,
+                                                                                  final long colorTone,
+                                                                                  final EdsFilterEffect filterEffect,
+                                                                                  final EdsTonigEffect toningEffect ) {
+        return execute( new SetPropertyCommand.PictureStyleDescription( contrast, sharpness, saturation, colorTone, filterEffect, toningEffect ) );
     }
 
-    public Boolean setApertureValue( final EdsAv value ) {
-        return executeNow( new SetPropertyCommand.ApertureValue( value ) );
+    public SetPropertyCommand.DriveMode setDriveMode( final EdsDriveMode value ) {
+        return execute( new SetPropertyCommand.DriveMode( value ) );
     }
 
-    public Boolean setShutterSpeed( final EdsTv value ) {
-        return executeNow( new SetPropertyCommand.ShutterSpeed( value ) );
+    public SetPropertyCommand.ISOSpeed setISOSpeed( final EdsISOSpeed value ) {
+        return execute( new SetPropertyCommand.ISOSpeed( value ) );
     }
 
-    public Boolean setExposureCompensation( final EdsExposureCompensation value ) {
-        return executeNow( new SetPropertyCommand.ExposureCompensation( value ) );
+    public SetPropertyCommand.MeteringMode setMeteringMode( final EdsMeteringMode value ) {
+        return execute( new SetPropertyCommand.MeteringMode( value ) );
     }
 
-    public Boolean setMovieShootingStatus( final long value ) {
-        return executeNow( new SetPropertyCommand.MovieShootingStatus( value ) );
+    public SetPropertyCommand.ApertureValue setApertureValue( final EdsAv value ) {
+        return execute( new SetPropertyCommand.ApertureValue( value ) );
     }
 
-    public Boolean setLiveViewOutputDevice( final EdsEvfOutputDevice value ) {
-        return executeNow( new SetPropertyCommand.LiveViewOutputDevice( value ) );
+    public SetPropertyCommand.ShutterSpeed setShutterSpeed( final EdsTv value ) {
+        return execute( new SetPropertyCommand.ShutterSpeed( value ) );
     }
 
-    public Boolean setLiveViewMode( final boolean value ) {
-        return executeNow( new SetPropertyCommand.LiveViewMode( value ) );
+    public SetPropertyCommand.ExposureCompensation setExposureCompensation( final EdsExposureCompensation value ) {
+        return execute( new SetPropertyCommand.ExposureCompensation( value ) );
     }
 
-    public Boolean setLiveViewWhiteBalance( final EdsWhiteBalance value ) {
-        return executeNow( new SetPropertyCommand.LiveViewWhiteBalance( value ) );
+    public SetPropertyCommand.MovieShootingStatus setMovieShootingStatus( final long value ) {
+        return execute( new SetPropertyCommand.MovieShootingStatus( value ) );
     }
 
-    public Boolean setLiveViewColorTemperature( final long value ) {
-        return executeNow( new SetPropertyCommand.LiveViewColorTemperature( value ) );
+    public SetPropertyCommand.LiveViewOutputDevice setLiveViewOutputDevice( final EdsEvfOutputDevice value ) {
+        return execute( new SetPropertyCommand.LiveViewOutputDevice( value ) );
     }
 
-    public Boolean setLiveViewDepthOfFieldInPreview( final boolean value ) {
-        return executeNow( new SetPropertyCommand.LiveViewDepthOfFieldInPreview( value ) );
+    public SetPropertyCommand.LiveViewMode setLiveViewMode( final boolean value ) {
+        return execute( new SetPropertyCommand.LiveViewMode( value ) );
     }
 
-    public Boolean setLiveViewAutoFocusMode( final EdsEvfAFMode value ) {
-        return executeNow( new SetPropertyCommand.LiveViewAutoFocusMode( value ) );
+    public SetPropertyCommand.LiveViewWhiteBalance setLiveViewWhiteBalance( final EdsWhiteBalance value ) {
+        return execute( new SetPropertyCommand.LiveViewWhiteBalance( value ) );
     }
 
-    public Boolean setLiveViewZoomRatio( final EdsEvfZoom value ) {
-        return executeNow( new SetPropertyCommand.LiveViewZoomRatio( value ) );
+    public SetPropertyCommand.LiveViewColorTemperature setLiveViewColorTemperature( final long value ) {
+        return execute( new SetPropertyCommand.LiveViewColorTemperature( value ) );
     }
 
-    public Boolean setLiveViewZoomPosition( final EdsPoint value ) {
-        return executeNow( new SetPropertyCommand.LiveViewZoomPosition( value ) );
+    public SetPropertyCommand.LiveViewDepthOfFieldInPreview setLiveViewDepthOfFieldInPreview( final boolean value ) {
+        return execute( new SetPropertyCommand.LiveViewDepthOfFieldInPreview( value ) );
     }
 
-    public Boolean setLiveViewZoomPosition( final long x, final long y ) {
-        return executeNow( new SetPropertyCommand.LiveViewZoomPosition( x, y ) );
+    public SetPropertyCommand.LiveViewAutoFocusMode setLiveViewAutoFocusMode( final EdsEvfAFMode value ) {
+        return execute( new SetPropertyCommand.LiveViewAutoFocusMode( value ) );
     }
 
-    //TODO - Test if the following can be written to.. documentation lists kEdsPropID_AEModeSelect constants, but these are no longer present in include files
-    public Boolean setShootingMode( final EdsAEMode value ) {
-        return executeNow( new SetPropertyCommand.ShootingMode( value ) );
+    public SetPropertyCommand.LiveViewZoomRatio setLiveViewZoomRatio( final EdsEvfZoom value ) {
+        return execute( new SetPropertyCommand.LiveViewZoomRatio( value ) );
+    }
+
+    public SetPropertyCommand.LiveViewZoomPosition setLiveViewZoomPosition( final EdsPoint value ) {
+        return execute( new SetPropertyCommand.LiveViewZoomPosition( value ) );
+    }
+
+    public SetPropertyCommand.LiveViewZoomPosition setLiveViewZoomPosition( final long x,
+                                                                            final long y ) {
+        return execute( new SetPropertyCommand.LiveViewZoomPosition( x, y ) );
+    }
+
+    //TODO: Test if the following can be written to.. documentation lists kEdsPropID_AEModeSelect constants, but these are no longer present in include files
+    public SetPropertyCommand.ShootingMode setShootingMode( final EdsAEMode value ) {
+        return execute( new SetPropertyCommand.ShootingMode( value ) );
     }
 
 }

@@ -57,10 +57,10 @@ import edsdk.utils.CanonConstant.EdsWhiteBalance;
  * Here are some great helpers.
  * _All_ the functions in here are not thread safe, so you'll want to
  * encapsulate them in
- * a CanonTask and then send them to the camera, like so for instance :
+ * a CanonCommand and then send them to the camera, like so for instance :
  * 
  * <pre>
- * canonCamera.executeNow( new CanonTask<Boolean>() {
+ * canonCamera.executeNow( new CanonCommand<Boolean>() {
  *     public void run(){
  *         CanonUtils.doSomethingLikeDownloadOrWhatever();
  *     }
@@ -77,7 +77,7 @@ import edsdk.utils.CanonConstant.EdsWhiteBalance;
  * @author Ananta Palani
  * 
  */
-// TODO - think about having CanonUtils handle state/property changes to handle cases described by CanonUtils.isLiveViewEnabled()
+// TODO: think about having CanonUtils handle state/property changes to handle cases described by CanonUtils.isLiveViewEnabled()
 public class CanonUtils {
 
     public static final int classIntField( final Class<?> klass,
@@ -149,7 +149,7 @@ public class CanonUtils {
 
         boolean success = false;
 
-        final long timeStart = System.currentTimeMillis();
+        //final long timeStart = System.currentTimeMillis();
 
         try {
             err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetDirectoryItemInfo( directoryItem, dirItemInfo ) );
@@ -175,11 +175,13 @@ public class CanonUtils {
                     destination.getParentFile().mkdirs();
                 }
 
-                System.out.println( "Downloading image " +
-                                    Native.toString( dirItemInfo.szFileName ) +
-                                    " to " + destination.getCanonicalPath() );
+                /*
+                 * System.out.println( "Downloading image " +
+                 * Native.toString( dirItemInfo.szFileName ) +
+                 * " to " + destination.getCanonicalPath() );
+                 */
 
-                // TODO - see if using an EdsCreateMemoryStream would be faster and whether the image could be read directly without saving to file first - see: http://stackoverflow.com/questions/1083446/canon-edsdk-memorystream-image
+                // TODO: see if using an EdsCreateMemoryStream would be faster and whether the image could be read directly without saving to file first - see: http://stackoverflow.com/questions/1083446/canon-edsdk-memorystream-image
                 err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCreateFileStream( Native.toByteArray( destination.getCanonicalPath() ), EdsFileCreateDisposition.kEdsFileCreateDisposition_CreateAlways.value(), EdsAccess.kEdsAccess_ReadWrite.value(), stream ) );
             }
 
@@ -188,9 +190,11 @@ public class CanonUtils {
             }
 
             if ( err == EdsError.EDS_ERR_OK ) {
-                System.out.println( "Image downloaded in " +
-                                    ( System.currentTimeMillis() - timeStart ) +
-                                    " ms" );
+                /*
+                 * System.out.println( "Image downloaded in " +
+                 * ( System.currentTimeMillis() - timeStart ) +
+                 * " ms" );
+                 */
 
                 err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownloadComplete( directoryItem ) );
 
@@ -256,7 +260,7 @@ public class CanonUtils {
      * @return
      * @throws IllegalStateException
      */
-    //TODO - this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
+    //TODO: this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
     public static EdsError setPropertyDataAdvanced( final EdsBaseRef ref,
                                                     final EdsPropertyID property,
                                                     final long param,
@@ -315,7 +319,7 @@ public class CanonUtils {
                 pointer.setDouble( 0, (Double) value );
                 break;
             }
-            case kEdsDataType_ByteBlock: { //Byte Block // TODO - According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
+            case kEdsDataType_ByteBlock: { //Byte Block // TODO: According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
                 final int[] array = (int[]) value;
                 size = 4 * array.length;
                 pointer = new Memory( size );
@@ -358,14 +362,14 @@ public class CanonUtils {
                 pointer.write( 0, array, 0, array.length );
                 break;
             }
-            case kEdsDataType_Bool: //EdsBool // TODO - implement
-            case kEdsDataType_Bool_Array: //EdsBool[] // TODO - implement
-            case kEdsDataType_Rational_Array: //EdsRational[] // TODO - implement
+            case kEdsDataType_Bool: //EdsBool // TODO: implement
+            case kEdsDataType_Bool_Array: //EdsBool[] // TODO: implement
+            case kEdsDataType_Rational_Array: //EdsRational[] // TODO: implement
             case kEdsDataType_Unknown: //Unknown
             default:
                 throw new IllegalStateException( type.description() + " (" +
                                                  type.name() +
-                                                 ") is not currently supported by GetPropertyTask" );
+                                                 ") is not currently supported by GetPropertyCommand" );
         }
         return CanonUtils.setPropertyData( ref, property, param, size, pointer );
     }
@@ -404,7 +408,7 @@ public class CanonUtils {
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */
-    //TODO - this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
+    //TODO: this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
     @SuppressWarnings( "unchecked" )
     public static <T> T getPropertyDataAdvanced( final EdsBaseRef ref,
                                                  final EdsPropertyID property,
@@ -438,7 +442,7 @@ public class CanonUtils {
                     return (T) Float.valueOf( memory.getFloat( 0 ) );
                 case kEdsDataType_Double: //EdsDouble
                     return (T) Double.valueOf( memory.getDouble( 0 ) );
-                case kEdsDataType_ByteBlock: //Byte Block // TODO - According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
+                case kEdsDataType_ByteBlock: //Byte Block // TODO: According to API, is either EdsInt8[] or EdsUInt32[], but perhaps former is a typo or an old value
                     return (T) memory.getIntArray( 0, size / 4 );
                 case kEdsDataType_Rational: //EdsRational
                     return (T) new EdsRational( memory );
@@ -461,13 +465,13 @@ public class CanonUtils {
                 case kEdsDataType_Int32_Array: //EdsInt32[]
                 case kEdsDataType_UInt32_Array: //EdsUInt32[]
                     return (T) memory.getIntArray( 0, size / 4 );
-                case kEdsDataType_Bool: //EdsBool // TODO - implement
-                case kEdsDataType_Bool_Array: //EdsBool[] // TODO - implement
-                case kEdsDataType_Rational_Array: //EdsRational[] // TODO - implement
+                case kEdsDataType_Bool: //EdsBool // TODO: implement
+                case kEdsDataType_Bool_Array: //EdsBool[] // TODO: implement
+                case kEdsDataType_Rational_Array: //EdsRational[] // TODO: implement
                 default:
                     throw new IllegalStateException( type.description() + " (" +
                                                      type.name() +
-                                                     ") is not currently supported by GetPropertyTask" );
+                                                     ") is not currently supported by GetPropertyCommand" );
             }
         }
 
@@ -496,7 +500,7 @@ public class CanonUtils {
                 return edsDataType;
             }
         }
-        // TODO - would it be better to return NULL?
+        // TODO: would it be better to return NULL?
         return EdsDataType.kEdsDataType_Unknown;
     }
 
@@ -562,15 +566,19 @@ public class CanonUtils {
     public static final DescriptiveEnum<?>[] getPropertyDesc( final EdsCameraRef camera,
                                                               final EdsPropertyID property ) throws IllegalArgumentException, IllegalStateException {
 
-        System.out.println( "Getting available property values for " +
-                            property.description() + " (" + property.name() +
-                            ")" );
+        /*
+         * System.out.println( "Getting available property values for " +
+         * property.description() + " (" + property.name() +
+         * ")" );
+         */
 
         final EdsPropertyDesc propertyDesc = CanonUtils.getPropertyDesc( (EdsBaseRef) camera, property );
 
         if ( propertyDesc.numElements.intValue() > 0 ) {
-            System.out.println( "Number of elements: " +
-                                propertyDesc.numElements );
+            /*
+             * System.out.println( "Number of elements: " +
+             * propertyDesc.numElements );
+             */
 
             final NativeLong[] propDesc = propertyDesc.propDesc;
             final DescriptiveEnum<?>[] properties = new DescriptiveEnum<?>[propertyDesc.numElements.intValue()];
@@ -741,7 +749,7 @@ public class CanonUtils {
             return false;
         }
 
-        //TODO - decide whether skip deactivating the live view system. Canon's EOS Utility leaves it enabled, so should consider leaving it enabled as well.
+        //TODO: decide whether skip deactivating the live view system. Canon's EOS Utility leaves it enabled, so should consider leaving it enabled as well.
         number = new NativeLongByReference( new NativeLong( 0 ) );
         data = number.getPointer();
         err = CanonUtils.setPropertyData( camera, EdsPropertyID.kEdsPropID_Evf_Mode, 0, NativeLong.SIZE, data );

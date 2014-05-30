@@ -8,13 +8,25 @@ import edsdk.utils.CanonConstant.EdsImageSize;
 import edsdk.utils.CanonConstant.EdsImageType;
 import edsdk.utils.CanonConstant.EdsPropertyID;
 
+/**
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
 public class CameraImageQuality {
 
     public static void main( final String[] args ) throws InterruptedException, IOException {
         final CanonCamera slr = new CanonCamera();
         slr.openSession();
 
-        final long imageQuality = slr.getProperty( EdsPropertyID.kEdsPropID_ImageQuality );
+        final long imageQuality = slr.getProperty( EdsPropertyID.kEdsPropID_ImageQuality ).get();
 
         /*
          * kEdsPropID_ImageQuality

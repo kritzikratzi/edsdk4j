@@ -25,6 +25,18 @@ import org.imgscalr.Scalr;
 import edsdk.api.CanonCamera;
 import edsdk.utils.CanonConstant.EdsSaveTo;
 
+/**
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
 public class SinglePhoto {
 
     public static final int shotAttempts = 5;
@@ -111,7 +123,7 @@ public class SinglePhoto {
                 photo = photos[0];
             }
 
-            //TODO - handle raw photo
+            //TODO: handle raw photo
             if ( photo != null ) {
                 BufferedImage image = ImageIO.read( photo );
                 if ( image != null ) {
@@ -132,7 +144,7 @@ public class SinglePhoto {
 
     public static File[] takePhoto( final CanonCamera cam ) {
         if ( cam.openSession() ) {
-            final File[] photos = cam.shoot( EdsSaveTo.kEdsSaveTo_Host, SinglePhoto.shotAttempts );
+            final File[] photos = cam.shoot( EdsSaveTo.kEdsSaveTo_Host, SinglePhoto.shotAttempts ).get();
             cam.closeSession();
             return photos;
         }

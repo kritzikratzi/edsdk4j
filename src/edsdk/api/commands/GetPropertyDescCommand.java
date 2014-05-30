@@ -22,10 +22,23 @@ import edsdk.utils.CanonConstant.EdsTv;
 import edsdk.utils.CanonConstant.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
-// TODO - Should better handle kEdsDataType_Unknown, which seems to be returned
-// if the camera doesn't support a property. Could have CanonTask have an
-// EdsError field, and if null is returned by the task, the error could be read
-// by the user
+/**
+ * Gets a property description from the camera.
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
+//TODO: Should better handle kEdsDataType_Unknown, which seems to be returned
+//if the camera doesn't support a property. Could have CanonCommand have an
+//EdsError field, and if null is returned by the command, the error could be
+//read by the user
 public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     private final EdsPropertyID property;
@@ -50,16 +63,16 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
     }
 
     /*
-     * Specific Property ID Tasks
+     * Specific Property ID Commands
      */
 
-    private static class GetEnumPropertyDescTask<T extends DescriptiveEnum<?>> extends CanonCommand<T[]> {
+    private static class GetEnumPropertyDescCommand<T extends DescriptiveEnum<?>> extends CanonCommand<T[]> {
 
         private final EdsPropertyID property;
         private final Class<T[]> klass;
 
-        public GetEnumPropertyDescTask( final EdsPropertyID property,
-                                        final Class<T[]> klass ) {
+        public GetEnumPropertyDescCommand( final EdsPropertyID property,
+                                           final Class<T[]> klass ) {
             this.property = property;
             this.klass = klass;
         }
@@ -88,7 +101,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class DriveMode extends GetEnumPropertyDescTask<EdsDriveMode> {
+    public static class DriveMode extends GetEnumPropertyDescCommand<EdsDriveMode> {
 
         public DriveMode() {
             super( EdsPropertyID.kEdsPropID_DriveMode, EdsDriveMode[].class );
@@ -96,7 +109,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class ISOSpeed extends GetEnumPropertyDescTask<EdsISOSpeed> {
+    public static class ISOSpeed extends GetEnumPropertyDescCommand<EdsISOSpeed> {
 
         public ISOSpeed() {
             super( EdsPropertyID.kEdsPropID_ISOSpeed, EdsISOSpeed[].class );
@@ -104,7 +117,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class MeteringMode extends GetEnumPropertyDescTask<EdsMeteringMode> {
+    public static class MeteringMode extends GetEnumPropertyDescCommand<EdsMeteringMode> {
 
         public MeteringMode() {
             super( EdsPropertyID.kEdsPropID_MeteringMode, EdsMeteringMode[].class );
@@ -116,7 +129,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * AutoFocusMode = AFMode
      * 
      */
-    public static class AutoFocusMode extends GetEnumPropertyDescTask<EdsAFMode> {
+    public static class AutoFocusMode extends GetEnumPropertyDescCommand<EdsAFMode> {
 
         public AutoFocusMode() {
             super( EdsPropertyID.kEdsPropID_AFMode, EdsAFMode[].class );
@@ -128,7 +141,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * ApertureValue = Av
      * 
      */
-    public static class ApertureValue extends GetEnumPropertyDescTask<EdsAv> {
+    public static class ApertureValue extends GetEnumPropertyDescCommand<EdsAv> {
 
         public ApertureValue() {
             super( EdsPropertyID.kEdsPropID_Av, EdsAv[].class );
@@ -140,7 +153,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * ShutterSpeed = Tv
      * 
      */
-    public static class ShutterSpeed extends GetEnumPropertyDescTask<EdsTv> {
+    public static class ShutterSpeed extends GetEnumPropertyDescCommand<EdsTv> {
 
         public ShutterSpeed() {
             super( EdsPropertyID.kEdsPropID_Tv, EdsTv[].class );
@@ -148,7 +161,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class ExposureCompensation extends GetEnumPropertyDescTask<EdsExposureCompensation> {
+    public static class ExposureCompensation extends GetEnumPropertyDescCommand<EdsExposureCompensation> {
 
         public ExposureCompensation() {
             super( EdsPropertyID.kEdsPropID_ExposureCompensation, EdsExposureCompensation[].class );
@@ -160,7 +173,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * ShootingMode = AEMode
      * 
      */
-    public static class ShootingMode extends GetEnumPropertyDescTask<EdsAEMode> {
+    public static class ShootingMode extends GetEnumPropertyDescCommand<EdsAEMode> {
 
         public ShootingMode() {
             super( EdsPropertyID.kEdsPropID_AEMode, EdsAEMode[].class );
@@ -168,7 +181,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class ImageQuality extends GetEnumPropertyDescTask<EdsImageQuality> {
+    public static class ImageQuality extends GetEnumPropertyDescCommand<EdsImageQuality> {
 
         public ImageQuality() {
             super( EdsPropertyID.kEdsPropID_ImageQuality, EdsImageQuality[].class );
@@ -176,7 +189,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class WhiteBalance extends GetEnumPropertyDescTask<EdsWhiteBalance> {
+    public static class WhiteBalance extends GetEnumPropertyDescCommand<EdsWhiteBalance> {
 
         public WhiteBalance() {
             super( EdsPropertyID.kEdsPropID_WhiteBalance, EdsWhiteBalance[].class );
@@ -184,7 +197,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class ColorSpace extends GetEnumPropertyDescTask<EdsColorSpace> {
+    public static class ColorSpace extends GetEnumPropertyDescCommand<EdsColorSpace> {
 
         public ColorSpace() {
             super( EdsPropertyID.kEdsPropID_ColorSpace, EdsColorSpace[].class );
@@ -192,7 +205,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
 
     }
 
-    public static class PictureStyle extends GetEnumPropertyDescTask<EdsPictureStyle> {
+    public static class PictureStyle extends GetEnumPropertyDescCommand<EdsPictureStyle> {
 
         public PictureStyle() {
             super( EdsPropertyID.kEdsPropID_PictureStyle, EdsPictureStyle[].class );
@@ -204,7 +217,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * LiveViewWhiteBalance = Evf_WhiteBalance
      * 
      */
-    public static class LiveViewWhiteBalance extends GetEnumPropertyDescTask<EdsWhiteBalance> {
+    public static class LiveViewWhiteBalance extends GetEnumPropertyDescCommand<EdsWhiteBalance> {
 
         public LiveViewWhiteBalance() {
             super( EdsPropertyID.kEdsPropID_Evf_WhiteBalance, EdsWhiteBalance[].class );
@@ -216,7 +229,7 @@ public class GetPropertyDescCommand extends CanonCommand<EdsPropertyDesc> {
      * LiveViewAutoFocusMode = Evf_AFMode
      * 
      */
-    public static class LiveViewAutoFocusMode extends GetEnumPropertyDescTask<EdsEvfAFMode> {
+    public static class LiveViewAutoFocusMode extends GetEnumPropertyDescCommand<EdsEvfAFMode> {
 
         public LiveViewAutoFocusMode() {
             super( EdsPropertyID.kEdsPropID_Evf_AFMode, EdsEvfAFMode[].class );

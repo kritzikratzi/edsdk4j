@@ -1,5 +1,8 @@
 package edsdk.api;
 
+import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 
@@ -25,8 +28,14 @@ import edsdk.utils.CanonUtils;
  * - wait for the notification from the camera that the file was stored
  * - transfer the image to the disk
  * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
  * 
  * @author hansi
+ * @author Ananta Palani
  * 
  */
 public abstract class CanonCommand<T> implements EdsObjectEventHandler {
@@ -36,6 +45,8 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     private boolean waitForFinish = false;
     private boolean ran = false;
     private T result;
+    private final ReentrantLock lock = new ReentrantLock();
+    private ArrayList<CanonCommandListener<T>> listeners = null;
 
     public CanonCommand() {}
 
@@ -70,9 +81,8 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
      * 
      * This will tell the dispatcher that it should start forwarding event
      * messages again, and also it'll wait with the execution of further
-     * commands
-     * until your command somehow calls finish() on itself to let the dispatcher
-     * know that it's done.
+     * commands until your command somehow calls finish() on itself to
+     * let the dispatcher know that it's done.
      * <
      */
     public void notYetFinished() {
@@ -81,13 +91,14 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
 
     /**
      * Only used in combination with notYetFinished.
-     * Call this when your commands work is done (e.g. you successfully
+     * Call this when your command's work is done (e.g. you successfully
      * shot and downloaded an image).
      * 
      * @see CanonCommand#notYetFinished()
      */
     public void finish() {
         finished = true;
+        notifyListenersIfDone();
     }
 
     /**
@@ -95,6 +106,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
      */
     protected void ran() {
         ran = true;
+        notifyListenersIfDone();
     }
 
     /**
@@ -176,18 +188,92 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
         return EdsError.EDS_ERR_OK;
     }
 
-    public T result() {
-        while ( !finished() ) {
-            try {
-                Thread.sleep( 10 );
-            }
-            catch ( final InterruptedException e ) {
-                System.out.println( "Interrupt received by CanonTask, stopping..." );
-                Thread.currentThread().interrupt(); // restore interrupted status
-                return null;
-            }
+    /**
+     * Waits until the command is completed and returns the result.
+     * 
+     * @return
+     */
+    public T get() {
+        try {
+            return get( 0 );
+        }
+        catch ( final InterruptedException e ) {
+            // this shouldn't happen since get( 0 ) internally handles InterruptedException when timeout=0.
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Waits until the command is completed and returns the result.
+     * If the result is not returned in time an interrupted exception is thrown.
+     * 
+     * @throws InterruptedException
+     */
+    public T get( final long timeout ) throws InterruptedException {
+        if ( this.camera == null ) {
+            System.err.println( "Attention: " + getClass() );
+            System.err.println( "  This command was not yet added to a queue " );
+            System.err.println( "  with CanonCamera.execute( ... )" );
+            System.err.println( "  This way you might wait forever until .get() returns. " );
         }
 
-        return result;
+        final long startTime = System.currentTimeMillis();
+        try {
+            while ( !finished() &&
+                    ( timeout == 0 || System.currentTimeMillis() - startTime < timeout ) ) {
+                Thread.sleep( 1 );
+            }
+        }
+        catch ( final InterruptedException e ) {
+            System.out.println( "Interrupt received by CanonCommand, stopping..." );
+            Thread.currentThread().interrupt(); // restore interrupted status
+            return null;
+        }
+
+        if ( finished() ) {
+            return result;
+        } else {
+            //TODO: should we just interrupt the thread instead?
+            throw new InterruptedException( "edsdkp5 - command didn't return the result in time" );
+        }
+    }
+
+    /**
+     * An alias for get()
+     * 
+     * @return
+     */
+    public T now() {
+        return get();
+    }
+
+    /**
+     * Add a done listener
+     * 
+     * @param listener
+     */
+    public void whenDone( final CanonCommandListener<T> listener ) {
+        lock.lock();
+        if ( finished() ) {
+            listener.success( result );
+        } else {
+            if ( listeners == null ) {
+                listeners = new ArrayList<CanonCommandListener<T>>();
+            }
+            listeners.add( listener );
+        }
+        lock.unlock();
+    }
+
+    private void notifyListenersIfDone() {
+        lock.lock();
+        if ( finished() && listeners != null ) {
+            for ( final CanonCommandListener<T> listener : listeners ) {
+                listener.success( result );
+            }
+            listeners = null;
+        }
+        lock.unlock();
     }
 }

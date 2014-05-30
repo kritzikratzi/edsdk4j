@@ -14,13 +14,25 @@ import edsdk.utils.CanonConstant.EdsError;
 import edsdk.utils.CanonConstant.EdsObjectEvent;
 import edsdk.utils.CanonUtils;
 
+/**
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
 public class QuickShootManager implements EdsObjectEventHandler {
 
     ArrayList<EdsDirectoryItemRef> refs = new ArrayList<EdsDirectoryItemRef>();
     private final CanonCamera camera;
     int wanted = 0;
 
-    //TODO - bring up to date with ShootCommand.run
+    //TODO: bring up to date with ShootCommand.run
     public QuickShootManager( final CanonCamera camera ) {
         this.camera = camera;
         // disable liveview... 
@@ -63,7 +75,7 @@ public class QuickShootManager implements EdsObjectEventHandler {
         camera.removeObjectEventHandler( this );
     }
 
-    //TODO - bring up to date with ShootCommand.run
+    //TODO: bring up to date with ShootCommand.run
     private class Shutter extends CanonCommand<Void> {
 
         //		private boolean oldEvfMode;
@@ -79,7 +91,7 @@ public class QuickShootManager implements EdsObjectEventHandler {
         }
     }
 
-    // TODO - bring up to date with ShootCommand.apply
+    // TODO: bring up to date with ShootCommand.apply
     private class Downloader extends CanonCommand<ArrayList<File>> {
 
         @Override
@@ -100,7 +112,7 @@ public class QuickShootManager implements EdsObjectEventHandler {
         return apply( inEvent, new EdsDirectoryItemRef( inRef.getPointer() ), inContext );
     }
 
-    //TODO - bring up to date with ShootCommand.apply
+    //TODO: bring up to date with ShootCommand.apply
     public EdsError apply( final EdsObjectEvent inEvent,
                            final EdsDirectoryItemRef inRef,
                            final Pointer inContext ) {

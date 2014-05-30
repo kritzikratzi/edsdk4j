@@ -38,27 +38,40 @@ import edsdk.utils.CanonConstant.EdsTv;
 import edsdk.utils.CanonConstant.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
-// TODO - These are defined in EdSdkLibrary but are not described in the API
-// Docs:
-// kEdsPropID_DepthOfField (EdsUInt32),
-// kEdsPropID_EFCompensation (??),
-// kEdsPropID_Evf_FocusAid (??),
-// kEdsPropID_MyMenu (kEdsDataType_UInt32_Array - EdsUInt32[])
+/**
+ * Gets a property from the camera.
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
+//TODO: These are defined in EdSdkLibrary but are not described in the API
+//Docs:
+//kEdsPropID_DepthOfField (EdsUInt32),
+//kEdsPropID_EFCompensation (??),
+//kEdsPropID_Evf_FocusAid (??),
+//kEdsPropID_MyMenu (kEdsDataType_UInt32_Array - EdsUInt32[])
 //
-// TODO - Should better handle kEdsDataType_Unknown, which seems to be returned
-// if the camera doesn't support a property. Could have CanonTask have an
-// EdsError field, and if null is returned by the task, the error could be read
-// by the user
+//TODO: Should better handle kEdsDataType_Unknown, which seems to be returned
+//if the camera doesn't support a property. Could have CanonCommand have an
+//EdsError field, and if null is returned by the command, the error could be
+//read by the user
 //
-// If return type T differs from data type for property (for instance,
-// conversion for EdsUInt32 to a CanonConstant enum), the Class<T> must be
-// provided by the constructor
+//If return type T differs from data type for property (for instance,
+//conversion for EdsUInt32 to a CanonConstant enum), the Class<T> must be
+//provided by the constructor
 public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
 
     private final EdsPropertyID property;
     private final long param;
     private final Class<T> klass;
-    private final boolean isLiveViewTask;
+    private final boolean isLiveViewCommand;
     private final int liveViewRetryCount = 2;
 
     public GetPropertyCommand( final EdsPropertyID property ) {
@@ -70,13 +83,13 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
     }
 
     public GetPropertyCommand( final EdsPropertyID property,
-                               final boolean isLiveViewTask ) {
-        this( property, 0, null, isLiveViewTask );
+                               final boolean isLiveViewCommand ) {
+        this( property, 0, null, isLiveViewCommand );
     }
 
     public GetPropertyCommand( final EdsPropertyID property, final long param,
-                               final boolean isLiveViewTask ) {
-        this( property, param, null, isLiveViewTask );
+                               final boolean isLiveViewCommand ) {
+        this( property, param, null, isLiveViewCommand );
     }
 
     public GetPropertyCommand( final EdsPropertyID property,
@@ -91,17 +104,17 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
 
     public GetPropertyCommand( final EdsPropertyID property,
                                final Class<T> klass,
-                               final boolean isLiveViewTask ) {
-        this( property, 0, klass, isLiveViewTask );
+                               final boolean isLiveViewCommand ) {
+        this( property, 0, klass, isLiveViewCommand );
     }
 
     public GetPropertyCommand( final EdsPropertyID property, final long param,
                                final Class<T> klass,
-                               final boolean isLiveViewTask ) {
+                               final boolean isLiveViewCommand ) {
         this.property = property;
         this.param = param;
         this.klass = klass;
-        this.isLiveViewTask = isLiveViewTask;
+        this.isLiveViewCommand = isLiveViewCommand;
     }
 
     @SuppressWarnings( "unchecked" )
@@ -111,7 +124,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
         EdsBaseRef.ByReference[] references = null;
         try {
             final EdsBaseRef baseRef;
-            if ( isLiveViewTask ) {
+            if ( isLiveViewCommand ) {
                 if ( CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), false ) ) {
                     for ( int i = 0; i < liveViewRetryCount &&
                                      references == null; i++ ) {
@@ -123,7 +136,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
                     if ( references != null ) {
                         baseRef = references[0].getValue();
                     } else {
-                        //TODO - it may take several seconds for live view to start, so this might happen every time.. perhaps the previous should be tried for a few seconds
+                        //TODO: it may take several seconds for live view to start, so this might happen every time.. perhaps the previous should be tried for a few seconds
                         //throw new IllegalStateException( "Could not retrieve live view image reference!" );
                         System.err.println( "Could not retrieve live view image reference!" );
                         setResult( null );
@@ -241,13 +254,13 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
                     System.err.println( type.description() +
                                         " (" +
                                         type.name() +
-                                        ") is not currently supported by GetPropertyTask. Likely this camera does not support property " +
+                                        ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " +
                                         property.name() +
                                         " in the current mode or at all." );
 
                     //                    throw new IllegalStateException( type.description() + " (" +
                     //                                                     type.name() +
-                    //                                                     ") is not currently supported by GetPropertyTask. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
+                    //                                                     ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
             }
 
             setResult( result );
@@ -270,7 +283,8 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
 
     public static class Data extends GetPropertyCommand<Long> {
 
-        public Data( final EdsPropertyID property, final boolean isLiveViewTask ) {
+        public Data( final EdsPropertyID property,
+                     final boolean isLiveViewCommand ) {
             super( property, true );
         }
 
@@ -313,7 +327,7 @@ public abstract class GetPropertyCommand<T> extends CanonCommand<T> {
     }
 
     /*
-     * Specific Property ID Tasks
+     * Specific Property ID Commands
      */
 
     public static class CustomFunction extends GetPropertyCommand<Long> {

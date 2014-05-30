@@ -24,6 +24,19 @@ import edsdk.utils.CanonConstant.EdsISOSpeed;
 import edsdk.utils.CanonConstant.EdsSaveTo;
 import edsdk.utils.CanonConstant.EdsTv;
 
+/**
+ * An example of taking multiple sequential shots.
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
 public class E05_Timelapse {
 
     public static void main( final String[] args ) throws InterruptedException {
@@ -71,13 +84,13 @@ public class E05_Timelapse {
         gbc.insets = new Insets( 3, 3, 3, 3 );
         gbc.gridy = 1;
 
-        final EdsTv currentShutterSpeed = camera.getShutterSpeed();
-        final EdsAv currentApertureValue = camera.getApertureValue();
-        final EdsISOSpeed currentISOSpeed = camera.getISOSpeed();
+        final EdsTv currentShutterSpeed = camera.getShutterSpeed().get();
+        final EdsAv currentApertureValue = camera.getApertureValue().get();
+        final EdsISOSpeed currentISOSpeed = camera.getISOSpeed().get();
 
-        final EdsTv[] availableShutterSpeed = camera.getAvailableShutterSpeed();
-        final EdsAv[] availableApertureValue = camera.getAvailableApertureValue();
-        final EdsISOSpeed[] availableISOSpeed = camera.getAvailableISOSpeed();
+        final EdsTv[] availableShutterSpeed = camera.getAvailableShutterSpeed().get();
+        final EdsAv[] availableApertureValue = camera.getAvailableApertureValue().get();
+        final EdsISOSpeed[] availableISOSpeed = camera.getAvailableISOSpeed().get();
 
         E05_Timelapse.addCombobox( content, gbc, "Shutter Speed", availableShutterSpeed, currentShutterSpeed, new Callback() {
 

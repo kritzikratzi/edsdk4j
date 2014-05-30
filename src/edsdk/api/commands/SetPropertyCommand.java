@@ -33,23 +33,36 @@ import edsdk.utils.CanonConstant.EdsTv;
 import edsdk.utils.CanonConstant.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
-// TODO - These are defined in EdSdkLibrary but are not described in the API
-// Docs:
-// kEdsPropID_DepthOfField (EdsUInt32),
-// kEdsPropID_EFCompensation,
-// kEdsPropID_Evf_FocusAid,
-// kEdsPropID_MyMenu (kEdsDataType_UInt32_Array - EdsUInt32[])
+/**
+ * Sets a property on the camera.
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
+//TODO: These are defined in EdSdkLibrary but are not described in the API
+//Docs...
+//kEdsPropID_DepthOfField (EdsUInt32),
+//kEdsPropID_EFCompensation,
+//kEdsPropID_Evf_FocusAid,
+//kEdsPropID_MyMenu (kEdsDataType_UInt32_Array - EdsUInt32[])
 //
-// TODO - This is no longer in the EdSdkLibrary and is not described by the
-// API Docs.. seem to be able to get the values (see GetPropertyTask)...
-// haven't tried setting it. Can it be set?
-// kEdsPropID_Evf_ImageClipRect (EdsDataType.kEdsDataType_ByteBlock -
-// EdsUInt32[])
+//TODO: These are no longer in the EdSdkLibrary and are not described
+//by the API Docs.. seem to be able to get the values
+//(see GetPropertyCommand)...haven't tried setting it. Can it be set?
+//kEdsPropID_Evf_ImageClipRect (EdsDataType.kEdsDataType_ByteBlock -
+//EdsUInt32[])
 //
-// TODO - Should better handle kEdsDataType_Unknown, which seems to be returned
-// if the camera doesn't support a property. Could have CanonTask have an
-// EdsError field, and if null is returned by the task, the error could be read
-// by the user
+//TODO: Should better handle kEdsDataType_Unknown, which seems to be returned
+//if the camera doesn't support a property. Could have CanonCommand have an
+//EdsError field, and if null is returned by the command, the error could be
+//read by the user
 //
 public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
 
@@ -57,7 +70,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     private final long param;
     private final T value;
     private final Class<T> klass;
-    private final boolean isLiveViewTask;
+    private final boolean isLiveViewCommand;
     private final int liveViewRetryCount = 2;
 
     public SetPropertyCommand( final EdsPropertyID property, final T value ) {
@@ -70,13 +83,13 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     }
 
     public SetPropertyCommand( final EdsPropertyID property, final T value,
-                               final boolean isLiveViewTask ) {
-        this( property, 0, value, isLiveViewTask );
+                               final boolean isLiveViewCommand ) {
+        this( property, 0, value, isLiveViewCommand );
     }
 
     @SuppressWarnings( "unchecked" )
     public SetPropertyCommand( final EdsPropertyID property, final long param,
-                               final T value, final boolean isLiveViewTask ) {
+                               final T value, final boolean isLiveViewCommand ) {
         this.property = property;
         this.param = param;
         this.value = value;
@@ -85,7 +98,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
         } else {
             klass = null;
         }
-        this.isLiveViewTask = isLiveViewTask;
+        this.isLiveViewCommand = isLiveViewCommand;
     }
 
     @SuppressWarnings( "unchecked" )
@@ -99,7 +112,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
         EdsBaseRef.ByReference[] references = null;
         try {
             final EdsBaseRef baseRef;
-            if ( isLiveViewTask ) {
+            if ( isLiveViewCommand ) {
                 if ( CanonUtils.isLiveViewEnabled( camera.getEdsCamera(), false ) ) {
                     for ( int i = 0; i < liveViewRetryCount &&
                                      references == null; i++ ) {
@@ -111,7 +124,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
                     if ( references != null ) {
                         baseRef = references[0].getValue();
                     } else {
-                        //TODO - it may take several seconds for live view to start, so this might happen every time.. perhaps the previous should be tried for a few seconds
+                        //TODO: it may take several seconds for live view to start, so this might happen every time.. perhaps the previous should be tried for a few seconds
                         //throw new IllegalStateException( "Could not retrieve live view image reference!" );
                         System.err.println( "Could not retrieve live view image reference!" );
                         setResult( null );
@@ -197,13 +210,13 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
                     System.err.println( type.description() +
                                         " (" +
                                         type.name() +
-                                        ") is not currently supported by GetPropertyTask. Likely this camera does not support property " +
+                                        ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " +
                                         property.name() +
                                         " in the current mode or at all." );
 
                     //                    throw new IllegalStateException( type.description() + " (" +
                     //                                                     type.name() +
-                    //                                                     ") is not currently supported by GetPropertyTask. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
+                    //                                                     ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
             }
             System.out.println( "Set property: " + property.name() + " - " +
                                 property.description() +
@@ -231,7 +244,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     public static class Data extends SetPropertyCommand<Long> {
 
         public Data( final EdsPropertyID property, final long value,
-                     final boolean isLiveViewTask ) {
+                     final boolean isLiveViewCommand ) {
             super( property, value, true );
         }
 
@@ -245,7 +258,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
 
         public EnumData( final EdsPropertyID property,
                          final DescriptiveEnum<? extends Number> value,
-                         final boolean isLiveViewTask ) {
+                         final boolean isLiveViewCommand ) {
             super( property, value, true );
         }
 
@@ -257,7 +270,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     }
 
     /*
-     * Specific Property ID Tasks
+     * Specific Property ID Commands
      */
 
     public static class CustomFunction extends SetPropertyCommand<Long> {
@@ -428,7 +441,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
      * AutoFocusMode = AFMode
      * 
      */
-    //TODO - API indicates this is a read only property - test if this works
+    //TODO: API indicates this is a read only property - test if this works
     public static class AutoFocusMode extends SetPropertyCommand<EdsAFMode> {
 
         public AutoFocusMode( final EdsAFMode value ) {

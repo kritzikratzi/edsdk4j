@@ -47,6 +47,18 @@ import edsdk.utils.CanonConstant.EdsTv;
 import edsdk.utils.CanonConstant.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
+/**
+ * 
+ * Copyright © 2014 Hansi Raber <super@superduper.org>, Ananta Palani
+ * <anantapalani@gmail.com>
+ * This work is free. You can redistribute it and/or modify it under the
+ * terms of the Do What The Fuck You Want To Public License, Version 2,
+ * as published by Sam Hocevar. See the COPYING file for more details.
+ * 
+ * @author hansi
+ * @author Ananta Palani
+ * 
+ */
 public class Test {
 
     public static void main( final String[] args ) throws InterruptedException, IOException {
@@ -271,7 +283,7 @@ public class Test {
             for ( final EdsCustomFunction e : EdsCustomFunction.values() ) {
                 System.out.println( "\nTrying " + e.description() + " (" +
                                     e.name() + ")" );
-                final Long result = cam.getCustomFunction( e );
+                final Long result = cam.getCustomFunction( e ).get();
                 System.out.println( "    Value: " + Test.toString( result ) );
             }
 
@@ -501,7 +513,7 @@ public class Test {
 
     public static final Long printProperty( final CanonCamera cam,
                                             final EdsPropertyID prop ) {
-        final Long value = cam.getProperty( prop );
+        final Long value = cam.getProperty( prop ).get();
         System.out.println( prop.name() + " - " + prop.description() + ": " +
                             value + "\n" );
         return value;
@@ -554,7 +566,7 @@ public class Test {
                                      struct.milliseconds.intValue() );
             } else if ( EdsFocusInfo.class.isAssignableFrom( klass ) ) {
                 final EdsFocusInfo struct = (EdsFocusInfo) value;
-                //TODO
+                // TODO: handle struct output
                 result = struct.toString();
             } else if ( EdsPictureStyleDesc.class.isAssignableFrom( klass ) ) {
                 final EdsPictureStyleDesc struct = (EdsPictureStyleDesc) value;

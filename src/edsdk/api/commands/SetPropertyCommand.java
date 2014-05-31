@@ -72,6 +72,7 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
     private final Class<T> klass;
     private final boolean isLiveViewCommand;
     private final int liveViewRetryCount = 2;
+    private final int busyRetryCount = 500;
 
     public SetPropertyCommand( final EdsPropertyID property, final T value ) {
         this( property, 0, value, false );
@@ -142,88 +143,96 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
 
             final EdsDataType type = CanonUtils.getPropertyType( baseRef, property, param );
 
-            //TODO: it would be better to get the actual error from CanonUtils.getPropertyType(), but in testing a valid value was always returned if something was supported
-            EdsError err = EdsError.EDS_ERR_NOT_SUPPORTED;
-            switch ( type ) {
-                case kEdsDataType_Int32: //EdsInt32
-                case kEdsDataType_UInt32: { //EdsUInt32
+            EdsError err = EdsError.EDS_ERR_DEVICE_BUSY;
+            int retries = 0;
+            while ( retries < busyRetryCount &&
+                    err == EdsError.EDS_ERR_DEVICE_BUSY ) {
+                //TODO: it would be better to use the actual error from CanonUtils.getPropertyType(), but in testing a valid value was always returned if something was supported
+                err = EdsError.EDS_ERR_NOT_SUPPORTED;
+                switch ( type ) {
+                    case kEdsDataType_Int32: //EdsInt32
+                    case kEdsDataType_UInt32: { //EdsUInt32
+                        final long longValue;
 
-                    final long longValue;
-                    if ( Boolean.class.isAssignableFrom( klass ) ) {
-                        // Boolean
-                        longValue = (Boolean) value ? 1l : 0l;
-                    } else if ( DescriptiveEnum.class.isAssignableFrom( klass ) ) {
-                        // DescriptiveEnum
-                        longValue = ( (DescriptiveEnum<? extends Number>) value ).value().longValue();
-                    } else {
-                        // Long
-                        longValue = (Long) value;
-                    }
-
-                    err = CanonUtils.setPropertyData( baseRef, property, param, longValue );
-                    break;
-                }
-                case kEdsDataType_String: //EdsChar[]
-                case kEdsDataType_Point: //EdsPoint
-                case kEdsDataType_Rect: //EdsRect
-                case kEdsDataType_Time: //EdsTime
-                case kEdsDataType_FocusInfo: //EdsFocusInfo
-                case kEdsDataType_PictureStyleDesc: { //EdsPictureStyleDesc
-                    err = CanonUtils.setPropertyDataAdvanced( baseRef, property, param, value );
-                    break;
-                }
-                case kEdsDataType_ByteBlock: //EdsUInt32[]
-                case kEdsDataType_Int32_Array: //EdsInt32[]
-                case kEdsDataType_UInt32_Array: { //EdsUInt32[]
-                    final int[] array;
-
-                    if ( DescriptiveEnum[].class.isAssignableFrom( klass ) ) {
-                        // DescriptiveEnum[]
-                        final DescriptiveEnum<? extends Number>[] valueArray = (DescriptiveEnum<? extends Number>[]) value;
-                        array = new int[valueArray.length];
-                        for ( int i = 0; i < valueArray.length; i++ ) {
-                            array[i] = valueArray[i].value().intValue();
+                        if ( Boolean.class.isAssignableFrom( klass ) ) {
+                            // Boolean
+                            longValue = (Boolean) value ? 1l : 0l;
+                        } else if ( DescriptiveEnum.class.isAssignableFrom( klass ) ) {
+                            // DescriptiveEnum
+                            longValue = ( (DescriptiveEnum<? extends Number>) value ).value().longValue();
+                        } else {
+                            // Long
+                            longValue = (Long) value;
                         }
-                    } else if ( DescriptiveEnum.class.isAssignableFrom( klass ) ) {
-                        // DescriptiveEnum
-                        array = new int[] { ( (DescriptiveEnum<? extends Number>) value ).value().intValue() };
-                    } else if ( EdsRect.class.isAssignableFrom( klass ) ) {
-                        // EdsRect
-                        final EdsRect edsRect = (EdsRect) value;
-                        array = new int[] { edsRect.point.x.intValue(),
-                                           edsRect.point.y.intValue(),
-                                           edsRect.size.width.intValue(),
-                                           edsRect.size.height.intValue() };
-                    } else if ( EdsSize.class.isAssignableFrom( klass ) ) {
-                        // EdsSize
-                        final EdsSize edsSize = (EdsSize) value;
-                        array = new int[] { edsSize.width.intValue(),
-                                           edsSize.height.intValue() };
-                    } else {
-                        // int[]
-                        array = (int[]) value;
+
+                        err = CanonUtils.setPropertyData( baseRef, property, param, longValue );
+                        break;
                     }
+                    case kEdsDataType_String: //EdsChar[]
+                    case kEdsDataType_Point: //EdsPoint
+                    case kEdsDataType_Rect: //EdsRect
+                    case kEdsDataType_Time: //EdsTime
+                    case kEdsDataType_FocusInfo: //EdsFocusInfo
+                    case kEdsDataType_PictureStyleDesc: { //EdsPictureStyleDesc
+                        err = CanonUtils.setPropertyDataAdvanced( baseRef, property, param, value );
+                        break;
+                    }
+                    case kEdsDataType_ByteBlock: //EdsUInt32[]
+                    case kEdsDataType_Int32_Array: //EdsInt32[]
+                    case kEdsDataType_UInt32_Array: { //EdsUInt32[]
+                        final int[] array;
 
-                    err = CanonUtils.setPropertyDataAdvanced( baseRef, property, param, array );
-                    break;
+                        if ( DescriptiveEnum[].class.isAssignableFrom( klass ) ) {
+                            // DescriptiveEnum[]
+                            final DescriptiveEnum<? extends Number>[] valueArray = (DescriptiveEnum<? extends Number>[]) value;
+                            array = new int[valueArray.length];
+                            for ( int i = 0; i < valueArray.length; i++ ) {
+                                array[i] = valueArray[i].value().intValue();
+                            }
+                        } else if ( DescriptiveEnum.class.isAssignableFrom( klass ) ) {
+                            // DescriptiveEnum
+                            array = new int[] { ( (DescriptiveEnum<? extends Number>) value ).value().intValue() };
+                        } else if ( EdsRect.class.isAssignableFrom( klass ) ) {
+                            // EdsRect
+                            final EdsRect edsRect = (EdsRect) value;
+                            array = new int[] { edsRect.point.x.intValue(),
+                                               edsRect.point.y.intValue(),
+                                               edsRect.size.width.intValue(),
+                                               edsRect.size.height.intValue() };
+                        } else if ( EdsSize.class.isAssignableFrom( klass ) ) {
+                            // EdsSize
+                            final EdsSize edsSize = (EdsSize) value;
+                            array = new int[] { edsSize.width.intValue(),
+                                               edsSize.height.intValue() };
+                        } else {
+                            // int[]
+                            array = (int[]) value;
+                        }
+
+                        err = CanonUtils.setPropertyDataAdvanced( baseRef, property, param, array );
+                        break;
+                    }
+                    default:
+                        System.err.println( type.description() +
+                                            " (" +
+                                            type.name() +
+                                            ") is not currently supported by SetPropertyCommand. Likely this camera does not support property " +
+                                            property.name() +
+                                            " in the current mode or at all." );
+
+                        //                    throw new IllegalStateException( type.description() + " (" +
+                        //                                                     type.name() +
+                        //                                                     ") is not currently supported by SetPropertyCommand. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
                 }
-                default:
-                    System.err.println( type.description() +
-                                        " (" +
-                                        type.name() +
-                                        ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " +
-                                        property.name() +
-                                        " in the current mode or at all." );
-
-                    //                    throw new IllegalStateException( type.description() + " (" +
-                    //                                                     type.name() +
-                    //                                                     ") is not currently supported by GetPropertyCommand. Likely this camera does not support property " + property.name() + " in the current mode or at all." );
+                retries++;
+                Thread.sleep( 10 );
             }
             System.out.println( "Set property: " + property.name() + " - " +
                                 property.description() +
                                 ( param > 0l ? param : "" ) + " = " + value +
                                 ", result " + err.value() + ": " + err.name() +
-                                " - " + err.description() );
+                                " - " + err.description() + " after " +
+                                retries + " tries" );
             setResult( err == EdsError.EDS_ERR_OK );
             return;
         }
@@ -487,26 +496,19 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
      * ShootingMode = AEMode
      * 
      * According to the EDSDK API docs this should only work on cameras without
-     * dials.
-     * However, it seems to work on the EOS 550D and may work on other models,
-     * but note
-     * that it takes about half a second to change the mode on the EOS 550D, so
-     * you may
-     * want to do a loop that waits until the mode has changed by testing
-     * whether the
-     * current shooting mode is equal to the target shooting mode.
+     * dials. However, it seems to work on the EOS 550D and may work on other
+     * models, but note that it takes about half a second to change the mode
+     * on the EOS 550D, so you may want to do a loop that waits until the mode
+     * has changed by testing whether the current shooting mode is equal to
+     * the target shooting mode.
      * 
      * Oddly, if you remove the USB cable without turning the camera off, the
-     * shooting
-     * mode stated on the camera display will be the same as that set by this
-     * function
-     * and may be different from that set on the dial. It is not reset by
-     * unplugging
-     * the USB cable.
+     * shooting mode stated on the camera display will be the same as that set
+     * by this function and may be different from that set on the dial. It is
+     * not reset by unplugging the USB cable.
      * 
      * Switching the dial to another value will change the current mode
-     * regardless of
-     * whether the USB cable is plugged in or not.
+     * regardless of whether the USB cable is plugged in or not.
      * 
      */
     public static class ShootingMode extends SetPropertyCommand<EdsAEMode> {

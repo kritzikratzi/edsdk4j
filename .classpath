@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" output="classes" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Reference/lib/imgscalr-lib-4.2.jar" sourcepath="/Reference/src/imgscalr-lib-4.2-sources.jar">
+	<classpathentry kind="lib" path="lib/imgscalr-lib-4.2.jar" sourcepath="lib/src/imgscalr-lib-4.2-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/Reference/doc/imgscalr-lib-4.2-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/edsdk4j/lib/javadoc/imgscalr-lib-4.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jnaerator-0.11-shaded.jar"/>

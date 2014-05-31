@@ -10,8 +10,14 @@
   <property name="edsdk.dir"        value="${basedir}/EDSDK"/>
   <property name="edsdk64.dir"      value="${basedir}/EDSDK_64"/>
   <property name="distver"          value="${dist}/edsdk4j-${version}"/>
+  <!-- javaver >= 1.6 -->
+  <property name="javaver"          value="1.6"/>
+  <!-- point javart.path to the rt.jar file that corresponds to javaver
+       or a warning about 'bootstrap class path not set in conjunction
+       with -source' will occur during compile -->
+  <property name="javart.path"      value=""/>
   
-  <property name="jar.file"         value="${distver}/edsdk4j.jar" />
+  <property name="jar.file"         value="${distver}/edsdk4j.jar"/>
   
   <property environment="env"/>
   
@@ -60,10 +66,12 @@
     <mkdir dir="${build}/classes" />
     <javac
       encoding="UTF-8"
+      includeantruntime="false"
       srcdir="${src}"
       destdir="${build}/classes"
-      source="1.6"
-      target="1.6"
+      source="${javaver}"
+      target="${javaver}"
+      bootclasspath="${javart.path}" 
       debug="on">
       <classpath refid="compile.path"/>
     </javac>

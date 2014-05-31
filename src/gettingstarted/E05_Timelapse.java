@@ -48,8 +48,10 @@ public class E05_Timelapse {
 
             while ( true ) {
                 System.out.println( "=========================================" );
-                System.out.println( "Battery Level = " +
-                                    camera.getBatteryLevel() );
+                final long level = camera.getBatteryLevel();
+                if ( level != 0xffffffff ) {
+                    System.out.println( "Battery Level = " + level );
+                }
 
                 camera.execute( new ShootCommand( EdsSaveTo.kEdsSaveTo_Host, 20, E05_Timelapse.filename() ) );
 
@@ -133,23 +135,27 @@ public class E05_Timelapse {
         gbc.gridx = 1;
         gbc.weightx = 1;
         // find the items ... 
-        final LinkedList<String> items = new LinkedList<String>();
-        for ( final DescriptiveEnum<?> e : enums ) {
-            items.add( e.description() );
-        }
-
-        final JComboBox<Object> combo = new JComboBox<Object>( items.toArray( new String[] {} ) );
-        combo.setSelectedItem( selected.description() );
-        combo.addActionListener( new ActionListener() {
-
-            @Override
-            public void actionPerformed( final ActionEvent event ) {
-                callback.call( combo.getSelectedItem().toString() );
+        if ( enums == null ) {
+            content.add( new JLabel( "not available with current mode / lens" ), gbc );
+        } else {
+            final LinkedList<String> items = new LinkedList<String>();
+            for ( final DescriptiveEnum<?> e : enums ) {
+                items.add( e.description() );
             }
-        } );
-        gbc.gridx = 1;
-        gbc.weightx = 1;
-        content.add( combo, gbc );
+
+            // In Java 6 JCombBox is not generic, so to compile in Java > 6 have to do this
+            @SuppressWarnings( { "rawtypes", "unchecked" } )
+            final JComboBox combo = new JComboBox( items.toArray( new String[] {} ) );
+            combo.setSelectedItem( selected.description() );
+            combo.addActionListener( new ActionListener() {
+
+                @Override
+                public void actionPerformed( final ActionEvent event ) {
+                    callback.call( combo.getSelectedItem().toString() );
+                }
+            } );
+            content.add( combo, gbc );
+        }
 
         gbc.gridy++;
     }

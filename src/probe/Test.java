@@ -66,48 +66,60 @@ public class Test {
 
         if ( camera.openSession() ) {
 
-            //            Long value = Test.printProperty( cam, EdsPropertyID.kEdsPropID_BatteryLevel );
-            //            System.out.println( value == 0xffffffff
-            //                                                   ? "On AC power"
-            //                                                   : "On battery, value is percentage remaining." );
-            //
-            //            value = Test.printProperty( cam, EdsPropertyID.kEdsPropID_BatteryQuality );
-            //
-            //            value = Test.printProperty( cam, EdsPropertyID.kEdsPropID_DriveMode );
+            Long lvalue = Test.printProperty( camera, EdsPropertyID.kEdsPropID_BatteryLevel );
+            System.out.println( lvalue == 0xffffffff
+                                                    ? "On AC power"
+                                                    : "On battery, value is percentage remaining." );
 
-            //            for ( final EdsPropertyID id : EdsPropertyID.values() ) {
-            //                getPropertyDesc( camera.getEdsCamera(), id, true );
-            //            }
+            lvalue = Test.printProperty( camera, EdsPropertyID.kEdsPropID_BatteryQuality );
 
-            //            final EdsISOSpeed currentISOSpeed = EdsISOSpeed.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_ISOSpeed ).intValue() );
-            //            final EdsISOSpeed[] availableISOSpeeds = camera.getAvailableISOSpeeds();
-            //            for ( final EdsISOSpeed e : availableISOSpeesd ) {
-            //                System.out.println( "ISO Speed " +
-            //                                    e.description() +
-            //                                    ( e.equals( currentISOSpeed )
-            //                                                                 ? " *CURRENT* "
-            //                                                                 : "" ) );
-            //            }
-            //
-            //            final EdsTv currentShutterSpeed = EdsTv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Tv ).intValue() );
-            //            final EdsTv[] availableShutterSpeed = camera.getAvailableShutterSpeed();
-            //            for ( final EdsTv e : availableShutterSpeeds ) {
-            //                System.out.println( "Shutter Speed " +
-            //                                    e.description() +
-            //                                    ( e.equals( currentShutterSpeed )
-            //                                                                     ? " *CURRENT* "
-            //                                                                     : "" ) );
-            //            }
-            //
-            //            final EdsAv currentApertureValue = EdsAv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Av ).intValue() );
-            //            final EdsAv[] availableApertureValues = camera.getAvailableApertureValues();
-            //            for ( final EdsAv e : availableApertureValues ) {
-            //                System.out.println( "Aperture " +
-            //                                    e.description() +
-            //                                    ( e.equals( currentApertureValue )
-            //                                                                      ? " *CURRENT* "
-            //                                                                      : "" ) );
-            //            }
+            lvalue = Test.printProperty( camera, EdsPropertyID.kEdsPropID_DriveMode );
+
+            for ( final EdsPropertyID id : EdsPropertyID.values() ) {
+                Test.getPropertyDesc( camera.getEdsCamera(), id, true );
+            }
+
+            final EdsISOSpeed currentISOSpeed = EdsISOSpeed.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_ISOSpeed ).intValue() );
+            final EdsISOSpeed[] availableISOSpeeds = camera.getAvailableISOSpeeds();
+            if ( availableISOSpeeds != null ) {
+                for ( final EdsISOSpeed e : availableISOSpeeds ) {
+                    System.out.println( "ISO Speed " +
+                                        e.description() +
+                                        ( e.equals( currentISOSpeed )
+                                                                     ? " *CURRENT* "
+                                                                     : "" ) );
+                }
+            } else {
+                System.out.println( "ISO Speed settings not configurable with current mode/lens" );
+            }
+
+            final EdsTv currentShutterSpeed = EdsTv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Tv ).intValue() );
+            final EdsTv[] availableShutterSpeeds = camera.getAvailableShutterSpeeds();
+            if ( availableShutterSpeeds != null ) {
+                for ( final EdsTv e : availableShutterSpeeds ) {
+                    System.out.println( "Shutter Speed " +
+                                        e.description() +
+                                        ( e.equals( currentShutterSpeed )
+                                                                         ? " *CURRENT* "
+                                                                         : "" ) );
+                }
+            } else {
+                System.out.println( "Shutter speed is not configurable with current mode/lens" );
+            }
+
+            final EdsAv currentApertureValue = EdsAv.enumOfValue( camera.getProperty( EdsPropertyID.kEdsPropID_Av ).intValue() );
+            final EdsAv[] availableApertureValues = camera.getAvailableApertureValues();
+            if ( availableApertureValues != null ) {
+                for ( final EdsAv e : availableApertureValues ) {
+                    System.out.println( "Aperture " +
+                                        e.description() +
+                                        ( e.equals( currentApertureValue )
+                                                                          ? " *CURRENT* "
+                                                                          : "" ) );
+                }
+            } else {
+                System.out.println( "Aperture value not configurable with current mode/lens" );
+            }
 
             System.out.println( "Generic Array Test" );
             final EdsISOSpeed[] aa = Test.genericArrayTest( EdsISOSpeed[].class, new int[] {
@@ -118,7 +130,7 @@ public class Test {
                 System.out.println( " " + a.description() );
             }
 
-            System.out.println( "Mirror Lockup Setting: " +
+            System.out.println( "\nMirror Lockup Setting: " +
                                 camera.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
 
             camera.beginLiveView();
@@ -131,21 +143,21 @@ public class Test {
 
             final ByReference[] liverefs = CanonUtils.getLiveViewImageReference( camera.getEdsCamera() );
             if ( liverefs != null && liverefs.length > 0 && liverefs[0] != null ) {
-                System.out.println( "live view active so adding evf image reference" );
+                System.out.println( "\nlive view active so adding evf image reference" );
                 baserefs.add( liverefs[0].getValue() );
             }
 
-            System.out.println( "Mirror Lockup Setting: " +
+            System.out.println( "\nMirror Lockup Setting: " +
                                 camera.getCustomFunction( EdsCustomFunction.kEdsCustomFunction_MirrorLockup ) );
 
-            System.out.println( "Live View Histogram Status: " +
+            System.out.println( "\nLive View Histogram Status: " +
                                 camera.getLiveViewHistogramStatus() );
 
             final boolean hideNegativeSizeProperties = true;
             final boolean hideNegativeSizeCustomFunctions = true;
 
             //TEST READING PROPERTIES FOR CAMERA AND LIVE VIEW
-            System.out.println( "Property Sizes" );
+            System.out.println( "\nProperty Sizes" );
             System.out.println( "---------------------------------------" );
             for ( final EdsBaseRef baseref : baserefs ) {
                 System.out.println( "\nGetting properties for: " +
@@ -225,7 +237,7 @@ public class Test {
             }
 
             //TEST READING CUSTOM FUNCTIONS
-            System.out.println( "Custom Function" );
+            System.out.println( "Custom Functions" );
             System.out.println( "---------------------------------------" );
             for ( int i = -10000; i < 10000; i++ ) {
                 final long size = CanonUtils.getPropertySize( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
@@ -233,7 +245,8 @@ public class Test {
                 final EdsDataType type = CanonUtils.getPropertyType( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
 
                 if ( size > -1 || !hideNegativeSizeCustomFunctions ) {
-                    System.out.println( "Number: " + i );
+                    System.out.println( "Number: " + i + " (0x" +
+                                        Integer.toHexString( i ) + ")" );
                     System.out.println( "  Type: " + type.description() );
                     System.out.println( "  Size: " + size );
                     if ( size == -1 &&
@@ -242,9 +255,17 @@ public class Test {
                     } else {
                         final Long value = CanonUtils.getPropertyData( camera.getEdsCamera(), EdsPropertyID.kEdsPropID_CFn, i );
                         System.out.println( " Value: " + value );
+                        final EdsCustomFunction e = EdsCustomFunction.enumOfValue( i );
+                        if ( e != null ) {
+                            System.out.println( " Known: Yes, " + e.name() +
+                                                " (" + e.description() + ")" );
+                        } else {
+                            System.out.println( " Known: NO" );
+                        }
                     }
                 }
             }
+            System.out.println( "\n" );
 
             if ( liverefs != null ) {
                 CanonUtils.release( liverefs );
@@ -257,7 +278,7 @@ public class Test {
             for ( final Method method : methods ) {
                 if ( method.getName().startsWith( "get" ) &&
                      method.getParameterTypes().length == 0 ) {
-                    System.out.println( "\nTrying " + method.getName() );
+                    System.out.println( "Trying " + method.getName() );
                     try {
                         final Object o = method.invoke( camera, (Object[]) null );
                         System.out.println( " Result: " + Test.toString( o ) );
@@ -276,6 +297,7 @@ public class Test {
                     }
                 }
             }
+            System.out.println( "\n\n" );
 
             //TEST CUSTOM FUNCTION FROM CanonCamera
             System.out.println( "EdsCustomFunction with CanonCamera.getCustomFunction" );
@@ -286,9 +308,10 @@ public class Test {
                 final Long result = camera.getCustomFunction( e );
                 System.out.println( "    Value: " + Test.toString( result ) );
             }
+            System.out.println( "\n" );
 
             //TEST FOR MISSING EdsPropID CONSTANTS
-            System.out.println( "Testing if its possible to get values from the camera for undefined values from 0x0 to 0xFFFF" );
+            System.out.println( "Testing if its possible to get values from the camera for undefined property IDs from 0x0 to 0xFFFF" );
             System.out.println( "----------------------------------------------------" );
             for ( int i = 0; i < 0xFFFF; i++ ) {
                 if ( null == EdsPropertyID.enumOfValue( i ) ) {
@@ -297,7 +320,9 @@ public class Test {
                     final NativeLongByReference number = new NativeLongByReference( new NativeLong( bufferSize ) );
                     EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertySize( camera.getEdsCamera(), new NativeLong( i ), new NativeLong( 0 ), type, number ) );
                     if ( !err.equals( EdsError.EDS_ERR_PROPERTIES_UNAVAILABLE ) ) {
-                        System.out.println( i + ": " + err.description() );
+                        System.out.println( i + " (0x" +
+                                            Integer.toHexString( i ) + "): " +
+                                            err.description() );
                     }
                     if ( err == EdsError.EDS_ERR_OK ) {
                         final int size = (int) number.getValue().longValue();
@@ -318,7 +343,9 @@ public class Test {
                                          edsType.equals( EdsDataType.kEdsDataType_UInt32 ) ) {
                                         System.out.println( "    property: " +
                                                             i +
-                                                            ", value: " +
+                                                            " (0x" +
+                                                            Integer.toHexString( i ) +
+                                                            "), value: " +
                                                             memory.getNativeLong( 0 ) +
                                                             ", data type: " +
                                                             edsType.description() +
@@ -326,7 +353,9 @@ public class Test {
                                     } else if ( edsType.equals( EdsDataType.kEdsDataType_String ) ) {
                                         System.out.println( "    property: " +
                                                             i +
-                                                            ", value: " +
+                                                            " (0x" +
+                                                            Integer.toHexString( i ) +
+                                                            "), value: " +
                                                             memory.getString( 0 ) +
                                                             ", data type: " +
                                                             edsType.description() +
@@ -334,7 +363,9 @@ public class Test {
                                     } else {
                                         System.out.println( "    property: " +
                                                             i +
-                                                            ", value: NOT SUPPORTED, data type: " +
+                                                            " (0x" +
+                                                            Integer.toHexString( i ) +
+                                                            "), value: NOT SUPPORTED, data type: " +
                                                             edsType.description() +
                                                             ", size: " + size );
                                     }
@@ -514,8 +545,8 @@ public class Test {
     public static final Long printProperty( final CanonCamera camera,
                                             final EdsPropertyID property ) {
         final Long value = camera.getProperty( property );
-        System.out.println( property.name() + " - " + property.description() + ": " +
-                            value + "\n" );
+        System.out.println( property.name() + " - " + property.description() +
+                            ": " + value + "\n" );
         return value;
     }
 

@@ -57,7 +57,6 @@ import edsdk.utils.CanonConstants.EdsFilterEffect;
 import edsdk.utils.CanonConstants.EdsISOSpeed;
 import edsdk.utils.CanonConstants.EdsImageQuality;
 import edsdk.utils.CanonConstants.EdsMeteringMode;
-import edsdk.utils.CanonConstants.EdsObjectEvent;
 import edsdk.utils.CanonConstants.EdsPictureStyle;
 import edsdk.utils.CanonConstants.EdsPropertyID;
 import edsdk.utils.CanonConstants.EdsSaveTo;
@@ -205,10 +204,10 @@ public class CanonCamera implements EdsObjectEventHandler {
     /////////////////////////////////////////////
     // From here on it's instance variables
 
-    private EdsCameraRef edsCamera;
+    private EdsCameraRef edsCamera = null;
 
-    private String errorMessage;
-    private EdsError errorCode;
+    private String errorMessage = "No Errors Yet";
+    private EdsError errorCode = EdsError.EDS_ERR_OK;
 
     public CanonCamera() {}
 
@@ -505,44 +504,53 @@ public class CanonCamera implements EdsObjectEventHandler {
         }
 
         private boolean connect() {
-            EdsError err;
+            EdsError err = EdsError.EDS_ERR_OK;
+            
+            final EdsCameraListRef.ByReference listRef = new EdsCameraListRef.ByReference();
+            final EdsCameraRef.ByReference cameraRef = new EdsCameraRef.ByReference();
+            
+            try {
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetCameraList( listRef ) );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    throw new Exception("Camera failed to initialize");
+                }
 
-            final EdsCameraListRef.ByReference list = new EdsCameraListRef.ByReference();
-            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetCameraList( list ) );
-            if ( err != EdsError.EDS_ERR_OK ) {
-                return setError( err, "Camera failed to initialize" );
+                final NativeLongByReference outRef = new NativeLongByReference();
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetChildCount( listRef.getValue(), outRef ) );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    throw new Exception( "Number of attached cameras couldn't be read" );
+                }
+
+                final long numCams = outRef.getValue().longValue();
+                if ( numCams <= 0 ) {
+                    err = EdsError.EDS_ERR_DEVICE_NOT_FOUND;
+                    throw new Exception( "No cameras found. Have you tried turning it off and on again?" );
+                }
+
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetChildAtIndex( listRef.getValue(), new NativeLong( 0 ), cameraRef ) );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    throw new Exception( "Access to camera failed" );
+                }
+/*
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsSetObjectEventHandler( cameraRef.getValue(), new NativeLong( EdsObjectEvent.kEdsObjectEvent_All.value() ), CanonCamera.this, new Pointer( 0 ) ) );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    throw new Exception( "Callback handler couldn't be added" );
+                }
+*/
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsOpenSession( cameraRef.getValue() ) );
+                if ( err != EdsError.EDS_ERR_OK ) {
+                    throw new Exception( "Couldn't open camera session" );
+                }
+                
+                edsCamera = cameraRef.getValue();
+            } catch (Exception e) {
+                CanonUtils.release( cameraRef );
+                setError( err, e.getMessage() );
+            } finally {
+                CanonUtils.release( listRef );
             }
 
-            final NativeLongByReference outRef = new NativeLongByReference();
-            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetChildCount( list.getValue(), outRef ) );
-            if ( err != EdsError.EDS_ERR_OK ) {
-                return setError( err, "Number of attached cameras couldn't be read" );
-            }
-
-            final long numCams = outRef.getValue().longValue();
-            if ( numCams <= 0 ) {
-                return setError( EdsError.EDS_ERR_DEVICE_NOT_FOUND, "No cameras found. Have you tried turning it off and on again?" );
-            }
-
-            final EdsCameraRef.ByReference cameras = new EdsCameraRef.ByReference();
-            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetChildAtIndex( list.getValue(), new NativeLong( 0 ), cameras ) );
-            if ( err != EdsError.EDS_ERR_OK ) {
-                return setError( err, "Access to camera failed" );
-            }
-
-            final Pointer context = new Pointer( 0 );
-            edsCamera = new EdsCameraRef( cameras.getValue().getPointer() );
-            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsSetObjectEventHandler( edsCamera, new NativeLong( EdsObjectEvent.kEdsObjectEvent_All.value() ), CanonCamera.this, context ) );
-            if ( err != EdsError.EDS_ERR_OK ) {
-                return setError( err, "Callback handler couldn't be added" );
-            }
-
-            err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsOpenSession( edsCamera ) );
-            if ( err != EdsError.EDS_ERR_OK ) {
-                return setError( err, "Couldn't open camera session" );
-            }
-
-            return true;
+            return err == EdsError.EDS_ERR_OK;
         }
 
     }
@@ -557,6 +565,7 @@ public class CanonCamera implements EdsObjectEventHandler {
         private boolean close() {
             //System.out.println( "closing session" );
             final EdsError err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsCloseSession( edsCamera ) );
+            CanonUtils.release( edsCamera );
 
             if ( err != EdsError.EDS_ERR_OK ) {
                 return setError( err, "Couldn't close camera session" );

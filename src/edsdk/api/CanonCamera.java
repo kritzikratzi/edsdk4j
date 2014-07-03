@@ -57,6 +57,7 @@ import edsdk.utils.CanonConstants.EdsFilterEffect;
 import edsdk.utils.CanonConstants.EdsISOSpeed;
 import edsdk.utils.CanonConstants.EdsImageQuality;
 import edsdk.utils.CanonConstants.EdsMeteringMode;
+import edsdk.utils.CanonConstants.EdsObjectEvent;
 import edsdk.utils.CanonConstants.EdsPictureStyle;
 import edsdk.utils.CanonConstants.EdsPropertyID;
 import edsdk.utils.CanonConstants.EdsSaveTo;
@@ -531,12 +532,12 @@ public class CanonCamera implements EdsObjectEventHandler {
                 if ( err != EdsError.EDS_ERR_OK ) {
                     throw new Exception( "Access to camera failed" );
                 }
-/*
+
                 err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsSetObjectEventHandler( cameraRef.getValue(), new NativeLong( EdsObjectEvent.kEdsObjectEvent_All.value() ), CanonCamera.this, new Pointer( 0 ) ) );
                 if ( err != EdsError.EDS_ERR_OK ) {
                     throw new Exception( "Callback handler couldn't be added" );
                 }
-*/
+
                 err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsOpenSession( cameraRef.getValue() ) );
                 if ( err != EdsError.EDS_ERR_OK ) {
                     throw new Exception( "Couldn't open camera session" );

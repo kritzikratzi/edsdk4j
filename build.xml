@@ -21,7 +21,7 @@
   
   <property environment="env"/>
   
-  <property name="jnaerator.lib"    value="${lib}/jnaerator*.jar"/>
+  <property name="jnaerator.lib"    value="${lib}/jnaerator-0.11-shaded.jar"/>
   
   <fileset id="jna.libs" dir="${lib}">
     <include name="jna*.jar"/>
@@ -56,6 +56,10 @@
   </target>
   
   <target name="generate-wrapper">
+  	<!-- if this yields strange errors make sure there's no BOM in 
+  	the header files. if there are run this in the headers directory: 
+  	grep -rl $'\xEF\xBB\xBF' . | xargs perl -i -pe 's{\xEF\xBB\xBF}{}'
+  	-->
     <exec logerror="true" executable="java">
       <env key="EDSDK_HOME" value="${edsdk.dir}"/>
       <arg line="-jar ${jnaerator.lib} config.jnaerator"/>

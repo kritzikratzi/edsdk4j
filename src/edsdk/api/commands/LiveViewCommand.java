@@ -41,7 +41,7 @@ public class LiveViewCommand {
 
         @Override
         public void run() {
-            setResult( CanonUtils.downloadLiveViewImage( camera.getEdsCamera() ) );
+            setResult( CanonUtils.getLiveViewImage( camera.getEdsCamera() ) );
         }
     }
 

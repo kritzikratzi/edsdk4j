@@ -227,12 +227,15 @@ public abstract class SetPropertyCommand<T> extends CanonCommand<Boolean> {
                 retries++;
                 Thread.sleep( 10 );
             }
-            System.out.println( "Set property: " + property.name() + " - " +
-                                property.description() +
-                                ( param > 0l ? param : "" ) + " = " + value +
-                                ", result " + err.value() + ": " + err.name() +
-                                " - " + err.description() + " after " +
-                                retries + " tries" );
+            
+            if( retries > 1 ){
+	            System.out.println( "Set property: " + property.name() + " - " +
+	                                property.description() +
+	                                ( param > 0l ? param : "" ) + " = " + value +
+	                                ", result " + err.value() + ": " + err.name() +
+	                                " - " + err.description() + " after " +
+	                                retries + " tries" );
+            }
             setResult( err == EdsError.EDS_ERR_OK );
             return;
         }

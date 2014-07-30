@@ -7,6 +7,7 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 
 import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
 import edsdk.utils.CanonConstants.DescriptiveEnum;
 import edsdk.utils.CanonConstants.EdsCameraCommand;
@@ -41,6 +42,9 @@ import edsdk.utils.CanonUtils;
 public abstract class CanonCommand<T> implements EdsObjectEventHandler {
 
     public CanonCamera camera;
+    // edsCamera can be reached also through camera.getEdsCamera(), 
+    // but it's needed so much that this is a handy shortcut. 
+    public EdsCameraRef edsCamera; 
     private boolean finished = false;
     private boolean waitForFinish = false;
     private boolean ran = false;
@@ -58,6 +62,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
      */
     public void setCamera( final CanonCamera camera ) {
         this.camera = camera;
+        this.edsCamera = camera.getEdsCamera(); 
     }
 
     /**

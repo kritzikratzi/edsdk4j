@@ -543,7 +543,7 @@ public class CanonCamera implements EdsObjectEventHandler {
                     throw new Exception( "Couldn't open camera session" );
                 }
                 
-                edsCamera = cameraRef.getValue();
+                CanonCamera.this.edsCamera = cameraRef.getValue();
             } catch (Exception e) {
                 CanonUtils.release( cameraRef );
                 setError( err, e.getMessage() );

@@ -28,20 +28,20 @@ but because of threading difficulties and the involved data types this can be a 
 In the ```edsdk.utils``` package you find a small layer built on top of the EDSDK 
 that gives you more Java-like examples. 
 
-Most notably, all calls are asynchroneous. Every command gives you a CanonTask 
+Most notably, all calls have synchroneous and async calls. The async variants give you a CanonTask 
 and you can choose if you want to wait for the result or be notified when it's done. 
 
 	CanonCamera slr = new CanonCamera(); 
 	slr.openSession();
 	
-	// Use .get() to block and wait for the result
-	File file = slr.shoot().get(); 
+	// Use the blocking variant to get a result immediately. 
+	File file = slr.shoot()[0]; 
 	System.out.println( "File: " + file.getAbsolutePath() );
 	
 	// Use async handlers to continue your code immediately 
 	slr.shoot().whenDone( f -> System.out.println( f ) ); 
 	
-	// close session! 
+	// close session is always blocking.
 	// because commands are queued this won't be executed 
 	// until the above slr.shoot() finished it's work. 
 	slr.closeSession(); 
@@ -51,8 +51,11 @@ and you can choose if you want to wait for the result or be notified when it's d
 
 		CanonCamera slr = new CanonCamera(); 
 		slr.openSession();
-		File file = slr.shoot().get(); 
+		File file = slr.shoot()[0]; // (*)
 		slr.closeSession();
+		
+		(*) If you have raw+jpeg enabled you'll have two 
+		images in that array. Usually it's just one. 
 
 For more look at the examples in src/gettingstarted. 
 

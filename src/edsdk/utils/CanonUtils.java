@@ -78,6 +78,8 @@ import edsdk.utils.CanonConstants.EdsWhiteBalance;
  * 
  */
 // TODO: think about having CanonUtils handle state/property changes to handle cases described by CanonUtils.isLiveViewEnabled()
+// hansi: not sure i understand correctly, but imho canonutils must stay a class with only dumb 
+//        methods that all work independently of context/state. sounds like it should go into canoncamera
 public class CanonUtils {
 
     public static final int classIntField( final Class<?> klass,
@@ -212,12 +214,27 @@ public class CanonUtils {
         return success ? destination : null;
     }
 
+    /**
+     * Set a camera property 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property ID of the property
+     * @param value New property value. 
+     * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
+     */
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final DescriptiveEnum<? extends Number> value ) {
         return CanonUtils.setPropertyDataAdvanced( ref, property, 0, value.value().longValue() );
     }
 
+    /**
+     * Set a camera property 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property ID of the property
+     * @param param 
+     * @param value New property value. 
+     * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
+     */
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final long param,
@@ -225,17 +242,43 @@ public class CanonUtils {
         return CanonUtils.setPropertyDataAdvanced( ref, property, param, value.value().longValue() );
     }
 
+    /**
+     * Set a camera property 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property ID of the property
+     * @param value New property value. 
+     * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
+     */
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final long value ) {
         return CanonUtils.setPropertyDataAdvanced( ref, property, 0, value );
     }
 
+    /**
+     * Set a camera property 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property ID of the property
+     * @param param 
+     * @param value New property value. 
+     * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
+     */
+
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final long param, final long value ) {
         return CanonUtils.setPropertyDataAdvanced( ref, property, param, value );
     }
+
+    /**
+     * Set a camera property 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property ID of the property
+     * @param param 
+     * @param size Data size in bytes
+     * @param value New property value.
+     * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
+     */
 
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
@@ -251,8 +294,9 @@ public class CanonUtils {
     }
 
     /**
-     * Only use this if you know that the type of the property you input is
-     * compatible with the value you supply.
+     * Set property data. 
+     * <em>Only use this if you know that the type of the property you input is
+     * compatible with the value you supply.</em>
      * 
      * @param ref Camera/image/live view reference
      * @param property Property to get from the camera
@@ -362,7 +406,8 @@ public class CanonUtils {
                 pointer.write( 0, array, 0, array.length );
                 break;
             }
-            case kEdsDataType_Bool: //EdsBool // TODO: implement
+            case kEdsDataType_Bool: 
+            	//EdsBool // TODO: implement
             case kEdsDataType_Bool_Array: //EdsBool[] // TODO: implement
             case kEdsDataType_Rational_Array: //EdsRational[] // TODO: implement
             case kEdsDataType_Unknown: //Unknown
@@ -374,17 +419,38 @@ public class CanonUtils {
         return CanonUtils.setPropertyData( ref, property, param, size, pointer );
     }
 
+    /**
+     * Query property data 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property Property id 
+     * @return Current value of the property as long 
+     */
     public static Long getPropertyData( final EdsBaseRef ref,
                                         final EdsPropertyID property ) {
         return CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
     }
 
+    /**
+     * Query property data 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property Property id
+     * @param param  
+     * @return Current long value of the property 
+     */
     public static Long getPropertyData( final EdsBaseRef ref,
                                         final EdsPropertyID property,
                                         final long param ) {
         return CanonUtils.getPropertyDataAdvanced( ref, property, param );
     }
 
+    /**
+     * Query property data 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property Property id 
+     * @param param 
+     * @param size Data size in bytes
+     * @return Current long value of the property 
+     */
     public static EdsError getPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final long param, final long size,
@@ -392,6 +458,12 @@ public class CanonUtils {
         return CanonUtils.toEdsError( CanonCamera.EDSDK.EdsGetPropertyData( ref, new NativeLong( property.value() ), new NativeLong( param ), new NativeLong( size ), data ) );
     }
 
+    /**
+     * Query property data 
+     * @param ref Reference to the camera/image/liveview object
+     * @param property Property id 
+     * @return Current value of the property  
+     */
     public static <T> T getPropertyDataAdvanced( final EdsBaseRef ref,
                                                  final EdsPropertyID property ) {
         return CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
@@ -409,6 +481,7 @@ public class CanonUtils {
      * @throws IllegalStateException
      */
     //TODO: this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
+    //hansi: i like having as much as possible public. it's nice for people who know what they're doing. 
     @SuppressWarnings( "unchecked" )
     public static <T> T getPropertyDataAdvanced( final EdsBaseRef ref,
                                                  final EdsPropertyID property,
@@ -481,11 +554,25 @@ public class CanonUtils {
                                             " - " + err.description() + ")" );
     }
 
+    /**
+     * see {@link CanonUtils#getPropertyType(EdsBaseRef, EdsPropertyID, long)}
+     * @param ref
+     * @param property
+     * @return
+     */
     public static EdsDataType getPropertyType( final EdsBaseRef ref,
                                                final EdsPropertyID property ) {
         return CanonUtils.getPropertyType( ref, property, 0 );
     }
 
+    /**
+     * Returns the data type of a specified property
+     * 
+     * @param ref Reference to the camera
+     * @param property Property id
+     * @param param Name of the parameter
+     * @return The data type, or null if the parameter isn't supported, or unknown if something else goes wrong.  
+     */
     public static EdsDataType getPropertyType( final EdsBaseRef ref,
                                                final EdsPropertyID property,
                                                final long param ) {
@@ -500,15 +587,31 @@ public class CanonUtils {
                 return edsDataType;
             }
         }
-        // TODO: would it be better to return NULL if EDS_ERR_NOT_SUPPORTED is returned?
+        else if( err == EdsError.EDS_ERR_NOT_SUPPORTED ){
+        	return null; 
+        }
+        
         return EdsDataType.kEdsDataType_Unknown;
     }
 
+    /**
+     * Get the size of a property
+     * @param ref Reference to the camera/image/liveview object
+     * @param property the property id
+     * @return Size in bytes
+     */
     public static long getPropertySize( final EdsBaseRef ref,
                                         final EdsPropertyID property ) {
         return CanonUtils.getPropertySize( ref, property, 0 );
     }
 
+    /**
+     * Get the size of a property
+     * @param ref Reference to the camera/image/liveview object
+     * @param property the property id
+     * @param param
+     * @return Size in bytes
+     */
     public static long getPropertySize( final EdsBaseRef ref,
                                         final EdsPropertyID property,
                                         final long param ) {
@@ -784,13 +887,6 @@ public class CanonUtils {
      * Instead, if {@code checkLiveViewActive} is {@code true} this function
      * will try to download a live view frame and if it cannot, the function
      * assumes that live view is off and {@code false} is returned.
-     * <p>
-     * Note that if {@code checkLiveViewActive} is {@code true}, then if live
-     * view is turned off while
-     * {@link CanonUtils#getLiveViewImageReference(EdsCameraRef)
-     * getLiveViewImageReference()} is queried, the tread will hang because the
-     * EDSDK will not return, so call this from a thread-handled environment
-     * such as {@link CanonCamera}.
      * 
      * @param camera the camera to query
      * @param checkLiveViewActive set {@code true} to check whether the camera
@@ -819,8 +915,10 @@ public class CanonUtils {
         return false;
     }
 
+   
     /**
-     * Creates a stream and corresponding live view image. You MUST call
+     * Creates a stream and corresponding live view image. 
+     * Don't forget to call 
      * {@link CanonUtils#release(edsdk.bindings.EdSdkLibrary.EdsBaseRef.ByReference...)
      * release()} on the returned array when you are done using it or
      * you will cause a memory leak!
@@ -880,7 +978,12 @@ public class CanonUtils {
         return new EdsBaseRef.ByReference[] { imageRef, streamRef };
     }
 
-    public static BufferedImage downloadLiveViewImage( final EdsCameraRef camera ) {
+    /**
+     * Download a live view image from the camera and convert it directly into a bufferd image. 
+     * @param camera
+     * @return
+     */
+    public static BufferedImage getLiveViewImage( final EdsCameraRef camera ) {
         EdsError err = EdsError.EDS_ERR_OK;
 
         final EdsBaseRef.ByReference[] references = CanonUtils.getLiveViewImageReference( camera );
@@ -938,7 +1041,6 @@ public class CanonUtils {
                 return img;
             }
             catch ( final IOException e ) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             finally {
@@ -948,15 +1050,30 @@ public class CanonUtils {
 
         return null;
     }
-
+    
+    /**
+     * Convert a long value to it's correspond error. 
+     * @param value
+     * @return
+     */
     public static EdsError toEdsError( final NativeLong value ) {
         return CanonUtils.toEdsError( value.intValue() );
     }
 
+    /**
+     * Convert a long value to it's corresponding error. 
+     * @param value
+     * @return
+     */
     public static EdsError toEdsError( final long value ) {
         return CanonUtils.toEdsError( value );
     }
 
+    /**
+     * Convert a long value to it's corresponding error. 
+     * @param value
+     * @return
+     */
     public static EdsError toEdsError( final int value ) {
         final EdsError error = EdsError.enumOfValue( value );
         if ( error != null ) {
@@ -965,6 +1082,11 @@ public class CanonUtils {
         return EdsError.EDS_ERR_UNEXPECTED_EXCEPTION;
     }
 
+    /**
+     * Releases a eds object 
+     * @param value
+     * @return
+     */
     public static void release( final EdsBaseRef.ByReference ... objects ) {
         for ( final EdsBaseRef.ByReference obj : objects ) {
             if ( obj != null ) {
@@ -972,6 +1094,12 @@ public class CanonUtils {
             }
         }
     }
+
+    /**
+     * Convert a bunch of eds objects 
+     * @param value
+     * @return
+     */
 
     public static void release( final EdsBaseRef ... objects ) {
         for ( final EdsBaseRef obj : objects ) {

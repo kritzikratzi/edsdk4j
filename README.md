@@ -39,7 +39,7 @@ and you can choose if you want to wait for the result or be notified when it's d
 	System.out.println( "File: " + file.getAbsolutePath() );
 	
 	// Use async handlers to continue your code immediately 
-	slr.shoot().whenDone( f -> System.out.println( f ) ); 
+	slr.shootAsync().whenDone( f -> System.out.println( f ) ); 
 	
 	// close session is always blocking.
 	// because commands are queued this won't be executed 

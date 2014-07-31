@@ -2,6 +2,7 @@ package edsdk.api;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -131,7 +132,12 @@ public class CanonCamera implements EdsObjectEventHandler {
         }
         if ( url != null ) {
             try {
-                final File file = new File( url.toURI() );
+            	// handle unc paths (pre java7 :/ )
+            	URI uri = url.toURI(); 
+            	if( uri.getAuthority() != null && uri.getAuthority().length() > 0 ){
+            		uri = new URL("file://" + url.toString().substring(5)).toURI();
+            	}
+                final File file = new File( uri );
                 final String dir = file.getParentFile().getPath();
                 System.setProperty( "jna.library.path", dir );
                 //System.out.println("jna.library.path: "+dir);
@@ -161,6 +167,9 @@ public class CanonCamera implements EdsObjectEventHandler {
 
     // Libraries needed to forward windows messages
     private static final User32 lib = User32.INSTANCE;
+    static{
+    	System.setProperty( "jna.predictable_field_order","true");
+    }
     //private static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("");
 
     // The queue of commands that need to be run. 

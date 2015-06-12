@@ -68,11 +68,12 @@ For more look at the examples in src/gettingstarted.
 
 ## Notes
 
-To regenerate the JNA wrapper classes:
+In case you need to regenerate the JNA wrapper classes:
 
 	set EDSDK_HOME=path-to-edsdk
 	ant generate-wrapper
 
+This does not need to be run, unless you want to regenerate the bindings for the latest version of the EDSDK because you need to use the newest features. 
 
 ## Issues:
 

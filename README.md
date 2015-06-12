@@ -46,6 +46,12 @@ and you can choose if you want to wait for the result or be notified when it's d
 	// until the above slr.shoot() finished it's work. 
 	slr.closeSession(); 
 
+## Pay attention to the parameters you're setting! 
+
+The EDSDK does not check whether the parameters you're setting are actually suitable for your camera model. This can lead to very strange and possibly unfixable configurations, in the worst case you can brick your camera with the infamous error 99. 
+
+I mostly tested with the EOS550/600 and had no problems so far, but one user reported a repair estimate of 400€ after bricking a 50D by just changing the quality setting. See https://github.com/kritzikratzi/edsdk4j/issues/20
+It's hard to tell what happened exactly and I'm almost 100% certain that that's not normal, but please be aware there is a slim chance of this happening to you as well. 
 
 ## Getting started
 

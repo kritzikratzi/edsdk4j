@@ -1,0 +1,80 @@
+<!--
+	Copyright 2014-206 Canon SDK for Java project
+	for project details and license see https://github.com/kritzikratzi/edsdk4j
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edsdk4j</groupId>
+	<artifactId>edsdk4j</artifactId>
+	<version>0.0.1</version>
+	<name>edsdk4j</name>
+	<description>Canon EDSDK Software Development Kit Java Wrapper</description>
+	<properties>
+		<jna.version>3.4.2</jna.version>
+		<junit4.version>4.11</junit4.version>
+		<jnaerator.version>0.11</jnaerator.version>
+		<imgscalr.version>4.2</imgscalr.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${jna.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> 
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>platform</artifactId>
+			<version>${jna.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath> 
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit4.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+			<version>${imgscalr.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nativelibs4java</groupId>
+			<artifactId>jnaerator</artifactId>
+			<version>${jnaerator.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<excludes>
+						<!-- <exclude>**/edsdk/api/CanonCamera</exclude>
+							<exclude>**/edsdk/bindings/*</exclude>
+						-->
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+		<extensions>
+			<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.10</version>
+			</extension>
+		</extensions>
+	</build>
+</project>

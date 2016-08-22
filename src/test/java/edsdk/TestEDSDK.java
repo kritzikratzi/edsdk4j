@@ -3,6 +3,7 @@
  */
 package edsdk;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -39,12 +40,18 @@ public class TestEDSDK extends EDSDKBaseTest {
 		CanonCamera.close();
 
 	}
+	
+	@Test
+	public void testCameraInfo() throws Exception {
+		
+	}
 
 	@Test
 	public void testPhoto() throws Exception {
 		final File[] photos = camera.shoot(EdsSaveTo.kEdsSaveTo_Host);
-
+		assertNotNull(photos);
 		if (photos != null) {
+			assertEquals(1,photos.length);
 			for (final File photo : photos) {
 				if (photo != null) {
 					System.out.println("Saved photo as: " + photo.getCanonicalPath());

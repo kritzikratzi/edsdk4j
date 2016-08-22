@@ -1,16 +1,12 @@
 package edsdk.api;
 
-import com.sun.jna.Native;
-import com.sun.jna.Library;
-
 import org.bridj.Platform;
 
 import com.sun.jna.Function;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
 import edsdk.bindings.EdSdkLibrary;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 
 /**
  * this class is a EDSDK Version 2.15 implementation that should work on MacOSX

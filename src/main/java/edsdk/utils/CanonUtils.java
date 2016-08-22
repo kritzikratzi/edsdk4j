@@ -83,6 +83,8 @@ import edsdk.utils.CanonConstants.EdsWhiteBalance;
 //        methods that all work independently of context/state. sounds like it should go into canoncamera
 public class CanonUtils {
 
+	public static boolean lenient=true; // avoid exceptions - set to true if you'd like to see all errors
+	
     public static final int classIntField( final Class<?> klass,
                                            final String fieldName ) {
         Throwable t = null;
@@ -436,7 +438,19 @@ public class CanonUtils {
      */
     public static Long getPropertyData( final EdsBaseRef ref,
                                         final EdsPropertyID property ) {
-        return CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
+        Object result = CanonUtils.getPropertyDataAdvanced( ref, property, 0 );
+        if (result instanceof Long) {
+        	Long value=(Long)result;
+        	return value;
+        } else {
+        	String type=result.getClass().getName();
+        	String msg="getPropertyData for "+property+" expected Long but got "+type;
+        	if (lenient)
+        		return 0L;
+        	else
+        		throw new RuntimeException(msg);
+        }
+        
     }
 
     /**

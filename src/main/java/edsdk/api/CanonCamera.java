@@ -1,14 +1,5 @@
 package edsdk.api;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
@@ -16,56 +7,14 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.NativeLongByReference;
-import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
-import edsdk.api.commands.DriveLensCommand;
-import edsdk.api.commands.FocusModeCommand;
-import edsdk.api.commands.GetPropertyCommand;
-import edsdk.api.commands.GetPropertyDescCommand;
-import edsdk.api.commands.LiveViewCommand;
-import edsdk.api.commands.SetPropertyCommand;
-import edsdk.api.commands.ShootCommand;
 import edsdk.bindings.EdSdkLibrary;
-import edsdk.bindings.EdSdkLibrary.EdsBaseRef;
 import edsdk.bindings.EdSdkLibrary.EdsCameraListRef;
 import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.bindings.EdSdkLibrary.EdsObjectEventHandler;
-import edsdk.bindings.EdsFocusInfo;
-import edsdk.bindings.EdsPictureStyleDesc;
-import edsdk.bindings.EdsPoint;
-import edsdk.bindings.EdsPropertyDesc;
-import edsdk.bindings.EdsRect;
-import edsdk.bindings.EdsSize;
-import edsdk.bindings.EdsTime;
-import edsdk.utils.CanonConstants.DescriptiveEnum;
-import edsdk.utils.CanonConstants.EdsAEMode;
-import edsdk.utils.CanonConstants.EdsAFMode;
-import edsdk.utils.CanonConstants.EdsAv;
-import edsdk.utils.CanonConstants.EdsBatteryQuality;
-import edsdk.utils.CanonConstants.EdsBracket;
-import edsdk.utils.CanonConstants.EdsColorSpace;
-import edsdk.utils.CanonConstants.EdsCustomFunction;
-import edsdk.utils.CanonConstants.EdsDataType;
-import edsdk.utils.CanonConstants.EdsDriveMode;
 import edsdk.utils.CanonConstants.EdsError;
-import edsdk.utils.CanonConstants.EdsEvfAFMode;
-import edsdk.utils.CanonConstants.EdsEvfDriveLens;
-import edsdk.utils.CanonConstants.EdsEvfHistogramStatus;
-import edsdk.utils.CanonConstants.EdsEvfOutputDevice;
-import edsdk.utils.CanonConstants.EdsEvfZoom;
-import edsdk.utils.CanonConstants.EdsExposureCompensation;
-import edsdk.utils.CanonConstants.EdsFilterEffect;
-import edsdk.utils.CanonConstants.EdsISOSpeed;
-import edsdk.utils.CanonConstants.EdsImageQuality;
-import edsdk.utils.CanonConstants.EdsMeteringMode;
 import edsdk.utils.CanonConstants.EdsObjectEvent;
-import edsdk.utils.CanonConstants.EdsPictureStyle;
-import edsdk.utils.CanonConstants.EdsPropertyID;
-import edsdk.utils.CanonConstants.EdsSaveTo;
-import edsdk.utils.CanonConstants.EdsTonigEffect;
-import edsdk.utils.CanonConstants.EdsTv;
-import edsdk.utils.CanonConstants.EdsWhiteBalance;
 import edsdk.utils.CanonUtils;
 
 /**
@@ -315,11 +264,19 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
         }
     }
 
+    /**
+     * open the session
+     * @return true if successful
+     */
     public boolean openSession() {
         final Boolean result = executeNow( new OpenSessionCommand() );
         return result != null && result;
     }
 
+    /**
+     * close session
+     * @return true if successful
+     */
     public boolean closeSession() {
         final Boolean result = executeNow( new CloseSessionCommand() );
         return result != null && result;

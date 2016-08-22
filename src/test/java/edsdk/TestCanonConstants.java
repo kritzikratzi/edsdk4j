@@ -19,7 +19,7 @@ public class TestCanonConstants {
     boolean result = CanonConstants.verifyAllConstants();
     assertTrue("Verify of CanonConstants should be ok",result);
     EdsAEMode[] aemodes = CanonConstants.EdsAEMode.values();
-    assertEquals(20,aemodes.length);
+    assertEquals(27,aemodes.length);
   }
 
 }

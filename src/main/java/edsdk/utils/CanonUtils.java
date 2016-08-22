@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
@@ -86,8 +87,16 @@ public class CanonUtils {
                                            final String fieldName ) {
         Throwable t = null;
         try {
-            final int value = klass.getField( fieldName ).getInt( null );
-            return value;
+        	Field field = klass.getField( fieldName );
+        	// enum values may be long as of jnaerator 0.12
+        	long longValue=field.getLong(null);
+        	int value=0;
+        	if (longValue==Long.MAX_VALUE) {
+        		value=Integer.MAX_VALUE;
+        	} else {
+        		value=(int) longValue;
+        	}
+        	return value;
         }
         catch ( final IllegalArgumentException e ) {
             t = e;

@@ -17,17 +17,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/edsdk4j/lib/javadoc/imgscalr-lib-4.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jnaerator-0.11-shaded.jar"/>
-	<classpathentry kind="lib" path="lib/jna-3.4.2.jar" sourcepath="lib/src/jna-3.4.2-src-full.zip">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/edsdk4j/lib/javadoc/jna-3.4.2-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jna-platform-3.4.2.jar" sourcepath="lib/src/jna-platform-3.4.2-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/edsdk4j/lib/javadoc/jna-platform-3.4.2-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

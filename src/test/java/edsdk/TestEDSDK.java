@@ -14,6 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edsdk.api.CanonCamera;
+import edsdk.api.commands.GetPropertyCommand;
+import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.utils.CanonConstants.EdsImageQuality;
 import edsdk.utils.CanonConstants.EdsSaveTo;
 
@@ -43,7 +45,9 @@ public class TestEDSDK extends EDSDKBaseTest {
 	
 	@Test
 	public void testCameraInfo() throws Exception {
-		
+		String productName=camera.getProductName();
+		assertNotNull(productName);
+		System.out.println("Canon Camera: "+productName+" is connected");
 	}
 
 	@Test

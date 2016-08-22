@@ -31,12 +31,11 @@ public class TestEDSDK extends EDSDKBaseTest {
         assertNotNull(edsdk);
         NativeLong callResult = edsdk.EdsInitializeSDK();
         check( callResult );
-        PointerByReference listRef=new PointerByReference();
+        EdsCameraListRef.ByReference listRef = new EdsCameraListRef.ByReference();
         callResult=edsdk.EdsGetCameraList( listRef );
         check(callResult);
         final NativeLongByReference outRef = new NativeLongByReference();
-        EdsCameraListRef inRef=new EdsCameraListRef(listRef.getPointer());
-        callResult=edsdk.EdsGetChildCount(listRef.getPointer(), outRef );
+        callResult=edsdk.EdsGetChildCount(listRef.getValue(), outRef );
         check(callResult);
     }
     

@@ -4278,20 +4278,22 @@ public interface EdSdkLibrary extends StdCallLibrary {
 		public EdsCameraListRef(Pointer address) {
 			super(address);
 		}
+
 		public EdsCameraListRef() {
 			super();
 		}
-		 public static class ByReference extends EdsBaseRef.ByReference {
 
-       @Override
-       public EdsCameraListRef getValue() {
-           final Pointer p = getPointer().getPointer( 0 );
-           if ( p == null ) {
-               return null;
-           }
-           return new EdsCameraListRef( p );
-       }
-   }
+		public static class ByReference extends EdsBaseRef.ByReference {
+
+			@Override
+			public EdsCameraListRef getValue() {
+				final Pointer p = getPointer().getPointer(0);
+				if (p == null) {
+					return null;
+				}
+				return new EdsCameraListRef(p);
+			}
+		}
 	};
 	public static class EdsVoid extends PointerType {
 		public EdsVoid(Pointer address) {
@@ -4378,7 +4380,7 @@ public interface EdSdkLibrary extends StdCallLibrary {
   };
 	
   /**
-   * typed Wrapper for an EdsBaseReference Pointer
+   * typed Wrapper for an EdsBaseReference Pointer - similar to PointerByReference
    * @author Hansi Raber <super@superduper.org>
    *
    * @param <T>
@@ -4390,11 +4392,19 @@ public interface EdSdkLibrary extends StdCallLibrary {
       this(null);
     }
 
+    /**
+     * initialize me from the given EdsBaseRef 
+     * @param r - the EdsBaseRef to initialize me from
+     */
     public EdsObjectByReference(final T r) {
       super(Pointer.SIZE);
       setValue(r);
     }
 
+    /**
+     * set my value
+     * @param r
+     */
     public void setValue(final T r) {
       getPointer().setPointer(0, r != null ? r.getPointer() : null);
     }

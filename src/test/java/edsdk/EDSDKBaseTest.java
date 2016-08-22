@@ -1,8 +1,11 @@
 package edsdk;
 
+import com.sun.jna.NativeLong;
+
 import edsdk.bindings.EdSdkLibrary;
 import edsdk.utils.CanonUtils;
 import edsdk.utils.CanonConstants.EdsError;
+import static org.junit.Assert.fail;
 
 /**
  * base Class for Testing Canon EDSDK
@@ -10,11 +13,17 @@ import edsdk.utils.CanonConstants.EdsError;
  *
  */
 public class EDSDKBaseTest {
-
-    public static void check( final int result ) {
+	boolean debug=true;
+	
+	/**
+	 * check the given longResult
+	 * @param longResult
+	 */
+    public static void check( NativeLong longResult ) {
+    	int result = longResult.intValue();
         if ( result != EdSdkLibrary.EDS_ERR_OK ) {
             final EdsError err = CanonUtils.toEdsError( result );
-            System.err.println( "Error " + err.value() + ": " + err.name() +
+            fail( "Error " + err.value() + ": " + err.name() +
                                 " - " + err.description() );
         }
     }

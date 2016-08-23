@@ -74,5 +74,5 @@ public class TestEDSDK extends EDSDKBaseTest {
 			System.out.println(size.name() + "/" + size.value());
 		}
 	}
-
+	
 }

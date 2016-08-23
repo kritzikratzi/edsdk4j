@@ -18,8 +18,7 @@ import edsdk.utils.CanonUtils;
 
 /**
  * The CanonCommand class tries to make your life a whole lot easier when you
- * would like
- * to create new commands for your camera.
+ * would like to create new commands for your camera.
  * 
  * E.g. one default command implemented with this is the take image cycle.
  * This is a lot of work because you need to do all the following:
@@ -52,6 +51,9 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     private final ReentrantLock lock = new ReentrantLock();
     private ArrayList<CanonCommandListener<T>> listeners = null;
 
+    /**
+     * default constructor
+     */
     public CanonCommand() {}
 
     /**
@@ -120,7 +122,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
      * finish() and notYetFinished().
      * 
      * @see CanonCommand#notYetFinished()
-     * @return
+     * @return true if successful
      */
     public boolean finished() {
         return waitForFinish ? finished : ran;
@@ -129,7 +131,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * Sends a command to the camera
      * 
-     * @return
+     * @return the EdsError status
      */
     public EdsError sendCommand( final EdsCameraCommand command,
                                  final DescriptiveEnum<? extends Number> params ) {
@@ -139,7 +141,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * Sends a command to the camera
      * 
-     * @return
+     * @return the EdsError status
      */
     public EdsError sendCommand( final EdsCameraCommand command,
                                  final long params ) {
@@ -149,7 +151,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * Sends a status command to the camera
      * 
-     * @return
+     * @return the EdsError status
      */
     public EdsError sendStatusCommand( final EdsCameraStatusCommand command,
                                        final DescriptiveEnum<? extends Number> params ) {
@@ -159,7 +161,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * Sends a status command to the camera
      * 
-     * @return
+     * @return the EdsError status
      */
     public EdsError sendStatusCommand( final EdsCameraStatusCommand command,
                                        final long params ) {
@@ -196,7 +198,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * Waits until the command is completed and returns the result.
      * 
-     * @return
+     * @return a value of my type T
      */
     public T get() {
         try {
@@ -247,7 +249,7 @@ public abstract class CanonCommand<T> implements EdsObjectEventHandler {
     /**
      * An alias for get()
      * 
-     * @return
+     * @return a value of my generic type
      */
     public T now() {
         return get();

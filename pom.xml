@@ -55,6 +55,7 @@
 		<junit4.version>4.11</junit4.version>
 		<jnaerator.version>0.12</jnaerator.version>
 		<imgscalr.version>4.2</imgscalr.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,6 +88,13 @@
 			<artifactId>jnaerator</artifactId>
 			<version>${jnaerator.version}</version>
 		</dependency>
+		<!-- for test of library version use PowerShell https://github.com/profesorfalken/jPowerShell-->
+		<dependency>
+        <groupId>com.profesorfalken</groupId>
+        <artifactId>jPowerShell</artifactId>
+        <version>1.5.1</version>
+        <scope>test</scope>
+    </dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

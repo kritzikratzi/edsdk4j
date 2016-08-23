@@ -14,7 +14,6 @@ public class EdsVolumeInfo extends Structure {
 	/** C type : EdsUInt32 */
 	public NativeLong storageType;
 	/**
-	 * @see EdsAccess<br>
 	 * C type : EdsAccess
 	 */
 	public int access;

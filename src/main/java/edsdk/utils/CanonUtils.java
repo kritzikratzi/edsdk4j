@@ -288,10 +288,9 @@ public class CanonUtils {
      * @param property ID of the property
      * @param param 
      * @param size Data size in bytes
-     * @param value New property value.
+     * @param data pointer to new property value.
      * @return Result of the operation, normally {@link EdsError#EDS_ERR_OK}
      */
-
     public static EdsError setPropertyData( final EdsBaseRef ref,
                                             final EdsPropertyID property,
                                             final long param, final int size,
@@ -313,7 +312,7 @@ public class CanonUtils {
      * @param ref Camera/image/live view reference
      * @param property Property to get from the camera
      * @param param See EDSDK API
-     * @return
+     * @return the EdsError status
      * @throws IllegalStateException
      */
     //TODO: this method isn't very safe to leave public, perhaps some setPropertyData[String/UInt32/etc.] methods would be better
@@ -500,7 +499,7 @@ public class CanonUtils {
      * @param ref Camera/image/live view reference
      * @param property Property to get from the camera
      * @param param See EDSDK API
-     * @return
+     * @return the property data
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */
@@ -579,10 +578,10 @@ public class CanonUtils {
     }
 
     /**
-     * see {@link CanonUtils#getPropertyType(EdsBaseRef, EdsPropertyID, long)}
+     * see {@link #getPropertyType(EdsBaseRef, EdsPropertyID, long) getPropertyType}
      * @param ref
      * @param property
-     * @return
+     * @return the property Type
      */
     public static EdsDataType getPropertyType( final EdsBaseRef ref,
                                                final EdsPropertyID property ) {
@@ -1005,7 +1004,7 @@ public class CanonUtils {
     /**
      * Download a live view image from the camera and convert it directly into a bufferd image. 
      * @param camera
-     * @return
+     * @return a live View Image
      */
     public static BufferedImage getLiveViewImage( final EdsCameraRef camera ) {
         EdsError err = EdsError.EDS_ERR_OK;
@@ -1076,9 +1075,8 @@ public class CanonUtils {
     }
     
     /**
-     * Convert a long value to it's correspond error. 
+     * Convert a long value to it's corresponding EDS error. 
      * @param value
-     * @return
      */
     public static EdsError toEdsError( final NativeLong value ) {
         return CanonUtils.toEdsError( value.intValue() );
@@ -1087,7 +1085,7 @@ public class CanonUtils {
     /**
      * Convert a long value to it's corresponding error. 
      * @param value
-     * @return
+     * @return the EDS Error
      */
     public static EdsError toEdsError( final long value ) {
         return CanonUtils.toEdsError( value );
@@ -1096,7 +1094,6 @@ public class CanonUtils {
     /**
      * Convert a long value to it's corresponding error. 
      * @param value
-     * @return
      */
     public static EdsError toEdsError( final int value ) {
         final EdsError error = EdsError.enumOfValue( value );
@@ -1107,9 +1104,8 @@ public class CanonUtils {
     }
 
     /**
-     * Releases a eds object 
-     * @param value
-     * @return
+     * Releases eds objects 
+     * @param objects
      */
     public static void release( final EdsBaseRef.ByReference ... objects ) {
         for ( final EdsBaseRef.ByReference obj : objects ) {
@@ -1121,10 +1117,8 @@ public class CanonUtils {
 
     /**
      * Convert a bunch of eds objects 
-     * @param value
-     * @return
+     * @param objects
      */
-
     public static void release( final EdsBaseRef ... objects ) {
         for ( final EdsBaseRef obj : objects ) {
             if ( obj != null ) {

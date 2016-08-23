@@ -2651,9 +2651,9 @@ public interface EdSdkLibrary extends StdCallLibrary {
      * <i>native declaration : EDSDK\Header\EDSDK.h:696</i><br>
      * 
      * @deprecated use the safer methods
-     *             {@link #EdsCreateFileStream(byte[], int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef)}
+     *             {@link #EdsCreateFileStream(byte[], int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef.ByReference)}
      *             and
-     *             {@link #EdsCreateFileStream(com.sun.jna.Pointer, int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef)}
+     *             {@link #EdsCreateFileStream(com.sun.jna.Pointer, int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef.ByReference)}
      *             instead
      */
     @Deprecated
@@ -2750,9 +2750,9 @@ public interface EdSdkLibrary extends StdCallLibrary {
      * <i>native declaration : EDSDK\Header\EDSDK.h:742</i><br>
      * 
      * @deprecated use the safer methods
-     *             {@link #EdsCreateFileStreamEx(short[], int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef)}
+     *             {@link #EdsCreateFileStreamEx(short[], int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef.ByReference)}
      *             and
-     *             {@link #EdsCreateFileStreamEx(com.sun.jna.ptr.ShortByReference, int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef)}
+     *             {@link #EdsCreateFileStreamEx(com.sun.jna.ptr.ShortByReference, int, int, edsdk.bindings.EdSdkLibrary.EdsStreamRef.ByReference)}
      *             instead
      */
     @Deprecated

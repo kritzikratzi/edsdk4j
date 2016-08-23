@@ -11,20 +11,16 @@
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
 
   0. You just DO WHAT THE FUCK YOU WANT TO.
-  
-  
-  
-  
-  
+    
 Please note: 
 This license does not apply to the external files distributed with this project. 
 These are: 
 - lib/jna
   LGPL
-- src/edsdk/*.java
+- src/main/java/edsdk/bindings/*.java
   Generated from the EDSDK header files. 
   Canon is the rights holder. 
 
   
-Everything else (src/edsdk/utils/*, src/edsdk/utils/commands/*, gettingstarted/*) is 
-WTFPL.  
+Everything else (src/main/java/edsdk/utils/*, src/main/java/edsdk/utils/commands/*, src/main/java/gettingstarted/*) 
+and src/main/test is WTFPL.  

@@ -1,8 +1,10 @@
 package edsdk.api;
 
+import com.sun.jna.Function;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinUser.MSG;
@@ -57,6 +59,9 @@ import edsdk.utils.CanonUtils;
  * @author Ananta Palani
  */
 public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandler {
+    // how often should we poll the message queue in Windows?
+    public static final int POLL_MILLISECS=1;
+    
     // Libraries needed to forward windows messages
     private static User32 lib;
 
@@ -64,21 +69,32 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
     public static EdSdkLibrary EDSDK = null;
 
     static {
-        options.put( Library.OPTION_CALLING_CONVENTION, StdCallLibrary.STDCALL_CONVENTION );
+        if (Platform.isWindows()) {
+          options.put( Library.OPTION_CALLING_CONVENTION, StdCallLibrary.STDCALL_CONVENTION );
+        }
+        if (Platform.isMac()) {
+          options.put( Library.OPTION_CALLING_CONVENTION, Function.C_CONVENTION );          
+        }
         initLibrary();
         EDSDK = (EdSdkLibrary) Native.loadLibrary( CanonCamera.edsdkDllLoc, EdSdkLibrary.class, CanonCamera.options );
-        lib = User32.INSTANCE;
+        if (Platform.isWindows()) {
+          lib = User32.INSTANCE;
+        }
     }
     static {
         // Tells the app to throw an error instead of crashing entirely. 
-        // Native.setProtected( true ); 
         // We actually want our apps to crash, because something very dramatic 
         // is going on when the user receives this kind of crash message from 
         // the os and it puts the developer under pressure to fix the issue. 
         // If we enable Native.setProtected the app might just freeze, 
         // which is imho more annoying than a proper crash. 
         // Anyways, if you want the exception-throwing-instead-crashing behaviour
-        // just call the above code as early as possible in your main method. 
+        // just call the below code as early as possible in your main method. 
+      
+        // ok on a Mac we might see things a bit differently ... 
+        if (Platform.isMac()) {
+          Native.setProtected( true );
+        }
 
         // Start the dispatch thread
         CanonCamera.dispatcherThread = new Thread() {
@@ -150,7 +166,7 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
             }
 
             try {
-                Thread.sleep( 1 );
+                Thread.sleep( POLL_MILLISECS );
             }
             catch ( final InterruptedException e ) {
                 System.out.println( "\nInterrupt received in CanonCamera, stopping..." );

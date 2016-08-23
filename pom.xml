@@ -12,7 +12,8 @@
 	<name>edsdk4j</name>
 	<description>Canon EDSDK Software Development Kit Java Wrapper</description>
 	<properties>
-		<jna.version>3.4.2</jna.version>
+		<!--   <jna.version>3.4.2</jna.version>-->
+		<jna.version>3.5.0</jna.version>
 		<junit4.version>4.11</junit4.version>
 		<jnaerator.version>0.11</jnaerator.version>
 		<imgscalr.version>4.2</imgscalr.version>
@@ -22,15 +23,15 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>${jna.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> 
+			<!--   <scope>system</scope>
+			<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> -->
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>platform</artifactId>
 			<version>${jna.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath> 
+			<!--  <scope>system</scope>
+			<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath>  -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

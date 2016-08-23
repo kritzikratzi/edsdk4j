@@ -199,7 +199,8 @@ public class CanonUtils {
             }
 
             if ( err == EdsError.EDS_ERR_OK ) {
-                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownload( directoryItem, dirItemInfo.size, stream.getValue() ) );
+                NativeLong nsize=new NativeLong(dirItemInfo.size);
+                err = CanonUtils.toEdsError( CanonCamera.EDSDK.EdsDownload( directoryItem, nsize, stream.getValue() ) );
             }
 
             if ( err == EdsError.EDS_ERR_OK ) {

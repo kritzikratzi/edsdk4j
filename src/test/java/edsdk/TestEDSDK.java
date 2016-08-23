@@ -14,8 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edsdk.api.CanonCamera;
-import edsdk.api.commands.GetPropertyCommand;
-import edsdk.bindings.EdSdkLibrary.EdsCameraRef;
 import edsdk.utils.CanonConstants.EdsImageQuality;
 import edsdk.utils.CanonConstants.EdsSaveTo;
 

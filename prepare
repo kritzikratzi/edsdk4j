@@ -1,0 +1,120 @@
+#!/bin/bash
+# WF 2016-08-23
+# EDSK4J preparation script
+# 
+# This script 
+#   checks that the Canon EDSK is available
+#   optionally generates new JNA wrapper
+
+# This should point to your EDSDK directory
+export EDSDK_HOME=EDSDK
+edsdklibpath="unknown"
+
+# Script Version
+version="0.0.1"
+
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\033[0;34m'
+red='\033[0;31m'
+green='\033[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\033[0m'
+
+#
+# a colored message 
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# show the given error message on stderr and exit
+#   params:
+#     1: l_msg - the error message to display
+#
+error() {
+  local l_msg="$1"
+  color_msg $red "error:" 1>&2
+  color_msg $red "\t$l_msg" 1>&2
+  exit 1
+}
+
+#
+# show usage
+#
+usage() {
+ echo "usage: $0" 1>&2
+ echo "  -h: help" 1>&2
+ exit 1
+}
+
+#
+# display an error and exit
+#
+error() {
+ echo "error: $1" 1>&2
+ exit 1
+}
+
+#
+# check operating system
+#
+checkos() {
+	os=`uname`
+	case $os in 
+  	Darwin) 
+    	edsdklibpath=$HOME/Library/Frameworks/EdSdk
+  	;;
+  	*)
+   		echo "supported operating system $os" 1>&2
+   		exit 1
+	esac
+}
+
+#
+# check 
+#
+check() {
+  checkos
+  if [ ! -f $edsklibpath ]
+  then
+    error "EDSDK Library $edsklibpath missing - you might want to copy it to this location"
+  else
+    
+    otool -L $edsdklibpath
+  fi
+  echo $edsdklibpath
+}
+
+#
+# generate the edsk JNA wrapper classes 
+#
+genwrapper() {
+  # check the header files for Unicode Byte Order Mark which needs to be removed
+	for f in $EDSDK_HOME/Header/*.h 
+	do
+  	file $f
+	done
+	#java -jar lib/jnaerator-0.12-shaded.jar src/main/jnaerator/config.jnaerator
+}
+
+if [ $# -lt 1 ]
+then
+  check
+else
+	while test $# -gt 0
+	do
+	  case $1 in
+	    # help
+	    -h|--help) 
+	      usage;;
+	    -g|--genwrapper) genwrapper;;
+	  esac
+	  shift
+	done
+fi

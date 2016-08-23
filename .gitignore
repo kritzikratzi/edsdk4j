@@ -10,5 +10,5 @@
 /target
 .settings
 .DS_Store
-.swp
+*.swp
 hs_err_pid*

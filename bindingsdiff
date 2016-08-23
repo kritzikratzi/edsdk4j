@@ -1,0 +1,10 @@
+#!/bin/bash
+# WF 2016-08-23
+target=./src/main/java/edsdk/bindings
+src=../edsdk4j/src/main/java/edsdk/bindings
+
+for f in $target/*.java
+do
+  b=`basename $f`
+  diff -w $f $src/$b
+done

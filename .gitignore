@@ -9,6 +9,6 @@
 /bin/
 /target
 .settings
-.DS_Store
+*.DS_Store
 *.swp
 hs_err_pid*

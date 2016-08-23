@@ -13,13 +13,35 @@ This is a Java wrapper around the Canon EOS Digital Software Development Kit EDS
 
 ## Project
 * Open Source hosted at https://github.com/kritzikratzi/edsdk4j
-* License based on license of libraries used - the rest is 
+* License based on license of libraries used - the rest is WTFPL http://www.wtfpl.net/
 * Maven based Java project including JUnit 4 tests.
-
 
 ## Documentation/Issues
 * [Wiki](http://https://github.com/kritzikratzi/edsdk4j/wiki)
 * [Issues](https://github.com/kritzikratzi/edsdk4j/issues)
+
+### Distribution
+Available at Maven Central see 
+
+http://search.maven.org/#artifactdetails|edsdk4j|edsdk4j|0.0.1|jar
+
+Maven dependency:
+
+```xml
+<dependency>
+  <groupId>edsdk4j</groupId>
+  <artifactId>edsdk4j</artifactId>
+  <version>0.0.1</version>
+</dependency>
+```
+
+### How to build
+You might want to make sure that you have your ESDK in place - see "Applying with Canon for ESDK ..." below
+```
+git clone https://github.com/kritzikratzi/edsdk4j
+cd edsdk4j
+mvn install -Dgpg.skip=true
+```
 
 ## Applying with Canon for ESDK Software Development kit access
 Before you can use this library you need to obtain the EDSDK native library from Canon. You can do so via their developers program: 

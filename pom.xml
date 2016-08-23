@@ -11,6 +11,43 @@
 	<version>0.0.1</version>
 	<name>edsdk4j</name>
 	<description>Canon EDSDK Software Development Kit Java Wrapper</description>
+	<packaging>jar</packaging>
+	<url>https://github.com/kritzikratzi/edsdk4j</url>
+	<licenses>
+		<license>
+			<name>WTFPL license</name>
+			<url>http://www.wtfpl.net/</url>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git://github.com/kritzikratzi/edsdk4j.git</connection>
+		<developerConnection>scm:git:git@github.com:kritzikratzi/edsdk4j.git</developerConnection>
+		<url>https://github.com/kritzikratzi/edsdk4j</url>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/kritzikratzi/edsdk4j/issues</url>
+		<system>GitHub</system>
+	</issueManagement>
+	<developers>
+		<developer>
+			<id>kritzikratzi</id>
+			<name>Hansi Raber</name>
+			<organization>Super Duper</organization>
+			<organizationUrl>http://www.superduper.org/</organizationUrl>
+		</developer>
+		<developer>
+			<id>anantapalani</id>
+			<name>Ananta Palani</name>
+			<organization>-</organization>
+			<organizationUrl>https://github.com/anantapalani/</organizationUrl>
+		</developer>
+		<developer>
+			<id>wf</id>
+			<name>Wolfgang Fahl</name>
+			<organization>BITPlan GmbH</organization>
+			<organizationUrl>http://www.bitplan.com</organizationUrl>
+		</developer>
+	</developers>
 	<properties>
 		<!-- previous versions: 3.4.2, 3.5.0, 3.5.1 ... see https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
 		<!-- <jna.version>3.4.2</jna.version> -->
@@ -84,9 +121,82 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<!--
+					see
+					http://central.sonatype.org/pages/apache-maven.html
+
+					Javadoc and Sources Attachments
+					To get Javadoc and Source jar files generated, you have to configure
+					the
+					javadoc and source Maven plugins.
+				-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
+				GPG Signed Components
+				The Maven GPG plugin is used to sign the components with the following
+				configuration.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- git hub site plugin https://github.com/github/maven-plugins -->
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.10</version>
+				<configuration>
+					<message>Creating site for ${project.version}</message>
+					<repositoryName>edsdk4j</repositoryName>      <!-- github repo name -->
+					<repositoryOwner>kritzikratzi</repositoryOwner>    <!-- github username -->
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>site</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<extensions>
-			<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh</artifactId>
@@ -94,4 +204,73 @@
 			</extension>
 		</extensions>
 	</build>
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<build>
+				<plugins>
+
+					<!--
+						according to :
+
+						http://central.sonatype.org/pages/apache-maven.html
+
+						Nexus Staging Maven Plugin for Deployment and Release
+
+						The Nexus Staging Maven Plugin is the recommended way to deploy your
+						components
+						to OSSRH and release them to the Central Repository.
+						To configure it simply add the plugin to your Maven pom.xml.
+					-->
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.3</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<!-- set to true for automation -->
+							<autoReleaseAfterClose>false</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+					<!-- Maven release plugin -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>2.5</version>
+						<configuration>
+							<autoVersionSubmodules>true</autoVersionSubmodules>
+							<useReleaseProfile>false</useReleaseProfile>
+							<releaseProfiles>release</releaseProfiles>
+							<goals>deploy</goals>
+							<arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!--
+			Work around Oracle's (IMHO silly) decision to make doclint default.
+			http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html
+			http://stackoverflow.com/questions/15886209/maven-is-not-working-in-java-8-when-javadoc-tags-are-incomplete
+		-->
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

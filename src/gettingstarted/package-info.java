@@ -1,4 +1,0 @@
-/**
- * Examples
- */
-package gettingstarted;

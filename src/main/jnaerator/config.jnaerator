@@ -1,0 +1,10 @@
+-o src/main/java
+-f
+-mode Directory
+-noMangling
+-runtime JNA
+-package edsdk.bindings
+-library EdSdk
+$(EDSDK_HOME)/Header/EDSDKErrors.h
+$(EDSDK_HOME)/Header/EDSDKTypes.h
+$(EDSDK_HOME)/Header/EDSDK.h

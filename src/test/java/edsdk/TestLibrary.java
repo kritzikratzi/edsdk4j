@@ -25,7 +25,13 @@ public class TestLibrary {
     File libFile = BaseCanonCamera.getEdSdkLibraryFile();
     assertTrue(BaseCanonCamera.edsdkHint+libFile.getAbsolutePath()+" should exist",libFile.exists());
     if (Platform.isWindows()) {
+      // use Powershell to find version
       PowerShellResponse response = PowerShell.executeSingleCommand("(Get-Item "+libFile.getAbsolutePath()+").VersionInfo");
+      // get results
+      String version=response.getCommandOutput();
+      System.out.println("Versions:" + version);
+      // check for the DLL version that this has been tested with
+      assertTrue("Your EDSDK DLL version is different then the version EDSDK4J has been tested with",version.contains("3.4.20.6404"));
     }
   }
 

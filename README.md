@@ -7,7 +7,7 @@ This is a Java wrapper around the EDSDK that gives you full access to your Canon
 - Setting apperature, exposure, ISO
 - Accessing live view
 
-(*) With a few changes it could also work on Mac OSX. 
+(*) With a few changes it might also work on Mac OSX. 
 
 ## Applying for SDK access
 Before you can use this library you need to obtain the EDSDK native library from Canon. You can do so via their developers program: 

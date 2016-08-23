@@ -1,0 +1,12 @@
+#!/bin/bash
+# generate new JNA wrapper
+
+# This should point to your EDSDK directory
+export EDSDK_HOME=EDSDK
+
+# check the header files for Unicode Byte Order Mark which needs to be removed
+for f in $EDSDK_HOME/Header/*.h 
+do
+  file $f
+done
+#java -jar lib/jnaerator-0.12-shaded.jar src/main/jnaerator/config.jnaerator

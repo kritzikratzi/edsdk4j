@@ -1,5 +1,5 @@
 <!--
-	Copyright 2014-206 Canon SDK for Java project
+	Copyright (c) 2014-2016 Canon SDK for Java project
 	for project details and license see https://github.com/kritzikratzi/edsdk4j
 
 -->
@@ -12,11 +12,11 @@
 	<name>edsdk4j</name>
 	<description>Canon EDSDK Software Development Kit Java Wrapper</description>
 	<properties>
-	  <!--  previous versions: 3.4.2, 3.5.0, 3.5.1 ... see https://mvnrepository.com/artifact/net.java.dev.jna/jna  -->
-		<!--   <jna.version>3.4.2</jna.version>-->		
+		<!-- previous versions: 3.4.2, 3.5.0, 3.5.1 ... see https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
+		<!-- <jna.version>3.4.2</jna.version> -->
 		<jna.version>4.2.2</jna.version>
 		<junit4.version>4.11</junit4.version>
-		<jnaerator.version>0.11</jnaerator.version>
+		<jnaerator.version>0.12</jnaerator.version>
 		<imgscalr.version>4.2</imgscalr.version>
 	</properties>
 	<dependencies>
@@ -24,15 +24,15 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>${jna.version}</version>
-			<!--   <scope>system</scope>
-			<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> -->
+			<!-- <scope>system</scope>
+				<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> -->
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
 			<version>${jna.version}</version>
-			<!--  <scope>system</scope>
-			<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath>  -->
+			<!-- <scope>system</scope>
+				<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath> -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -68,6 +68,21 @@
 						-->
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.nativelibs4java</groupId>
+				<artifactId>maven-jnaerator-plugin</artifactId>
+				<version>${jnaerator.version}</version>
+				<configuration>
+					<javaOutputDirectory>src/main/bindings</javaOutputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<extensions>

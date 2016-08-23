@@ -1,6 +1,8 @@
-# EDSDK4J
+EDSDK4J
+=======
 
-This is a Java wrapper around the EDSDK that gives you full access to your Canon SLR camera via the EDSDK on Windows*. The features include: 
+## Purpose
+This is a Java wrapper around the Canon EOS Digital Software Development Kit EDSDK that gives you full access to your Canon SLR camera on Windows*. The features include: 
 
 - Taking and downloading pictures
 - Manually adjusting focus
@@ -9,7 +11,17 @@ This is a Java wrapper around the EDSDK that gives you full access to your Canon
 
 (*) With a few changes it might also work on Mac OSX. 
 
-## Applying for SDK access
+## Project
+* Open Source hosted at https://github.com/kritzikratzi/edsdk4j
+* License based on license of libraries used - the rest is 
+* Maven based Java project including JUnit 4 tests.
+
+
+## Documentation/Issues
+* [Wiki](http://https://github.com/kritzikratzi/edsdk4j/wiki)
+* [Issues](https://github.com/kritzikratzi/edsdk4j/issues)
+
+## Applying with Canon for ESDK Software Development kit access
 Before you can use this library you need to obtain the EDSDK native library from Canon. You can do so via their developers program: 
 
 - [Canon Europe](http://www.didp.canon-europa.com/)
@@ -18,6 +30,7 @@ Before you can use this library you need to obtain the EDSDK native library from
 - [Canon Oceania](https://www.canon.co.nz/en-NZ/Personal/Support-Help/Support-News/Canon-SDK)
 
 Once you were granted access - this may take a few days - download the latest version of their library and follow the usage instructions. 
+
 
 ## Architecture 
 
@@ -84,4 +97,8 @@ This does not need to be run, unless you want to regenerate the bindings for the
   into the Native.loadLibrary() method (see CanonCamera class for this
   workaround).
 
+## Version history
+*      : pre 2014-08    https://github.com/kritzikratzi/edsdk-processing
+*      :     2014-08    https://github.com/kritzikratzi/edsdk4j
+* 0.0.1:     2016-08-23 First mavenized release via GitHub / Maven central
  

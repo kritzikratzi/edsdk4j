@@ -23,13 +23,13 @@ This is a Java wrapper around the Canon EOS Digital Software Development Kit EDS
 ### Distribution
 Available at Maven Central see 
 
-http://search.maven.org/#artifactdetails|edsdk4j|edsdk4j|0.0.1|jar
+http://search.maven.org/#artifactdetails%7Ccom.bitplan%7Cedsdk4j%7C0.0.1%7Cjar
 
 Maven dependency:
 
 ```xml
 <dependency>
-  <groupId>edsdk4j</groupId>
+  <groupId>com.bitplan</groupId>
   <artifactId>edsdk4j</artifactId>
   <version>0.0.1</version>
 </dependency>

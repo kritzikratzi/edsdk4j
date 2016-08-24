@@ -26,8 +26,8 @@ public class TestLibrary  {
     BaseCanonCamera.initLibrary();
     File libFile = BaseCanonCamera.getEdSdkLibraryFile();
     assertTrue(BaseCanonCamera.libraryInfo.hint+libFile.getAbsolutePath()+" should exist",libFile.exists());
-    assertFalse("Crash protection should be off in production",Native.isProtected());
     if (Platform.isWindows()) {
+      assertTrue("Crash protection is on by default for Windows ",Native.isProtected());
       // use Powershell to find version
       PowerShellResponse response = PowerShell.executeSingleCommand("(Get-Item "+libFile.getAbsolutePath()+").VersionInfo");
       // get results

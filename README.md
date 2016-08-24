@@ -17,7 +17,7 @@ This is a Java wrapper around the Canon EOS Digital Software Development Kit EDS
 * Maven based Java project including JUnit 4 tests.
 
 ## Documentation/Issues
-* [Wiki](http://https://github.com/kritzikratzi/edsdk4j/wiki)
+* [Wiki](https://github.com/kritzikratzi/edsdk4j/wiki)
 * [Issues](https://github.com/kritzikratzi/edsdk4j/issues)
 
 ### Distribution
@@ -47,12 +47,12 @@ mvn install -Dgpg.skip=true
 Before running the Unit Tests you might want to connect your camera with an USB cable and make sure that no 
 other application is using the USB connection to your camera.
 
-If you hava a maven command line installed you can run the tests from the command line with:
+If you have a maven command line installed you can run the tests from the command line with:
 ```
 mvn test
 ```
 
-or in you IDE e.g. click pom.xml and choose "Run As/Maven test" in Eclipse
+or run the tests in you IDE. E.g. in Eclipse click pom.xml and choose "Run As/Maven test".
 
 #### expected mvn test result
 
@@ -180,5 +180,5 @@ This does not need to be run, unless you want to regenerate the bindings for the
 ## Version history
 *      : pre 2014-08    https://github.com/kritzikratzi/edsdk-processing
 *      :     2014-08    https://github.com/kritzikratzi/edsdk4j
-* 0.0.1:     2016-08-23 First mavenized release via GitHub / Maven central
+* 0.0.1:     2016-08-24 First mavenized release via GitHub / Maven central
  

@@ -1,10 +1,10 @@
--o src/main/java
--f
+-o src/main/bindings
 -mode Directory
 -noMangling
+-skipLibraryInstance
 -runtime JNA
 -package edsdk.bindings
 -library EdSdk
-$(EDSDK_HOME)/Header/EDSDKErrors.h
-$(EDSDK_HOME)/Header/EDSDKTypes.h
-$(EDSDK_HOME)/Header/EDSDK.h
+EDSDK/Header/EDSDKErrors.h
+EDSDK/Header/EDSDKTypes.h
+EDSDK/Header/EDSDK.h

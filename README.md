@@ -181,4 +181,20 @@ This does not need to be run, unless you want to regenerate the bindings for the
 *      : pre 2014-08    https://github.com/kritzikratzi/edsdk-processing
 *      :     2014-08    https://github.com/kritzikratzi/edsdk4j
 * 0.0.1:     2016-08-24 First mavenized release via GitHub / Maven central
+
+# Links
+## EDSDK4J on github
+* https://github.com/kritzikratzi/edsdk4j
+
+## Canon EDSDK questions on Stackoverflow
+* http://stackoverflow.com/questions/tagged/edsdk
+
+## JNA
+* https://github.com/java-native-access/jna
+* http://stackoverflow.com/questions/13510975/jnawhat-is-the-purpose-of-getfieldorder-in-structure-class
+* http://stackoverflow.com/questions/18876512/jna-cast-to-struct-from-void
+
+## jnaerator
+* https://github.com/nativelibs4java/JNAerator
+
  

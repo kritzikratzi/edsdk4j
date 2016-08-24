@@ -111,31 +111,14 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.3</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
 					<excludes>
-						<!-- <exclude>**/edsdk/api/CanonCamera</exclude>
-							<exclude>**/edsdk/bindings/*</exclude>
-						-->
+						<exclude>**/srcv/main/bindings/**/*</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.nativelibs4java</groupId>
-				<artifactId>maven-jnaerator-plugin</artifactId>
-				<version>${jnaerator.version}</version>
-				<configuration>
-					<javaOutputDirectory>src/main/bindings</javaOutputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<!--

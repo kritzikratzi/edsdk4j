@@ -9,12 +9,11 @@ g++ -dynamiclib  *.o -o add.dylib
 # copy to frameworks directory
 cp -p add.dylib $HOME/Library/Frameworks
 # create JNA headers
-java -jar ../../../lib/jnaerator-0.12-shaded.jar \
-  -o ../../test/java \
+java -jar ../../../../lib/jnaerator-0.12-shaded.jar \
+  -o ../../../test/java \
   -f \
   -noMangling \
   -skipLibraryInstance \
   -runtime JNA \
 	-library add add.h \
 	-mode Directory \
-	

@@ -2,15 +2,12 @@ package edsdk.api;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.sun.jna.NativeLong;
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 import edsdk.api.commands.DriveLensCommand;

@@ -1,10 +1,10 @@
 #!/bin/bash
 # WF 2016-08-23
-target=./src/main/java/edsdk/bindings
-src=../edsdk4j/src/main/java/edsdk/bindings
+src=src/main/java/edsdk/bindings
+target=src/main/bindings/edsdk/bindings
 
 for f in $target/*.java
 do
   b=`basename $f`
-  diff -w $f $src/$b
+  diff -qw $f $src/$b
 done

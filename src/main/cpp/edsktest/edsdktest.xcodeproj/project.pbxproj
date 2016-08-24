@@ -1,0 +1,272 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B6DC9CC71D6DD7EF00833F94 /* edsdktest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DC9CC61D6DD7EF00833F94 /* edsdktest.cpp */; };
+		B6DC9CCA1D6DD9F800833F94 /* DPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DC9CC81D6DD9F800833F94 /* DPP.framework */; };
+		B6DC9CCB1D6DD9F800833F94 /* EDSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B6DC9CB71D6DD76E00833F94 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B6DC9CB91D6DD76E00833F94 /* edsdktest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = edsdktest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6DC9CC61D6DD7EF00833F94 /* edsdktest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edsdktest.cpp; sourceTree = "<group>"; };
+		B6DC9CC81D6DD9F800833F94 /* DPP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DPP.framework; path = ../../../../EDSDK/Framework/DPP.framework; sourceTree = "<group>"; };
+		B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EDSDK.framework; path = ../../../../EDSDK/Framework/EDSDK.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B6DC9CB61D6DD76E00833F94 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6DC9CCB1D6DD9F800833F94 /* EDSDK.framework in Frameworks */,
+				B6DC9CCA1D6DD9F800833F94 /* DPP.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B6DC9CB01D6DD76E00833F94 = {
+			isa = PBXGroup;
+			children = (
+				B6DC9CC81D6DD9F800833F94 /* DPP.framework */,
+				B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */,
+				B6DC9CBB1D6DD76E00833F94 /* edsdktest */,
+				B6DC9CBA1D6DD76E00833F94 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B6DC9CBA1D6DD76E00833F94 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B6DC9CB91D6DD76E00833F94 /* edsdktest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B6DC9CBB1D6DD76E00833F94 /* edsdktest */ = {
+			isa = PBXGroup;
+			children = (
+				B6DC9CC31D6DD7A300833F94 /* edsdktest */,
+			);
+			path = edsdktest;
+			sourceTree = "<group>";
+		};
+		B6DC9CC31D6DD7A300833F94 /* edsdktest */ = {
+			isa = PBXGroup;
+			children = (
+				B6DC9CC61D6DD7EF00833F94 /* edsdktest.cpp */,
+			);
+			name = edsdktest;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B6DC9CB81D6DD76E00833F94 /* edsdktest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6DC9CC01D6DD76E00833F94 /* Build configuration list for PBXNativeTarget "edsdktest" */;
+			buildPhases = (
+				B6DC9CB51D6DD76E00833F94 /* Sources */,
+				B6DC9CB61D6DD76E00833F94 /* Frameworks */,
+				B6DC9CB71D6DD76E00833F94 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = edsdktest;
+			productName = edsdktest;
+			productReference = B6DC9CB91D6DD76E00833F94 /* edsdktest */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B6DC9CB11D6DD76E00833F94 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Wolfgang Fahl";
+				TargetAttributes = {
+					B6DC9CB81D6DD76E00833F94 = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
+				};
+			};
+			buildConfigurationList = B6DC9CB41D6DD76E00833F94 /* Build configuration list for PBXProject "edsdktest" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B6DC9CB01D6DD76E00833F94;
+			productRefGroup = B6DC9CBA1D6DD76E00833F94 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B6DC9CB81D6DD76E00833F94 /* edsdktest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B6DC9CB51D6DD76E00833F94 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6DC9CC71D6DD7EF00833F94 /* edsdktest.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B6DC9CBE1D6DD76E00833F94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B6DC9CBF1D6DD76E00833F94 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B6DC9CC11D6DD76E00833F94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Volumes/HD2014-02/Users/wf/Documents/workspace/edsdk4j/EDSDK/Framework",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = $HOME/Documents/workspace/edsdk4j/EDSDK/Header;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		B6DC9CC21D6DD76E00833F94 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Volumes/HD2014-02/Users/wf/Documents/workspace/edsdk4j/EDSDK/Framework",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = $HOME/Documents/workspace/edsdk4j/EDSDK/Header;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B6DC9CB41D6DD76E00833F94 /* Build configuration list for PBXProject "edsdktest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6DC9CBE1D6DD76E00833F94 /* Debug */,
+				B6DC9CBF1D6DD76E00833F94 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B6DC9CC01D6DD76E00833F94 /* Build configuration list for PBXNativeTarget "edsdktest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6DC9CC11D6DD76E00833F94 /* Debug */,
+				B6DC9CC21D6DD76E00833F94 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B6DC9CB11D6DD76E00833F94 /* Project object */;
+}

@@ -49,7 +49,9 @@ error() {
 #
 usage() {
  echo "usage: $0" 1>&2
- echo "  -h: help" 1>&2
+ echo "  -h|--help      : help" 1>&2
+ echo "  -g|--genwrapper: genwrapper" 1>&2 
+ 
  exit 1
 }
 
@@ -95,12 +97,25 @@ check() {
 # generate the edsk JNA wrapper classes 
 #
 genwrapper() {
-  # check the header files for Unicode Byte Order Mark which needs to be removed
+  # check the header files for Unicode Byte Order Mark which need to be removed
+  # see  https://github.com/kritzikratzi/edsdk4j/issues/7
 	for f in $EDSDK_HOME/Header/*.h 
 	do
   	file $f
+  	grep $'\xEF\xBB\xBF' $f
+  	if  [ $? -eq 0 ]
+  	then
+     	perl -i -pe 's{\xEF\xBB\xBF}{}' $f
+ 	  fi
 	done
-	#java -jar lib/jnaerator-0.12-shaded.jar src/main/jnaerator/config.jnaerator
+	types=$EDSDK_HOME/Header/EDSDKTypes.h
+	grep "struct tag" $types
+ 	if  [ $? -eq 0 ]
+  then
+   	perl -i -pe 's{struct tag}{struct }' $types
+  fi	 
+	#mvn com.nativelibs4java:maven-jnaerator-plugin:generate
+	java -jar lib/jnaerator-0.12-shaded.jar src/main/jnaerator/config.jnaerator
 }
 
 if [ $# -lt 1 ]

@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.bitplan</groupId>
 	<artifactId>edsdk4j</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<name>edsdk4j</name>
 	<description>Canon EDSDK Software Development Kit Java Wrapper</description>
 	<packaging>jar</packaging>
@@ -116,7 +116,20 @@
 					<source>1.7</source>
 					<target>1.7</target>
 					<excludes>
-						<exclude>**/srcv/main/bindings/**/*</exclude>
+						<exclude>**/src/main/bindings/**/*</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+				  <includes>
+				    <include>**/*Test*.java</include>
+				  </includes>
+					<excludes>
+						<exclude>**/*TestSuite.java</exclude> 
 					</excludes>
 				</configuration>
 			</plugin>

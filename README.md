@@ -52,7 +52,9 @@ If you have a maven command line installed you can run the tests from the comman
 mvn test
 ```
 
-or run the tests in you IDE. E.g. in Eclipse click pom.xml and choose "Run As/Maven test".
+or run the tests in you IDE. 
+* e.g. in Eclipse click pom.xml and choose "Run As/Maven test".
+* e.g. in Eclipse you can run the src/main/test/TestSuite with "Run As/JUnit Test"
 
 #### expected mvn test result
 

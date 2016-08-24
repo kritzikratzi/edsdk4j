@@ -1,7 +1,6 @@
 package edsdk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
@@ -9,6 +8,7 @@ import org.junit.Test;
 
 import com.profesorfalken.jpowershell.PowerShell;
 import com.profesorfalken.jpowershell.PowerShellResponse;
+import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
 import edsdk.CmdLine.StreamResult;
@@ -25,7 +25,8 @@ public class TestLibrary  {
   public void testLibrary() throws Exception {
     BaseCanonCamera.initLibrary();
     File libFile = BaseCanonCamera.getEdSdkLibraryFile();
-    assertTrue(BaseCanonCamera.edsdkHint+libFile.getAbsolutePath()+" should exist",libFile.exists());
+    assertTrue(BaseCanonCamera.libraryInfo.hint+libFile.getAbsolutePath()+" should exist",libFile.exists());
+    assertFalse("Crash protection should be off in production",Native.isProtected());
     if (Platform.isWindows()) {
       // use Powershell to find version
       PowerShellResponse response = PowerShell.executeSingleCommand("(Get-Item "+libFile.getAbsolutePath()+").VersionInfo");
@@ -35,13 +36,13 @@ public class TestLibrary  {
       // check for the DLL version that this has been tested with
       assertTrue("Your EDSDK DLL version is different then the version EDSDK4J has been tested with",version.contains("3.4.20.6404"));
     } else if (Platform.isMac()) {
-      System.out.println("Checking "+BaseCanonCamera.edsdkHint+" "+libFile.getAbsolutePath());
+      System.out.println("Checking "+BaseCanonCamera.libraryInfo.hint+" "+libFile.getAbsolutePath());
       String cmd="otool -L "+libFile.getAbsolutePath();
       StreamResult result=CmdLine.getExecuteResult(cmd, null, CmdLine.ExecuteMode.Wait);
       System.out.println(result.stdoutTxt);
       long binlength = libFile.length();
       System.out.println("The dylib has a size of "+binlength+" bytes");
-      assertEquals(1412960,binlength);
+      assertEquals("Version 3.4 of EDSDK is recommended which is tested by length here",1412960,binlength);
     }
   }
 

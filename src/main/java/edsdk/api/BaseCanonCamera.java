@@ -57,6 +57,8 @@ import edsdk.utils.CanonConstants.EdsSaveTo;
 import edsdk.utils.CanonConstants.EdsTonigEffect;
 import edsdk.utils.CanonConstants.EdsTv;
 import edsdk.utils.CanonConstants.EdsWhiteBalance;
+import edsdk.utils.DLL_Setup;
+import edsdk.utils.DLL_Setup.LibraryInfo;
 
 /**
  * This class should be the easiest way to use the canon sdk.
@@ -100,101 +102,24 @@ import edsdk.utils.CanonConstants.EdsWhiteBalance;
 public abstract class BaseCanonCamera implements EdsObjectEventHandler {
 
   public static final Map<String, Integer> options = new LinkedHashMap<String, Integer>();
-  protected static String edsdkDllLoc = null;
-  public static String edsdkHint = null;
 
   public static boolean debug = false;
-  protected static String libpath;
-
-  /**
-   * set the path to the JNALibrary
-   */
-  public static void setJNALibraryPath() {
-    URL url = null;
-    Class<BaseCanonCamera> clazz = BaseCanonCamera.class;
-
-    try {
-      url = clazz.getProtectionDomain().getCodeSource().getLocation();
-    } catch (final Exception e) {
-      url = null;
-    }
-    if (url == null) {
-      try {
-        url = clazz.getResource(clazz.getSimpleName() + ".class");
-        url = new URL(url.getPath().substring(0, url.getPath().indexOf('!')));
-      } catch (final Exception e) {
-        url = null;
-      }
-    }
-    if (url != null) {
-      try {
-        // handle unc paths (pre java7 :/ )
-        URI uri = url.toURI();
-        if (uri.getAuthority() != null && uri.getAuthority().length() > 0) {
-          uri = new URL("file://" + url.toString().substring(5)).toURI();
-        }
-        final File file = new File(uri);
-        final String dir = file.getParentFile().getPath();
-        System.setProperty("jna.library.path", dir);
-        if (debug) {
-          System.out.println("jna.library.path: " + dir);
-        }
-      } catch (final Exception e) {
-        e.printStackTrace();
-      }
-    }
-  }
+  public static LibraryInfo libraryInfo;
 
   /**
    * get the EDSDK Library file
    * @return the library file (DLL on Windows/DyLib on Mac OSX) for inspection
    */
   public static File getEdSdkLibraryFile() {
-    File libFile = new File(edsdkDllLoc);
+    File libFile = new File(libraryInfo.dllLoc);
     return libFile;
   }
 
   /**
-   * initialize the Library
+   * initialize the SDK Dynamic Link Library
    */
-  public static void initLibrary() {
-    setJNALibraryPath();
-
-    String arch = System.getProperty("os.arch");
-    if (arch == null) {
-      arch = System.getProperty("com.ibm.vm.bitmode");
-    }
-
-    // let's find the EDSDK native libraries
-    // first we need to determine the operating system being in use
-    if (Platform.isMac()) {
-      // see
-      // stackoverflow.com/questions/15695786/how-to-define-paths-to-frameworks-on-a-mac-in-java
-      // make the library available in your home directory e.g. with:
-      // cd $HOME/Library/Frameworks
-      // ln -s /Applications/Canon\ Utilities/EOS\ Utility/EU2/EOS\ Utility\
-      // 2.app/Contents/Frameworks/EDSDK.framework/Versions/Current/EDSDK EDSDK
-      // check the content e.g. with
-      // nm EDSDK
-      //
-      libpath = System.getProperty("user.home") + "/Library/Frameworks/";
-      System.setProperty("jna.library.path", libpath);
-      edsdkDllLoc = libpath + "EdSdk";
-      // edsdkDllLoc = "EdSdk";
-      edsdkHint = "EDSDK Dynamic Link Library from ";
-    } else {
-      edsdkHint = "EDSDK DLL";
-      if (arch != null && arch.endsWith("64")) {
-        edsdkDllLoc = "EDSDK_64/EDSDK.dll";
-      } else {
-        edsdkDllLoc = "EDSDK/Dll/EDSDK.dll";
-      }
-    }
-    System.err.println("Java Architecture: " + arch + " - Using " + edsdkHint
-        + ": " + edsdkDllLoc);
-  }
-
-  static {
+  static public void initLibrary() {
+    libraryInfo=DLL_Setup.initLibrary("EdSdk");
     System.setProperty("jna.predictable_field_order", "true");
   }
   // private static final HMODULE hMod = Kernel32.INSTANCE.GetModuleHandle("");
@@ -372,6 +297,12 @@ public abstract class BaseCanonCamera implements EdsObjectEventHandler {
     return null;
   }
 
+  /**
+   * output the given EdsError with the given message
+   * @param result
+   * @param message
+   * @return true if successful
+   */
   public boolean setError(final EdsError result, final String message) {
     errorCode = result;
     errorMessage = message + " (error " + errorCode.value() + ": "
@@ -382,10 +313,18 @@ public abstract class BaseCanonCamera implements EdsObjectEventHandler {
     return false;
   }
 
+  /**
+   * access the last error Code
+   * @return the EdsError
+   */
   public EdsError getLastError() {
     return errorCode;
   }
 
+  /**
+   * access the last error Message
+   * @return
+   */
   public String getLastErrorMessage() {
     return errorMessage;
   }

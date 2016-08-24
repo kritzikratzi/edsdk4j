@@ -1,0 +1,20 @@
+#!/bin/bash
+# WF 2016-08-24
+# http://stackoverflow.com/questions/3532589/how-to-build-a-dylib-from-several-o-in-mac-os-x-using-gcc
+# https://github.com/nativelibs4java/JNAerator/wiki/Command-Lin-eOptions-And-Environment-Variables
+# compile
+g++ -c add.cpp
+# link
+g++ -dynamiclib  *.o -o add.dylib
+# copy to frameworks directory
+cp -p add.dylib $HOME/Library/Frameworks
+# create JNA headers
+java -jar ../../../lib/jnaerator-0.12-shaded.jar \
+  -o ../../test/java \
+  -f \
+  -noMangling \
+  -skipLibraryInstance \
+  -runtime JNA \
+	-library add add.h \
+	-mode Directory \
+	

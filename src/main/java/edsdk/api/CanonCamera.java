@@ -76,13 +76,15 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
           options.put( Library.OPTION_CALLING_CONVENTION, Function.C_CONVENTION );          
         }
         initLibrary();
-        EDSDK = (EdSdkLibrary) Native.loadLibrary( CanonCamera.edsdkDllLoc, EdSdkLibrary.class, CanonCamera.options );
+        EDSDK = (EdSdkLibrary) Native.loadLibrary( CanonCamera.libraryInfo.dllLoc, EdSdkLibrary.class, CanonCamera.options );
         if (Platform.isWindows()) {
           lib = User32.INSTANCE;
         }
     }
     static {
         // Tells the app to throw an error instead of crashing entirely. 
+        // see https://jna.java.net/javadoc/overview-summary.html#crash-protection
+        //
         // We actually want our apps to crash, because something very dramatic 
         // is going on when the user receives this kind of crash message from 
         // the os and it puts the developer under pressure to fix the issue. 
@@ -90,12 +92,8 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
         // which is imho more annoying than a proper crash. 
         // Anyways, if you want the exception-throwing-instead-crashing behaviour
         // just call the below code as early as possible in your main method. 
-      
-        // ok on a Mac we might see things a bit differently ... 
-        if (Platform.isMac()) {
-          Native.setProtected( true );
-        }
-
+        //  Native.setProtected( true );
+     
         // Start the dispatch thread
         CanonCamera.dispatcherThread = new Thread() {
 

@@ -43,6 +43,64 @@ cd edsdk4j
 mvn install -Dgpg.skip=true
 ```
 
+### Testing
+Before running the Unit Tests you might want to connect your camera with an USB cable and make sure that no 
+other application is using the USB connection to your camera.
+
+If you hava a maven command line installed you can run the tests from the command line with:
+```
+mvn test
+```
+
+or in you IDE e.g. click pom.xml and choose "Run As/Maven test" in Eclipse
+
+#### expected mvn test result
+
+```
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running edsdk.TestCanonConstants
+Begin checking whether CanonConstants has all constants from EdSdkLibrary
+Completed checking
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.382 sec
+Running edsdk.TestEDSDK
+Camera saved an image file
+Saved photo as: C:\Users\wf\AppData\Local\Temp\IMG_0001.JPG
+EdsImageQuality_LJF/1310479
+EdsImageQuality_LJN/1244943
+EdsImageQuality_MJF/18087695
+EdsImageQuality_MJN/18022159
+EdsImageQuality_SJF/34864911
+EdsImageQuality_SJN/34799375
+EdsImageQuality_LRLJF/6553619
+EdsImageQuality_LR/6618895
+Canon Camera: Canon EOS 1000D is connected
+
+Interrupt received in CanonCamera, stopping...
+EDSDK Dispatcher thread says bye!
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.958 sec
+Running edsdk.TestJNA
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running edsdk.TestLibrary
+Versions:
+ProductVersion   FileVersion      FileName                                     
+--------------   -----------      --------                                     
+3.4.20.6404      3.4.20.6404      C:\Users\wf\workspace\edsdk4j\EDSDK_64\EDS...
+
+
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.346 sec
+Hello, World
+Argument 0: Welcome
+Argument 1: to
+Argument 2: JNA
+
+Results :
+
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+```
+
 ## Applying with Canon for ESDK Software Development kit access
 Before you can use this library you need to obtain the EDSDK native library from Canon. You can do so via their developers program: 
 

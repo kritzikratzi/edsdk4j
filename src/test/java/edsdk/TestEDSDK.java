@@ -5,6 +5,7 @@ package edsdk;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.awt.BorderLayout;
@@ -12,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -71,6 +73,19 @@ public class TestEDSDK extends EDSDKBaseTest {
 		}
 
 	}
+	
+	@Test
+	public void testRecordMJPeg() throws Exception {
+		File tmpFile=File.createTempFile("TestEDSK", ".mjpeg");
+		FileOutputStream fos=new FileOutputStream(tmpFile);
+		camera.recordVideo(fos,2500);
+		assertTrue(tmpFile.exists());
+		if (debug) {
+			System.out.println(tmpFile.getAbsolutePath());
+			System.out.println(tmpFile.length());
+		}
+		assertTrue(tmpFile.length()>20000);
+	}
 
 	@Test
 	/**
@@ -88,9 +103,6 @@ public class TestEDSDK extends EDSDKBaseTest {
                 @Override
                 public void windowClosing( final WindowEvent e ) {
                     camera.endLiveView();
-                    camera.closeSession();
-                    CanonCamera.close();
-                    System.exit( 0 );
                 }
             } );
             frame.setVisible( true );

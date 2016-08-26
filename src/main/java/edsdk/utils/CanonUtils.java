@@ -828,6 +828,11 @@ public class CanonUtils {
         return false;
     }
 
+    /**
+     * begin starting a live View
+     * @param camera
+     * @return true if successful
+     */
     public static boolean beginLiveView( final EdsCameraRef camera ) {
         EdsError err = EdsError.EDS_ERR_OK;
 

@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B6DC9CC71D6DD7EF00833F94 /* edsdktest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DC9CC61D6DD7EF00833F94 /* edsdktest.cpp */; };
-		B6DC9CCA1D6DD9F800833F94 /* DPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DC9CC81D6DD9F800833F94 /* DPP.framework */; };
-		B6DC9CCB1D6DD9F800833F94 /* EDSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */; };
+		B6DC9CCE1D6E0E1900833F94 /* EDSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DC9CCD1D6E0E1900833F94 /* EDSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,8 +26,7 @@
 /* Begin PBXFileReference section */
 		B6DC9CB91D6DD76E00833F94 /* edsdktest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = edsdktest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6DC9CC61D6DD7EF00833F94 /* edsdktest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edsdktest.cpp; sourceTree = "<group>"; };
-		B6DC9CC81D6DD9F800833F94 /* DPP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DPP.framework; path = ../../../../EDSDK/Framework/DPP.framework; sourceTree = "<group>"; };
-		B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EDSDK.framework; path = ../../../../EDSDK/Framework/EDSDK.framework; sourceTree = "<group>"; };
+		B6DC9CCD1D6E0E1900833F94 /* EDSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = EDSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,8 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6DC9CCB1D6DD9F800833F94 /* EDSDK.framework in Frameworks */,
-				B6DC9CCA1D6DD9F800833F94 /* DPP.framework in Frameworks */,
+				B6DC9CCE1D6E0E1900833F94 /* EDSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,8 +44,7 @@
 		B6DC9CB01D6DD76E00833F94 = {
 			isa = PBXGroup;
 			children = (
-				B6DC9CC81D6DD9F800833F94 /* DPP.framework */,
-				B6DC9CC91D6DD9F800833F94 /* EDSDK.framework */,
+				B6DC9CCD1D6E0E1900833F94 /* EDSDK.framework */,
 				B6DC9CBB1D6DD76E00833F94 /* edsdktest */,
 				B6DC9CBA1D6DD76E00833F94 /* Products */,
 			);
@@ -222,6 +218,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Volumes/HD2014-02/Users/wf/Documents/workspace/edsdk4j/EDSDK/Framework",
+					"$(PROJECT_DIR)",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -237,6 +234,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Volumes/HD2014-02/Users/wf/Documents/workspace/edsdk4j/EDSDK/Framework",
+					"$(PROJECT_DIR)",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

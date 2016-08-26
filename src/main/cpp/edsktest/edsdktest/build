@@ -2,4 +2,4 @@
 # WF 2016-08-24
 root=$HOME/Documents/workspace/edsdk4j
 # compile against default Framework Location /Library/Frameworks
-g++ -I $root/EDSDK/Header -framework EDSDK -framework DPP -arch i386 edsdktest.cpp -o edsdktest
+g++ -I $root/EDSDK/Header -F .. -framework EDSDK -arch i386 edsdktest.cpp -o edsdktest

@@ -32,6 +32,7 @@ int main()
             if(count == 0)
             {
                 error = EDS_ERR_DEVICE_NOT_FOUND;
+                cout << "no camera found\n" ;
             } else {
                 cout << "# of cameras found is: " << count << "\n";
             }

@@ -1,0 +1,1 @@
+java -jar lib/jnaerator-0.12-shaded.jar src/main/jnaerator/configv34.jnaerator

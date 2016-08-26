@@ -8,6 +8,7 @@
 /lib/javadoc
 /bin/
 /target
+*.framework
 .settings
 *.DS_Store
 *.swp

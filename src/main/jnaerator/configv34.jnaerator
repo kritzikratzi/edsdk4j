@@ -1,0 +1,10 @@
+-o src/main/java
+-mode Directory
+-noMangling
+-skipLibraryInstance
+-runtime JNA
+-package edsdk.bindingsv34
+-library EdSdk
+EDSDK/Header/EDSDKErrors.h
+EDSDK/Header/EDSDKTypes.h
+EDSDK/Header/EDSDK.h

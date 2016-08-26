@@ -1,0 +1,6 @@
+#!/bin/bash
+# WF 2016-08-24
+root=$HOME/Documents/workspace/edsdk4j
+# compile against default Framework Location /Library/Frameworks
+# -F "/Applications/Canon\ Utilities/EOS\ Utility/EU2/EOS\ Utility\ 2.app/Contents/Frameworks"
+g++ -I $root/EDSDK/Header -F .. -framework EDSDK -arch x86_64 edsdktest.cpp -o edsdktest

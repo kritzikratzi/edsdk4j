@@ -86,7 +86,8 @@ public class TestEDSDK extends EDSDKBaseTest {
 		}
 		File tmpFile=File.createTempFile("TestEDSK", ".mjpeg");
 		FileOutputStream fos=new FileOutputStream(tmpFile);
-		camera.recordVideo(fos,4000);
+		// record for 1000 milliseconds (will take approx 1 sec longer due to preparation time)
+		camera.recordVideo(fos,Recorder.LIVE_VIEW_PREPARATION_TIME_MS+1000);
 		assertTrue(tmpFile.exists());
 		if (debug) {
 			System.out.println(tmpFile.getAbsolutePath());

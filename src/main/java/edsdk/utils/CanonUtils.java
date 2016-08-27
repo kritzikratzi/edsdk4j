@@ -865,6 +865,11 @@ public class CanonUtils {
         return true;
     }
 
+    /**
+     * end the live view
+     * @param camera
+     * @return true if successful
+     */
     public static boolean endLiveView( final EdsCameraRef camera ) {
         EdsError err = EdsError.EDS_ERR_OK;
 
@@ -1007,11 +1012,31 @@ public class CanonUtils {
     }
 
     /**
-     * Download a live view image from the camera and convert it directly into a bufferd image. 
+     * Download a live view image from the camera and convert it directly into a buffered image. 
      * @param camera
      * @return a live View Image
      */
-    public static BufferedImage getLiveViewImage( final EdsCameraRef camera ) {
+	public static BufferedImage getLiveViewImage(final EdsCameraRef camera) {
+		byte[] data = getLiveViewImageBuffer(camera);
+		if (data != null) {
+			try {
+				final BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+				return img;
+			} catch (final IOException e) {
+				e.printStackTrace();
+			} finally {
+
+			}
+		}
+		return null;
+	}
+    
+    /**
+     * Download a live view image from the camera and return the data
+     * @param camera
+     * @return the bytes for the live image just transmitted
+     */
+    public static byte[] getLiveViewImageBuffer( final EdsCameraRef camera ) {
         EdsError err = EdsError.EDS_ERR_OK;
 
         final EdsBaseRef.ByReference[] references = CanonUtils.getLiveViewImageReference( camera );
@@ -1064,16 +1089,8 @@ public class CanonUtils {
             }
 
             final byte[] data = ref.getValue().getByteArray( 0, length.getValue().intValue() );
-            try {
-                final BufferedImage img = ImageIO.read( new ByteArrayInputStream( data ) );
-                return img;
-            }
-            catch ( final IOException e ) {
-                e.printStackTrace();
-            }
-            finally {
-                CanonUtils.release( imageRef, streamRef );
-            }
+            CanonUtils.release( imageRef, streamRef );
+            return data;
         }
 
         return null;

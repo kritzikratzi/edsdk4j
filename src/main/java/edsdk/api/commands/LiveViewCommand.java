@@ -44,6 +44,13 @@ public class LiveViewCommand {
             setResult( CanonUtils.getLiveViewImage( camera.getEdsCamera() ) );
         }
     }
+    
+    public static class DownloadBuffer extends CanonCommand<byte[]> {
+    	 @Override
+         public void run() {
+             setResult( CanonUtils.getLiveViewImageBuffer( camera.getEdsCamera() ) );
+         }
+    }
 
     public static class IsLiveViewEnabled extends CanonCommand<Boolean> {
 

@@ -1,13 +1,10 @@
 package edsdk.api;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 /**
  * Video Recording Helper
@@ -20,8 +17,8 @@ public class Recorder extends Thread {
 	int loopCount = 0;
 	public static boolean debug = false;
 	// set the maximum possible frame Rate here
-	public static int MAX_FPS=60;
-	public static int LIVE_VIEW_PREPARATION_TIME_MS=100;
+	public static int MAX_FPS=25;
+	public static int LIVE_VIEW_PREPARATION_TIME_MS=1200;
 	public String msg;
 
 	boolean keepRunning;
@@ -60,17 +57,21 @@ public class Recorder extends Thread {
 		}
 		while (keepRunning) {
 			try {
-				final BufferedImage image = camera.downloadLiveView();
+				final byte[] imageBuffer = camera.downloadLiveViewBuffer();
 				// if wee didn't download and image
-				if (image == null) {
+				if (imageBuffer == null) {
 					// then we are going to wait a few milliSeconds - approximately have the time for a frame
 					Thread.sleep(1000/MAX_FPS/2);
 					loopCount++;
+					if (debug)
+						LOGGER.log(Level.INFO,"loop: "+loopCount);
 				} else {
-					ImageIO.write(image, "jpg", mjpegStream);
+					mjpegStream.write(imageBuffer);
 					mjpegStream.flush();
 					// count frames
 					frameCount++;
+					if (debug)
+						LOGGER.log(Level.INFO,"frame: "+frameCount);
 				}
 			} catch (InterruptedException | IOException thrown) {
 				msg="stopping recorder due to exception";
@@ -79,7 +80,7 @@ public class Recorder extends Thread {
 			}
 		}
 		if (debug) {
-			msg="Recorded "+frameCount+" frames with "+loopCount+" idle loops ";
+			msg="Recorded "+frameCount+" frames with "+loopCount+" idle loops and "+LIVE_VIEW_PREPARATION_TIME_MS+" msecs Live view preparation time";
 			LOGGER.log(Level.INFO,msg);		}
 		try {
 			mjpegStream.close();

@@ -389,6 +389,10 @@ public abstract class BaseCanonCamera implements EdsObjectEventHandler {
   public BufferedImage downloadLiveView() {
     return executeNow(new LiveViewCommand.Download());
   }
+  
+  public byte[] downloadLiveViewBuffer() {
+	  return executeNow(new LiveViewCommand.DownloadBuffer());  
+  }
 
   public LiveViewCommand.Download downloadLiveViewAsync() {
     return execute(new LiveViewCommand.Download());

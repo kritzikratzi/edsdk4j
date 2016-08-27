@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edsdk.api.CanonCamera;
+import edsdk.api.Recorder;
 import edsdk.utils.CanonConstants.EdsImageQuality;
 import edsdk.utils.CanonConstants.EdsSaveTo;
 
@@ -75,10 +76,17 @@ public class TestEDSDK extends EDSDKBaseTest {
 	}
 	
 	@Test
+	/**
+	 * rest recording Live View as MJpeg
+	 * @throws Exception
+	 */
 	public void testRecordMJPeg() throws Exception {
+		if (debug) {
+			Recorder.debug=true;
+		}
 		File tmpFile=File.createTempFile("TestEDSK", ".mjpeg");
 		FileOutputStream fos=new FileOutputStream(tmpFile);
-		camera.recordVideo(fos,2500);
+		camera.recordVideo(fos,4000);
 		assertTrue(tmpFile.exists());
 		if (debug) {
 			System.out.println(tmpFile.getAbsolutePath());

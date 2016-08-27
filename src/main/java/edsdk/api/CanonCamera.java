@@ -1,11 +1,5 @@
 package edsdk.api;
 
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import com.sun.jna.Function;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -302,36 +296,4 @@ public class CanonCamera extends BaseCanonCamera implements EdsObjectEventHandle
         return result != null && result;
     }
 
-    /**
-     * record a video from the live view 
-     * @param mjpegFile
-     * @param milliSeconds - how many milliSeconds the recording should take place
-     * @throws IOException 
-     * @throws InterruptedException 
-     */
-	public void recordVideo(FileOutputStream mjpegStream, int milliSeconds) throws IOException, InterruptedException {
-		this.beginLiveView();
-		long startTime = System.nanoTime();
-		long endTime=startTime+milliSeconds*1000000L;
-		int frameCount=0;
-		int loopCount=0;
-		// loop until timeout is reaced
-		while (System.nanoTime()<endTime) {
-			// we are going throttled speed 20 fps here
-			Thread.sleep(25);
-			final BufferedImage image = downloadLiveView();
-			// if wee didn't download and image
-			if (image==null) {
-				// then we are going to wait 10 milliSeconds
-				loopCount++;
-			} else {
-				System.out.println(++frameCount);
-				ImageIO.write(image, "jpg", mjpegStream);
-				mjpegStream.flush();
-			}
-		}
-		System.out.println(""+frameCount+"/"+loopCount);
-		mjpegStream.close();
-		this.endLiveView();
-	}
 }

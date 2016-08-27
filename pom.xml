@@ -1,8 +1,5 @@
-<!--
-	Copyright (c) 2014-2016 Canon SDK for Java project
-	for project details and license see https://github.com/kritzikratzi/edsdk4j
-
--->
+<!-- Copyright (c) 2014-2016 Canon SDK for Java project for project details 
+	and license see https://github.com/kritzikratzi/edsdk4j -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -62,15 +59,13 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>${jna.version}</version>
-			<!-- <scope>system</scope>
-				<systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> -->
+			<!-- <scope>system</scope> <systemPath>${project.basedir}/lib/jna-${jna.version}.jar</systemPath> -->
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
 			<version>${jna.version}</version>
-			<!-- <scope>system</scope>
-				<systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath> -->
+			<!-- <scope>system</scope> <systemPath>${project.basedir}/lib/jna-platform-${jna.version}.jar</systemPath> -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -125,24 +120,18 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
-				  <includes>
-				    <include>**/*Test*.java</include>
-				  </includes>
+					<includes>
+						<include>**/*Test*.java</include>
+					</includes>
 					<excludes>
-						<exclude>**/*TestSuite.java</exclude> 
+						<exclude>**/*TestSuite.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
-				<!--
-					see
-					http://central.sonatype.org/pages/apache-maven.html
-
-					Javadoc and Sources Attachments
-					To get Javadoc and Source jar files generated, you have to configure
-					the
-					javadoc and source Maven plugins.
-				-->
+				<!-- see http://central.sonatype.org/pages/apache-maven.html Javadoc 
+					and Sources Attachments To get Javadoc and Source jar files generated, you 
+					have to configure the javadoc and source Maven plugins. -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.2.1</version>
@@ -168,11 +157,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--
-				GPG Signed Components
-				The Maven GPG plugin is used to sign the components with the following
-				configuration.
-			-->
+			<!-- GPG Signed Components The Maven GPG plugin is used to sign the components 
+				with the following configuration. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
@@ -207,6 +193,18 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<!-- http://code.mycila.com/license-maven-plugin/ -->
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.9.0</version>
+				<configuration>
+					<header>src/etc/header.txt</header>
+					<includes>
+						<include>src/**/*.java</include>
+					</includes>
+				</configuration>
+			</plugin>
 		</plugins>
 		<extensions>
 			<extension>
@@ -222,18 +220,11 @@
 			<build>
 				<plugins>
 
-					<!--
-						according to :
-
-						http://central.sonatype.org/pages/apache-maven.html
-
-						Nexus Staging Maven Plugin for Deployment and Release
-
-						The Nexus Staging Maven Plugin is the recommended way to deploy your
-						components
-						to OSSRH and release them to the Central Repository.
-						To configure it simply add the plugin to your Maven pom.xml.
-					-->
+					<!-- according to : http://central.sonatype.org/pages/apache-maven.html 
+						Nexus Staging Maven Plugin for Deployment and Release The Nexus Staging Maven 
+						Plugin is the recommended way to deploy your components to OSSRH and release 
+						them to the Central Repository. To configure it simply add the plugin to 
+						your Maven pom.xml. -->
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -262,11 +253,8 @@
 				</plugins>
 			</build>
 		</profile>
-		<!--
-			Work around Oracle's (IMHO silly) decision to make doclint default.
-			http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html
-			http://stackoverflow.com/questions/15886209/maven-is-not-working-in-java-8-when-javadoc-tags-are-incomplete
-		-->
+		<!-- Work around Oracle's (IMHO silly) decision to make doclint default. 
+			http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html http://stackoverflow.com/questions/15886209/maven-is-not-working-in-java-8-when-javadoc-tags-are-incomplete -->
 		<profile>
 			<id>doclint-java8-disable</id>
 			<activation>

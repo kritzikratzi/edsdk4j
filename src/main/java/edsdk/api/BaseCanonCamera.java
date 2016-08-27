@@ -2,6 +2,7 @@ package edsdk.api;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -1329,5 +1330,25 @@ public abstract class BaseCanonCamera implements EdsObjectEventHandler {
       final EdsAEMode value) {
     return execute(new SetPropertyCommand.ShootingMode(value));
   }
+  
+  /**
+   * record a video from the live view 
+   * @param mjpegFile
+   * @param milliSeconds - how many milliSeconds the recording should take place
+   * @throws Exception 
+   */
+	public void recordVideo(OutputStream mjpegStream, int milliSeconds) throws Exception {
+		Recorder recorder=new Recorder(this,mjpegStream);
+		long startTime = System.nanoTime();
+		long endTime=startTime+milliSeconds*1000000L;
+		recorder.start();
+		// wait loop until timeout is reached
+		while (System.nanoTime()<endTime) {
+			Thread.sleep(1);
+		}
+		// halt the recorder
+		recorder.stopRunning();
+	}
+
 
 }

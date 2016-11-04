@@ -113,8 +113,8 @@ public class DLL_Setup {
       libName=libName.toUpperCase();
       result.hint= libName+" DLL";
       if (arch != null && arch.endsWith("64")) {
-        // e.g. EDSDK_64/EDSDK.dll
-        result.dllLoc = libName+"_64/"+libName+".dll";
+        // e.g. EDSDK_64/Dll/EDSDK.dll
+        result.dllLoc = libName+"_64/Dll/"+libName+".dll";
       } else {
         // e.g. EDSDK/Dll/EDSDK.dll
         result.dllLoc = libName+"/Dll/"+libName+".dll";

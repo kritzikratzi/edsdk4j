@@ -49,7 +49,7 @@
 		<!-- previous versions: 3.4.2, 3.5.0, 3.5.1 ... see https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
 		<!-- <jna.version>3.4.2</jna.version> -->
 		<jna.version>4.2.2</jna.version>
-		<junit4.version>4.11</junit4.version>
+		<junit4.version>4.13.1</junit4.version>
 		<jnaerator.version>0.12</jnaerator.version>
 		<imgscalr.version>4.2</imgscalr.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

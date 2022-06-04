@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>com.profesorfalken</groupId>
 			<artifactId>jPowerShell</artifactId>
-			<version>1.5.1</version>
+			<version>3.1.1</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->

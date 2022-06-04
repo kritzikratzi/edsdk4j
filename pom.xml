@@ -178,7 +178,7 @@
 			<plugin>
 				<groupId>com.github.github</groupId>
 				<artifactId>site-maven-plugin</artifactId>
-				<version>0.10</version>
+				<version>0.12</version>
 				<configuration>
 					<message>Creating site for ${project.version}</message>
 					<repositoryName>edsdk4j</repositoryName>      <!-- github repo name -->

@@ -48,7 +48,7 @@
 	<properties>
 		<!-- previous versions: 3.4.2, 3.5.0, 3.5.1 ... see https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
 		<!-- <jna.version>3.4.2</jna.version> -->
-		<jna.version>4.2.2</jna.version>
+		<jna.version>5.13.0</jna.version>
 		<junit4.version>4.13.2</junit4.version>
 		<jnaerator.version>0.12</jnaerator.version>
 		<imgscalr.version>4.2</imgscalr.version>
